@@ -1,0 +1,62 @@
+---
+import "@fontsource-variable/playfair-display/wght.css";
+import "@fontsource/be-vietnam-pro/400.css";
+import "@fontsource/be-vietnam-pro/500.css";
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
+import LanguageSwitcher from "../components/LanguageSwitcher.astro";
+import CursorEffects from "../components/CursorEffects.astro";
+import { getLang, homePath, languages, useTranslations, type Lang } from "../i18n/ui";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Đường dẫn của trang này ở từng ngôn ngữ. Mặc định trỏ về trang chủ. */
+  alternates?: Partial<Record<Lang, string>>;
+  /** Tắt nút đổi ngôn ngữ cố định khi trang tự đặt nó ở chỗ khác. */
+  floatingLangSwitcher?: boolean;
+}
+
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+
+const {
+  title = t("site.name"),
+  description = t("site.description"),
+  alternates = {},
+  floatingLangSwitcher = true,
+} = Astro.props;
+
+const links = Object.fromEntries(
+  (Object.keys(languages) as Lang[]).map((l) => [l, alternates[l] ?? homePath[l]]),
+) as Record<Lang, string>;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    {
+      Object.entries(links).map(([l, href]) => (
+        <link rel="alternate" hreflang={l} href={new URL(href, Astro.url)} />
+      ))
+    }
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+  <body class="bg-ink font-sans text-paper antialiased">
+    {floatingLangSwitcher && <LanguageSwitcher lang={lang} links={links} />}
+    <slot />
+    <CursorEffects />
+    <script>
+      document.addEventListener("astro:after-swap", () => {
+        document.documentElement.classList.add("navigated");
+      });
+    </script>
+  </body>
+</html>

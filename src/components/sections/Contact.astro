@@ -1,0 +1,38 @@
+---
+import SectionPage from "../../layouts/SectionPage.astro";
+import ContactIcon, { type IconName } from "../ContactIcon.astro";
+import { getLang, useTranslations } from "../../i18n/ui";
+import { cvUrl, email, socials } from "../../data/profile";
+
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+
+const links: { label: string; icon: IconName; value: string; href: string }[] = [
+  { label: t("contact.email"), icon: "email", value: email, href: `mailto:${email}` },
+  ...socials.map((s) => ({ label: s.label, icon: s.icon, value: s.href.replace(/^https?:\/\/(www\.)?/, ""), href: s.href })),
+  { label: t("nav.cv"), icon: "cv", value: cvUrl.replace(/^https?:\/\//, ""), href: cvUrl },
+];
+---
+
+<SectionPage section="contact" title={t("contact.title")} lead={t("contact.lead")}>
+  <ul class="not-prose divide-y divide-paper/15 overflow-hidden rounded-2xl border border-paper/20 bg-ink/40 backdrop-blur-md">
+    {
+      links.map((l) => (
+        <li>
+          <a
+            href={l.href}
+            target={l.href.startsWith("http") || l.href.endsWith(".pdf") ? "_blank" : undefined}
+            rel="noopener"
+            class="flex items-center justify-between gap-4 px-5 py-4 glow-text-hover hover:bg-paper/5 hover:text-rice focus-visible:outline-2 focus-visible:outline-rice"
+          >
+            <span class="flex items-center gap-3 font-medium">
+              <ContactIcon name={l.icon} class="size-5 shrink-0 text-rice" />
+              {l.label}
+            </span>
+            <span class="truncate text-paper/70">{l.value}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</SectionPage>

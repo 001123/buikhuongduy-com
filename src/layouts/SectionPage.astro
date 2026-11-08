@@ -1,0 +1,46 @@
+---
+import Layout from "./Layout.astro";
+import Background from "../components/Background.astro";
+import LanguageSwitcher from "../components/LanguageSwitcher.astro";
+import { contentAnim } from "../components/transitions";
+import { getLang, homePath, sectionPaths, useTranslations, type Section } from "../i18n/ui";
+
+interface Props {
+  section: Section;
+  title: string;
+  lead: string;
+}
+
+const { section, title, lead } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+---
+
+<Layout title={`${title} · ${t("site.name")}`} description={lead} alternates={sectionPaths[section]} floatingLangSwitcher={false}>
+  <main class="relative isolate min-h-dvh px-4 py-10 sm:px-6 sm:py-16">
+    <Background dim />
+
+    <article class="mx-auto max-w-[51rem] rounded-3xl border border-paper/15 bg-ink/60 px-6 pt-7 pb-10 shadow-2xl shadow-ink/50 sm:px-12 sm:pt-9 sm:pb-14" transition:name={`content-${section}`} transition:animate={contentAnim}>
+      <div class="mb-7 flex items-center justify-between gap-3 sm:mb-9">
+        <a
+          href={homePath[lang]}
+          class="inline-flex items-center gap-1.5 rounded-full border border-paper/40 bg-ink/40 px-3 py-1.5 text-sm font-medium text-paper shadow-lg shadow-ink/30 backdrop-blur-md glow-hover hover:border-rice hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
+            <path d="M15 18l-6-6 6-6"></path>
+          </svg>
+          {t("nav.home")}
+        </a>
+        <LanguageSwitcher lang={lang} links={sectionPaths[section]} class="" />
+      </div>
+      <header class="mb-10 flex flex-col items-start gap-4">
+        <h1 class="font-serif text-[clamp(2rem,8vw,3.5rem)] font-semibold tracking-wide text-paper">{title}</h1>
+        <span aria-hidden="true" class="h-px w-24 bg-linear-to-r from-rice to-transparent sm:w-40"></span>
+        <p class="text-lg text-paper/80">{lead}</p>
+      </header>
+      <div class="prose prose-invert max-w-none prose-headings:font-serif prose-headings:text-paper prose-a:text-rice prose-a:glow-text-hover prose-strong:text-paper">
+        <slot />
+      </div>
+    </article>
+  </main>
+</Layout>

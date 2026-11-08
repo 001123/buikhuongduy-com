@@ -1,0 +1,178 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-serif: "Playfair Display Variable", ui-serif, Georgia, serif;
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #2b1d12;
+  --color-wood: #4a2f1c;
+  --color-paper: #f6ecd9;
+  --color-rice: #d9b54a;
+  --color-lotus: #e9a3b4;
+}
+
+@theme {
+  --animate-fade-up: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* ---------- Text glow ---------- */
+/* Quầng tối mềm phía sau giúp tách chữ khỏi ảnh nền, thêm ánh sáng ấm nhẹ quanh chữ. */
+@utility text-glow {
+  text-shadow:
+    0 0 24px rgb(246 236 217 / 0.28),
+    0 0 6px rgb(246 236 217 / 0.18),
+    0 2px 16px rgb(43 29 18 / 0.65);
+}
+
+@utility text-glow-soft {
+  text-shadow:
+    0 1px 2px rgb(43 29 18 / 0.6),
+    0 0 12px rgb(43 29 18 / 0.5);
+}
+
+/* Nút phát sáng nhẹ màu vàng lúa khi hover/focus. */
+@utility glow-hover {
+  transition-property: color, background-color, border-color, box-shadow, text-shadow, translate, scale;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+
+  @media (hover: hover) {
+    &:hover {
+      box-shadow:
+        0 0 0 1px rgb(217 181 74 / 0.2),
+        0 0 18px rgb(217 181 74 / 0.3),
+        0 8px 24px rgb(43 29 18 / 0.35);
+      text-shadow: 0 0 10px rgb(217 181 74 / 0.45);
+    }
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 18px rgb(217 181 74 / 0.3);
+  }
+}
+
+/* Chỉ chữ phát sáng — cho link dạng dòng/chữ nằm trong khung (không dùng box-shadow). */
+@utility glow-text-hover {
+  transition-property: color, background-color, text-shadow;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+
+  @media (hover: hover) {
+    &:hover {
+      text-shadow: 0 0 10px rgb(217 181 74 / 0.55);
+    }
+  }
+
+  &:focus-visible {
+    text-shadow: 0 0 10px rgb(217 181 74 / 0.55);
+  }
+}
+
+/* ---------- View transitions ---------- */
+
+@keyframes content-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+    filter: blur(2px);
+  }
+}
+
+@keyframes content-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(3px);
+  }
+}
+
+@keyframes content-out-back {
+  to {
+    opacity: 0;
+    transform: translateY(4px);
+    filter: blur(2px);
+  }
+}
+
+@keyframes content-in-back {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+    filter: blur(3px);
+  }
+}
+
+/* Lớp phủ nền chuyển độ tối chậm và êm hơn nội dung. */
+::view-transition-old(home-overlay),
+::view-transition-new(home-overlay) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* Viên nền của ngôn ngữ đang chọn trượt sang vị trí mới. */
+::view-transition-group(lang-pill) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Chữ VI/EN không hoà màu chéo khi viên nền đang trượt (tránh chữ trắng đè lên nền sáng):
+   chữ cũ tắt nhanh, chữ mới chỉ hiện khi viên nền đã gần tới nơi. */
+/* Trình duyệt xếp lớp theo thứ tự DOM của trang cũ, nên chữ có thể nằm dưới viên nền — luôn đưa chữ lên trên. */
+::view-transition-group(lang-label-vi),
+::view-transition-group(lang-label-en) {
+  z-index: 1;
+}
+
+::view-transition-old(lang-label-vi),
+::view-transition-old(lang-label-en) {
+  animation: lang-label-out 0.08s ease-out both;
+}
+
+::view-transition-new(lang-label-vi),
+::view-transition-new(lang-label-en) {
+  /* Không fade: chữ tối mờ dần trên nền sáng trông như chữ trắng/xám rồi mới đậm lại. */
+  animation: lang-label-in 0.2s step-end both;
+}
+
+@keyframes lang-label-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes lang-label-in {
+  from {
+    opacity: 0;
+  }
+}
+
+::view-transition-group(*) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* Sau lần điều hướng đầu, hiệu ứng intro (fade-up) nhường chỗ cho view transition. */
+html.navigated [class*="animate-fade-up"] {
+  animation: none;
+}

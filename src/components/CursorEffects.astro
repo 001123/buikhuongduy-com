@@ -1,0 +1,52 @@
+---
+// Hiệu ứng gợn sóng tinh tế khi click/chạm. Tự tắt khi người dùng bật "giảm chuyển động".
+---
+
+<style is:global>
+  .click-ripple {
+    position: fixed;
+    z-index: 100;
+    width: 48px;
+    height: 48px;
+    margin: -24px 0 0 -24px;
+    border: 1.5px solid var(--color-rice);
+    box-shadow:
+      0 0 12px color-mix(in oklab, var(--color-rice) 60%, transparent),
+      inset 0 0 8px color-mix(in oklab, var(--color-rice) 40%, transparent);
+    border-radius: 9999px;
+    pointer-events: none;
+    animation: click-ripple 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes click-ripple {
+    from {
+      transform: scale(0.2);
+      opacity: 1;
+    }
+    to {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .click-ripple {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  window.addEventListener("pointerdown", (e) => {
+    if (reduceMotion.matches) return;
+    const ripple = document.createElement("span");
+    ripple.className = "click-ripple";
+    ripple.setAttribute("aria-hidden", "true");
+    ripple.style.left = `${e.clientX}px`;
+    ripple.style.top = `${e.clientY}px`;
+    ripple.addEventListener("animationend", () => ripple.remove(), { once: true });
+    document.body.append(ripple);
+  }, { passive: true });
+</script>

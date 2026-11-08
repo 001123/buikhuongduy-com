@@ -1,0 +1,135 @@
+---
+import SectionPage from "../../layouts/SectionPage.astro";
+import { getLang, useTranslations } from "../../i18n/ui";
+import { cvUrl } from "../../data/profile";
+
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+
+const skills = [
+  "AI Agents, Skills, MCP",
+  "React / Next.js",
+  "JavaScript / TypeScript",
+  "CSS, SCSS, Tailwind",
+  "Vitest, Playwright, agent-browser",
+  "Webpack, Vite",
+  "Vue / Nuxt",
+  "Node.js, Bun",
+  "AWS, GCP, Cloudflare, GitOps",
+  "SQL, NoSQL",
+  "UI/UX",
+];
+
+const content = {
+  vi: {
+    intro: [
+      "Xin chào, mình là Duy (Timi), Frontend Lead theo hướng AI-native với hơn 9 năm kinh nghiệm xây dựng sản phẩm web và mobile lưu lượng lớn bằng React, Next.js, Vue và TypeScript.",
+      "Mình từng dẫn dắt đội 10 lập trình viên, thiết kế nền tảng multi-tenant phục vụ hàng triệu lượt truy cập mỗi tháng, và làm sản phẩm từ nền tảng bảo hiểm hơn 2 triệu khách hàng đến các trang sức khoẻ hơn 30 triệu lượt xem mỗi tháng. Mình đưa AI vào cả sản phẩm lẫn cách đội làm việc, từ công cụ nội bộ dùng LLM đến quy trình Claude Code cho cả team.",
+      "Hiện mình điều hành KD Labs, nơi mình làm các công cụ mã nguồn mở cho lập trình viên như KD Code, một extension VS Code điều phối nhiều coding agent cùng lúc.",
+    ],
+    jobs: [
+      { period: "08/2026 — nay", role: "Founder", org: "KD Labs", note: "Xây KD Code và Simple OTP, hai sản phẩm mã nguồn mở (MIT), và viết nghiên cứu về AI agent, bảo mật mobile, mật mã học trên kd.io.vn." },
+      { period: "04/2025 — 08/2026", role: "Front-End Lead", org: "AFD", note: "Dẫn dắt đội frontend 10 người, xây nền tảng multi-tenant trên Contentful phục vụ hàng triệu lượt truy cập mỗi tháng, làm AI Content Engine nội bộ và đưa quy trình AI-native thành chuẩn của team." },
+      { period: "08/2021 — 04/2025", role: "Frontend Web Developer", org: "10X / Saladin", note: "Xây Saladin, nền tảng bảo hiểm một cửa đạt hơn 2 triệu khách hàng; dựng design system từ đầu và tích hợp MoMo, ZaloPay, Payoo, OnePay, Viettel Money." },
+      { period: "01/2020 — 05/2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Chuyển 9 trang sức khoẻ (HelloBacsi, HelloSehat) từ WordPress sang Next.js trong 2 tháng, giảm thời gian tải từ 4–5 giây xuống dưới 2 giây." },
+      { period: "08/2018 — 10/2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Ra mắt 2 ứng dụng mobile cho khách hàng doanh nghiệp, một app đạt hơn 10 triệu lượt tải." },
+      { period: "10/2017 — 08/2018", role: "Junior Web Developer", org: "Maple Studio", note: "Làm hơn 10 theme WordPress, Shopify, Haravan, tất cả đúng tiến độ." },
+    ],
+    projects: [
+      { name: "KD Code", summary: "Extension VS Code mã nguồn mở để chat và điều phối nhiều coding agent (Claude, Codex, OpenCode) qua Agent Client Protocol, có so sánh Best-of-N trên Git worktree riêng.", tags: ["TypeScript", "VS Code API", "ACP"], href: "https://marketplace.visualstudio.com/items?itemName=kd-labs.kd-code" },
+      { name: "Simple OTP", summary: "Ứng dụng 2FA mã nguồn mở, không kết nối mạng, cho iOS và Android. Mã hoá bằng AES-256-GCM trong Keychain/Keystore, hỗ trợ TOTP/HOTP và quét QR.", tags: ["iOS", "Android", "AES-256-GCM"], href: "https://github.com/kd-labs-io/simple-otp" },
+      { name: "Blog kd.io.vn", summary: "Blog kỹ thuật về hệ thống AI-native, điều phối multi-agent, bảo mật mobile và mật mã học.", tags: ["Astro", "AI", "Security"], href: "https://kd.io.vn" },
+      { name: "Onbai Online", summary: "Web app thời gian thực để cùng bạn bè luyện kiến thức trực tuyến.", tags: ["Realtime", "Web"], href: "https://github.com/onbai-oss" },
+    ],
+    languages: "Tiếng Việt (bản ngữ) · Tiếng Anh (giao tiếp công việc)",
+  },
+  en: {
+    intro: [
+      "Hi, I'm Duy (Timi), an AI-native Frontend Lead with 9+ years of experience building high-traffic web and mobile products with React, Next.js, Vue and TypeScript.",
+      "I've led a team of 10 developers, architected multi-tenant platforms serving millions of monthly visits, and shipped products ranging from a 2M+ customer insurance platform to healthcare sites with 30M+ monthly views. I build AI into both products and the way teams work, from LLM-powered internal tools to Claude Code workflows across the team.",
+      "I also run KD Labs, where I build open-source developer tools like KD Code, a VS Code extension that orchestrates multiple coding agents.",
+    ],
+    jobs: [
+      { period: "Aug 2026 — now", role: "Founder", org: "KD Labs", note: "Building KD Code and Simple OTP, two open-source (MIT) products, and publishing research on AI agents, mobile security and cryptography at kd.io.vn." },
+      { period: "Apr 2025 — Aug 2026", role: "Front-End Lead", org: "AFD", note: "Led a frontend team of 10, built a multi-tenant Contentful platform serving millions of monthly visits, shipped an internal AI Content Engine and made AI-native development the team standard." },
+      { period: "Aug 2021 — Apr 2025", role: "Frontend Web Developer", org: "10X / Saladin", note: "Built Saladin, a one-stop insurance platform that grew to 2M+ customers; designed the design system from scratch and integrated MoMo, ZaloPay, Payoo, OnePay and Viettel Money." },
+      { period: "Jan 2020 — May 2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Migrated 9 healthcare sites (HelloBacsi, HelloSehat) from WordPress to Next.js in 2 months, cutting load time from 4–5s to under 2s." },
+      { period: "Aug 2018 — Oct 2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Shipped 2 mobile apps for enterprise clients, one with 10M+ downloads." },
+      { period: "Oct 2017 — Aug 2018", role: "Junior Web Developer", org: "Maple Studio", note: "Delivered 10+ WordPress, Shopify and Haravan themes, all on schedule." },
+    ],
+    projects: [
+      { name: "KD Code", summary: "Open-source VS Code extension to chat with and orchestrate coding agents (Claude, Codex, OpenCode) over the Agent Client Protocol, with Best-of-N comparison in isolated Git worktrees.", tags: ["TypeScript", "VS Code API", "ACP"], href: "https://marketplace.visualstudio.com/items?itemName=kd-labs.kd-code" },
+      { name: "Simple OTP", summary: "Open-source, zero-network 2FA app for iOS and Android. Secrets are encrypted with AES-256-GCM in Keychain/Keystore, with TOTP/HOTP and QR import.", tags: ["iOS", "Android", "AES-256-GCM"], href: "https://github.com/kd-labs-io/simple-otp" },
+      { name: "kd.io.vn blog", summary: "Technical writing on AI-native systems, multi-agent orchestration, mobile security and cryptography.", tags: ["Astro", "AI", "Security"], href: "https://kd.io.vn" },
+      { name: "Onbai Online", summary: "Realtime web app for practicing knowledge online with friends.", tags: ["Realtime", "Web"], href: "https://github.com/onbai-oss" },
+    ],
+    languages: "Vietnamese (native) · English (working proficiency)",
+  },
+}[lang];
+---
+
+<SectionPage section="about" title={t("about.title")} lead={t("about.lead")}>
+  {content.intro.map((p) => <p>{p}</p>)}
+
+  <h2>{t("about.experience")}</h2>
+  <ol class="not-prose space-y-6 border-l border-rice/40 pl-6">
+    {
+      content.jobs.map((job) => (
+        <li class="relative">
+          <span aria-hidden="true" class="absolute top-2 -left-[1.82rem] size-2.5 rounded-full bg-rice"></span>
+          <p class="text-sm text-rice">{job.period}</p>
+          <p class="font-medium text-paper">
+            {job.role} · <span class="text-paper/80">{job.org}</span>
+          </p>
+          <p class="text-paper/70">{job.note}</p>
+        </li>
+      ))
+    }
+  </ol>
+
+  <h2>{t("projects.title")}</h2>
+  <div class="not-prose grid gap-4 sm:grid-cols-2">
+    {
+      content.projects.map((p) => (
+        <a
+          href={p.href}
+          target="_blank"
+          rel="noopener"
+          class="group flex flex-col gap-3 rounded-2xl border border-paper/20 bg-ink/40 p-5 backdrop-blur-md glow-hover hover:-translate-y-0.5 hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+        >
+          <h3 class="font-serif text-xl font-semibold text-paper group-hover:text-rice">{p.name}</h3>
+          <p class="text-paper/75">{p.summary}</p>
+          <ul class="mt-auto flex flex-wrap gap-2">
+            {p.tags.map((tag) => (
+              <li class="rounded-full border border-rice/40 px-2.5 py-0.5 text-xs text-rice">{tag}</li>
+            ))}
+          </ul>
+        </a>
+      ))
+    }
+  </div>
+
+  <h2>{t("projects.skills")}</h2>
+  <ul class="not-prose flex flex-wrap gap-2">
+    {skills.map((s) => <li class="rounded-full border border-paper/30 bg-ink/40 px-3 py-1 text-sm text-paper">{s}</li>)}
+  </ul>
+
+  <h2>{t("about.languages")}</h2>
+  <p>{content.languages}</p>
+
+  <p class="not-prose mt-12">
+    <a
+      href={cvUrl}
+      target="_blank"
+      rel="noopener"
+      class="inline-flex items-center gap-2 rounded-full border border-rice/80 bg-rice/15 px-5 py-2.5 font-medium text-rice glow-hover hover:bg-rice hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+    >
+      {t("cv.download")}
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
+        <path d="M12 4v11"></path>
+        <path d="m7 10 5 5 5-5"></path>
+        <path d="M5 20h14"></path>
+      </svg>
+    </a>
+  </p>
+</SectionPage>

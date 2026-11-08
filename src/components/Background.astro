@@ -1,0 +1,34 @@
+---
+import { Picture } from "astro:assets";
+import bgHome from "../assets/bg-home.webp";
+
+interface Props {
+  /** Phủ tối hơn cho các trang nội dung để chữ dễ đọc. */
+  dim?: boolean;
+}
+
+const { dim = false } = Astro.props;
+---
+
+<div class="fixed inset-0 -z-20" transition:name="home-bg" transition:animate="none">
+  <Picture
+    src={bgHome}
+    alt=""
+    formats={["avif", "webp"]}
+    fallbackFormat="webp"
+    widths={[640, 960, 1280, bgHome.width]}
+    sizes="100vw"
+    loading="eager"
+    fetchpriority="high"
+    pictureAttributes={{ class: "block h-full w-full" }}
+    class="h-full w-full object-cover object-[55%_center]"
+  />
+</div>
+<div
+  aria-hidden="true"
+  transition:name="home-overlay"
+  class:list={[
+    "fixed inset-0 -z-10",
+    dim ? "bg-ink/75" : "bg-linear-to-b from-ink/60 via-ink/10 via-45% to-transparent",
+  ]}
+></div>

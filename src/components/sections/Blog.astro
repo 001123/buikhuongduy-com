@@ -1,0 +1,11 @@
+---
+import SectionPage from "../../layouts/SectionPage.astro";
+import { getLang, useTranslations } from "../../i18n/ui";
+
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+---
+
+<SectionPage section="blog" title={t("blog.title")} lead={t("blog.lead")}>
+  <p class="text-paper/70 italic">{t("blog.empty")}</p>
+</SectionPage>
