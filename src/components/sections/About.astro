@@ -74,6 +74,19 @@ const content = {
     languages: "Vietnamese (native) · English (working proficiency)",
   },
 }[lang];
+
+// Same format as job periods: "11/2026" (vi), "Nov 2026" (en).
+// Rendered at build time, then refreshed in the browser so the static page never shows a stale month.
+function formatMonth(date: Date, l: string) {
+  return l === "vi"
+    ? `${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`
+    : date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+const now = new Date();
+const buildMonth = {
+  label: formatMonth(now, lang),
+  iso: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`,
+};
 ---
 
 <SectionPage section="about" title={t("about.title")} lead={t("about.lead")}>
@@ -114,19 +127,22 @@ const content = {
         ),
       )
     }
-    <p>
-      <span aria-hidden="true" class="mr-2 inline-flex h-[1lh] items-center align-top">
-        <span class="relative flex size-2">
-          <span class="absolute inset-0 rounded-full bg-rice motion-safe:animate-ping motion-safe:[animation-duration:2.4s]"></span>
-          <span class="relative size-2 rounded-full bg-rice shadow-[0_0_8px_rgb(217_181_74/0.9)]"></span>
-        </span>
-      </span>
-      {t("about.hire")} <a href={sectionPaths.contact[lang]} class="no-underline hover:underline">{t("about.hireLink")} →</a>
-    </p>
   </div>
 
   <h2>{t("about.experience")}</h2>
   <ol class="not-prose space-y-6 border-l border-rice/40 pl-6">
+    <li class="relative">
+      <span aria-hidden="true" class="absolute top-2 -left-[1.82rem] flex size-2.5">
+        <span class="absolute inset-0 rounded-full bg-rice motion-safe:animate-ping motion-safe:[animation-duration:2.4s]"></span>
+        <span class="relative size-2.5 rounded-full bg-rice shadow-[0_0_8px_rgb(217_181_74/0.9)]"></span>
+      </span>
+      <p class="text-sm text-rice">
+        <time data-current-month data-lang={lang} datetime={buildMonth.iso}>{buildMonth.label}</time>
+      </p>
+      <p class="font-medium text-paper">
+        {t("about.hire")} <a href={sectionPaths.contact[lang]} class="text-rice no-underline hover:underline">{t("about.hireLink")} →</a>
+      </p>
+    </li>
     {
       content.jobs.map((job) => (
         <li class="relative">
@@ -187,3 +203,19 @@ const content = {
     </a>
   </p>
 </SectionPage>
+
+<script>
+  function refreshCurrentMonth() {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    document.querySelectorAll<HTMLTimeElement>("time[data-current-month]").forEach((el) => {
+      el.dateTime = `${now.getFullYear()}-${month}`;
+      el.textContent =
+        el.dataset.lang === "vi"
+          ? `${month}/${now.getFullYear()}`
+          : now.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+    });
+  }
+  refreshCurrentMonth();
+  document.addEventListener("astro:page-load", refreshCurrentMonth);
+</script>
