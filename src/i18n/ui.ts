@@ -26,7 +26,7 @@ export const ui = {
     "about.experience": "Kinh nghiệm",
     "about.languages": "Ngôn ngữ",
 
-    "projects.title": "Dự án",
+    "projects.title": "Dự án cá nhân",
     "cv.download": "Xem CV đầy đủ",
     "projects.skills": "Kỹ năng",
 
@@ -55,7 +55,7 @@ export const ui = {
     "about.experience": "Experience",
     "about.languages": "Languages",
 
-    "projects.title": "Projects",
+    "projects.title": "Personal Projects",
     "cv.download": "View full résumé",
     "projects.skills": "Skills",
 
