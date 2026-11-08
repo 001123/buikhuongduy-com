@@ -17,7 +17,7 @@ const t = useTranslations(lang);
   transition:name="lang-switcher"
   transition:animate="none"
   class:list={[
-    "flex items-center gap-1 rounded-full border border-paper/40 bg-ink/40 p-1 pl-3 text-sm font-medium text-paper shadow-lg shadow-ink/30 backdrop-blur-md",
+    "flex items-center gap-1 rounded-full border border-paper/40 bg-ink p-1 pl-3 text-sm font-medium text-paper shadow-lg shadow-ink/30",
     className,
   ]}
 >
@@ -42,7 +42,7 @@ const t = useTranslations(lang);
           <span
             aria-hidden="true"
             transition:name="lang-pill"
-            class="absolute inset-0 rounded-full bg-paper/90"
+            class="absolute inset-0 rounded-full bg-paper"
           ></span>
           <span class="relative" transition:name={`lang-label-${l}`}>{l}</span>
         </span>
