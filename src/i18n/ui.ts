@@ -26,9 +26,11 @@ export const ui = {
     "hero.status": "Sẵn sàng cho cơ hội mới",
 
     "about.title": "Giới Thiệu",
-    "about.lead": "Đôi lời về mình, những gì mình làm và con đường đã đi qua.",
+    "about.lead": "Đôi lời về mình, công việc và con đường đã đi qua.",
     "about.experience": "Kinh nghiệm",
     "about.languages": "Ngôn ngữ",
+    "about.hire": "Hiện mình đang tìm kiếm cơ hội mới.",
+    "about.hireLink": "Bấm để kết nối",
 
     "projects.title": "Dự án cá nhân",
     "cv.download": "Xem CV đầy đủ",
@@ -39,7 +41,7 @@ export const ui = {
     "blog.empty": "Bài viết đầu tiên đang được chuẩn bị.",
 
     "contact.title": "Kết Nối",
-    "contact.lead": "Mình đang sẵn sàng cho công việc mới, đặc biệt là vai trò Frontend Lead hoặc AI\u2060-\u2060native engineering. Nếu đội của bạn đang tìm người, hãy kết nối với mình nhé!",
+    "contact.lead": "Duy đang sẵn sàng cho công việc mới, đặc biệt là vai trò Frontend Lead hoặc AI\u2060-\u2060native engineering. Nếu đội của bạn đang tìm người, hãy kết nối với Duy nhé!",
     "contact.email": "Email",
   },
   en: {
@@ -62,6 +64,8 @@ export const ui = {
     "about.lead": "A little about me, what I do and the path that led here.",
     "about.experience": "Experience",
     "about.languages": "Languages",
+    "about.hire": "I'm currently open to new opportunities.",
+    "about.hireLink": "Get in touch",
 
     "projects.title": "Personal Projects",
     "cv.download": "View full résumé",

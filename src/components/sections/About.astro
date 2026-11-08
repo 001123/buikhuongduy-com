@@ -1,6 +1,8 @@
 ---
 import SectionPage from "../../layouts/SectionPage.astro";
-import { getLang, useTranslations } from "../../i18n/ui";
+import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
+import { Image } from "astro:assets";
+import avatar from "../../assets/avatar_cv.webp";
 import { cvUrl } from "../../data/profile";
 
 const lang = getLang(Astro.currentLocale);
@@ -22,15 +24,17 @@ const skills = [
 
 const content = {
   vi: {
+    avatarAlt: "Ảnh chân dung Bùi Khương Duy",
     intro: [
       "Xin chào, mình là Duy (Timi), Frontend Lead theo hướng AI-native với hơn 9 năm kinh nghiệm xây dựng sản phẩm web và mobile lưu lượng lớn bằng React, Next.js, Vue và TypeScript.",
       "Mình từng dẫn dắt đội 10 lập trình viên, thiết kế nền tảng multi-tenant phục vụ hàng triệu lượt truy cập mỗi tháng, và làm sản phẩm từ nền tảng bảo hiểm hơn 2 triệu khách hàng đến các trang sức khoẻ hơn 30 triệu lượt xem mỗi tháng. Mình đưa AI vào cả sản phẩm lẫn cách đội làm việc, từ công cụ nội bộ dùng LLM đến quy trình Claude Code cho cả team.",
-      "Hiện mình điều hành KD Labs, nơi mình làm các công cụ mã nguồn mở cho lập trình viên như KD Code, một extension VS Code điều phối nhiều coding agent cùng lúc.",
+      "Hiện mình điều hành KD Labs, nơi phát triển các công cụ mã nguồn mở cho lập trình viên như KD Code, một extension VS Code điều phối nhiều coding agent cùng lúc.",
+      "Suốt chặng đường đó, trải qua nhiều dự án, nhiều đội nhóm và cả những lúc vấp ngã, mình vẫn luôn cố gắng học hỏi và tối ưu từng ngày. Mình biết ơn tất cả những người đã giúp đỡ, đồng hành và chỉ dạy, cùng những bài học từ cuộc sống đã giúp mình trưởng thành như hôm nay.",
     ],
     jobs: [
-      { period: "08/2026 — nay", role: "Founder", org: "KD Labs", note: "Xây KD Code (VS Code extension) và Simple OTP (mobile app cho Android và iOS), hai sản phẩm mã nguồn mở (MIT). Nghiên cứu và áp dụng phương pháp AI-native để phát triển phần mềm nhanh hơn, hiệu quả hơn và an toàn hơn." },
+      { period: "08/2026 — nay", role: "Founder", org: "KD Labs", note: "Xây KD Code (VS Code extension) và Simple OTP (mobile app cho Android và iOS), hai sản phẩm mã nguồn mở (MIT); các dự án khác vẫn đang được phát triển. Nghiên cứu và áp dụng phương pháp AI-native để phát triển phần mềm nhanh hơn, hiệu quả hơn và an toàn hơn." },
       { period: "04/2025 — 08/2026", role: "Front-End Lead", org: "AFD", note: "Dẫn dắt đội frontend 10 người, xây nền tảng multi-tenant trên Contentful, Strapi và Payload CMS phục vụ hàng triệu lượt truy cập mỗi tháng, phát triển mobile app bằng Expo, làm AI Content Engine nội bộ và đưa quy trình AI-native thành chuẩn của team." },
-      { period: "08/2021 — 04/2025", role: "Frontend Web Developer", org: "10X / Saladin", note: "Xây Saladin, nền tảng bảo hiểm một cửa đạt hơn 2 triệu khách hàng; dựng design system từ đầu và tích hợp MoMo, ZaloPay, Payoo, OnePay, Viettel Money." },
+      { period: "08/2021 — 04/2025", role: "Senior Frontend Developer", org: "10X / Saladin", note: "Xây Saladin, nền tảng bảo hiểm một cửa đạt hơn 2 triệu khách hàng; dựng design system từ đầu và tích hợp MoMo, ZaloPay, Payoo, OnePay, Viettel Money." },
       { period: "01/2020 — 05/2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Chuyển 9 trang sức khoẻ (HelloBacsi, HelloSehat), tổng traffic hơn 30 triệu lượt truy cập mỗi tháng, từ WordPress sang Next.js trong 2 tháng, giảm thời gian tải từ 4–5 giây xuống dưới 2 giây." },
       { period: "08/2018 — 10/2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Ra mắt 2 ứng dụng mobile cho khách hàng doanh nghiệp, một app đạt hơn 10 triệu lượt tải." },
       { period: "10/2017 — 08/2018", role: "Junior Web Developer", org: "Maple Studio", note: "Làm hơn 10 theme WordPress, Shopify, Haravan, tất cả đúng tiến độ." },
@@ -44,15 +48,17 @@ const content = {
     languages: "Tiếng Việt (bản ngữ) · Tiếng Anh (giao tiếp công việc)",
   },
   en: {
+    avatarAlt: "Portrait of Bui Khuong Duy",
     intro: [
       "Hi, I'm Duy (Timi), an AI-native Frontend Lead with 9+ years of experience building high-traffic web and mobile products with React, Next.js, Vue and TypeScript.",
       "I've led a team of 10 developers, architected multi-tenant platforms serving millions of monthly visits, and shipped products ranging from a 2M+ customer insurance platform to healthcare sites with 30M+ monthly views. I build AI into both products and the way teams work, from LLM-powered internal tools to Claude Code workflows across the team.",
       "I also run KD Labs, where I build open-source developer tools like KD Code, a VS Code extension that orchestrates multiple coding agents.",
+      "Over these 9+ years, through many projects, teams and a few stumbles along the way, I keep learning and improving every day. I'm grateful to everyone who has helped, guided and worked alongside me, and to the life lessons that shaped who I am today.",
     ],
     jobs: [
-      { period: "Aug 2026 — now", role: "Founder", org: "KD Labs", note: "Building KD Code (a VS Code extension) and Simple OTP (a mobile app for Android and iOS), two open-source (MIT) products. Researching and applying AI-native practices to build software faster, more efficiently and more securely." },
+      { period: "Aug 2026 — now", role: "Founder", org: "KD Labs", note: "Building KD Code (a VS Code extension) and Simple OTP (a mobile app for Android and iOS), two open-source (MIT) products, with more projects in development. Researching and applying AI-native practices to build software faster, more efficiently and more securely." },
       { period: "Apr 2025 — Aug 2026", role: "Front-End Lead", org: "AFD", note: "Led a frontend team of 10, built a multi-tenant platform on Contentful, Strapi and Payload CMS serving millions of monthly visits, developed a mobile app with Expo, shipped an internal AI Content Engine and made AI-native development the team standard." },
-      { period: "Aug 2021 — Apr 2025", role: "Frontend Web Developer", org: "10X / Saladin", note: "Built Saladin, a one-stop insurance platform that grew to 2M+ customers; designed the design system from scratch and integrated MoMo, ZaloPay, Payoo, OnePay and Viettel Money." },
+      { period: "Aug 2021 — Apr 2025", role: "Senior Frontend Developer", org: "10X / Saladin", note: "Built Saladin, a one-stop insurance platform that grew to 2M+ customers; designed the design system from scratch and integrated MoMo, ZaloPay, Payoo, OnePay and Viettel Money." },
       { period: "Jan 2020 — May 2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Migrated 9 healthcare sites (HelloBacsi, HelloSehat) serving over 30 million monthly visits from WordPress to Next.js in 2 months, cutting load time from 4–5s to under 2s." },
       { period: "Aug 2018 — Oct 2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Shipped 2 mobile apps for enterprise clients, one with 10M+ downloads." },
       { period: "Oct 2017 — Aug 2018", role: "Junior Web Developer", org: "Maple Studio", note: "Delivered 10+ WordPress, Shopify and Haravan themes, all on schedule." },
@@ -69,7 +75,22 @@ const content = {
 ---
 
 <SectionPage section="about" title={t("about.title")} lead={t("about.lead")}>
-  {content.intro.map((p) => <p>{p}</p>)}
+  <div class="flow-root">
+    <div class="not-prose mb-6 flex justify-center sm:float-left sm:mb-4 sm:mr-8">
+      <Image
+        src={avatar}
+        alt={content.avatarAlt}
+        width={384}
+        height={384}
+        loading="eager"
+        class="size-36 rounded-full border-2 border-rice/60 object-cover shadow-xl shadow-ink/50 sm:size-40"
+      />
+    </div>
+    {content.intro.map((p) => <p>{p}</p>)}
+    <p>
+      {t("about.hire")} <a href={sectionPaths.contact[lang]}>{t("about.hireLink")} →</a>
+    </p>
+  </div>
 
   <h2>{t("about.experience")}</h2>
   <ol class="not-prose space-y-6 border-l border-rice/40 pl-6">
