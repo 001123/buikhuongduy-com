@@ -16,8 +16,11 @@
   --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes fade-up {
+    /* 0.01, not 0: Chrome skips fully transparent elements for LCP, so starting at 0 pushed the
+       hero h1 (the LCP element) one frame past FCP and Lighthouse's simulation then charged LCP
+       for every request in between. Visually identical. */
     from {
-      opacity: 0;
+      opacity: 0.01;
       transform: translateY(12px);
     }
     to {
