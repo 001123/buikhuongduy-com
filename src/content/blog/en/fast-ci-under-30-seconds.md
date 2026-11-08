@@ -1,6 +1,6 @@
 ---
 title: "CI Under 30 Seconds: Build and Deploy a Personal Site to Cloudflare Pages"
-description: "Why each push takes only about 25 seconds for GitHub Actions to build Astro and deploy to Cloudflare Pages: one job, a pnpm cache, an Astro build cache, Chrome already on the runner and a pinned Wrangler version."
+description: "Why each push takes only about 25 seconds for GitHub Actions to build Astro and deploy to Cloudflare Pages: a lean deploy job, Lighthouse running in parallel, a pnpm cache, an Astro build cache, Chrome already on the runner and a pinned Wrangler version."
 pubDate: 2026-11-08
 tags: [ci, github-actions, cloudflare, astro, performance]
 ---
@@ -8,7 +8,8 @@ tags: [ci, github-actions, cloudflare, astro, performance]
 :::tldr
 - **About 25 seconds from push until the new site is live**. The job itself runs for only about 19 seconds.
 - **Astro's build cache** (`node_modules/.astro`) is the biggest change: the build step drops from **16–36 seconds to 2–5 seconds**.
-- **One job only**: no splitting, no matrix, no passing artifacts back and forth.
+- **Deploy fits in one job**: no splitting, no matrix, no passing artifacts back and forth.
+- **Lighthouse runs in parallel in its own job**: it keeps the score at 100 without adding a single second to the deploy.
 - **pnpm + store cache**: installing dependencies takes only about 2 seconds.
 - **Nothing extra downloaded**: Mermaid uses the Chrome already on the runner, and Wrangler is pinned in `devDependencies`.
 - **`cancel-in-progress`**: when pushes come fast, only the latest commit gets deployed.
@@ -81,9 +82,9 @@ Adding `github.sha` makes the key always new, so at the end of each job the cach
 The first run after adding the cache still takes 30 seconds for the build step, because there is nothing to restore yet. The cache only helps from the second run onward.
 :::
 
-## 2. One job, no splitting
+## 2. Deploy fits in one job
 
-The workflow has only one job: checkout, install, build and deploy. There is no separate lint job, no separate test job and no matrix of Node versions.
+The whole deploy path is one job: checkout, install, build and deploy. There is no separate lint job, no separate test job and no matrix of Node versions. The only exception is the Lighthouse job in section 6, and it is not on the deploy path.
 
 For a personal static site, splitting jobs gains nothing. Each new job is a new runner that must start up, check out the code again and install dependencies again. Artifacts in `dist/` would also have to be uploaded and downloaded between jobs. A single job avoids all of that cost.
 
@@ -112,7 +113,19 @@ concurrency:
 
 When I push two commits close together, the older run is cancelled right away to make way for the newer commit. No runner is wasted on a version that will be overwritten, and an older version cannot finish deploying after the newer one.
 
-## 6. A static site is the foundation
+## 6. Lighthouse runs in parallel and does not block the deploy
+
+Besides the deploy job, the workflow has a `lighthouse` job that keeps the site's Lighthouse score at 100. It builds the site again, then runs Lighthouse CI (`lhci autorun`) on the `dist/` folder for the main pages, 3 times per page. If any page scores below 100 in any category (Performance, Accessibility, Best Practices, SEO), the job fails and attaches the reports for review. I wrote about how the site reaches 100 in [this post](/en/blog/perfect-lighthouse-score/).
+
+![A workflow run on GitHub Actions: the deploy job took 29s, the lighthouse job ran in parallel for 4m 25s, and the whole workflow took 4m 44s](../../../assets/blog/fast-ci-deploy-and-lighthouse-jobs.webp)
+
+This job is slow, about **4 minutes 25 seconds**, because it has to launch Chrome and measure each page several times. But it runs **in parallel** and has no `needs` link to the deploy, so the deploy does not wait for it. In the run above, the whole workflow took 4 minutes 44 seconds, while the deploy job still took only **29 seconds**. The new site was live long before Lighthouse finished scoring.
+
+This is the only place where I accept a separate job, because Lighthouse is a quality check, not a condition for deploying. If it were in the same job, every push would wait more than 4 extra minutes before the new site went live. As a separate job, it costs only one more install and build, which take a few seconds thanks to the cache, and the deploy feedback loop stays the same.
+
+For pull requests, making `lighthouse` a required check means a PR that lowers the score cannot be merged. For a direct push to `main`, the deploy still goes out, and a red Lighthouse job tells me to fix it in the next commit.
+
+## 7. A static site is the foundation
 
 All of the above works only because the site is **static HTML**. There is no server to restart, no database migration and no health check waiting for a new instance to be ready.
 
@@ -122,7 +135,7 @@ Pull requests go through the same workflow and get their own preview. That lets 
 
 ## Conclusion
 
-Fast CI does not come from a stronger runner or a paid service. It comes from **measuring where each second goes**, then removing repeated work: cache what has already been computed, do not download what is already there and do not split what does not need splitting.
+Fast CI does not come from a stronger runner or a paid service. It comes from **measuring where each second goes**, then removing repeated work: cache what has already been computed, do not download what is already there, do not split what does not need splitting, and keep slow checks off the deploy path.
 
 When CI takes only 25 seconds, I deploy more often, each change is smaller and bugs are found sooner. A short feedback loop is the best thing to invest in.
 

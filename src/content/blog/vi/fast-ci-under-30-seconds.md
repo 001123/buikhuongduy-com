@@ -1,6 +1,6 @@
 ---
 title: "CI dưới 30 giây: build và deploy trang cá nhân lên Cloudflare Pages"
-description: "Vì sao mỗi lần push, GitHub Actions chỉ mất khoảng 25 giây để build Astro và deploy lên Cloudflare Pages: một job duy nhất, cache pnpm, cache build của Astro, Chrome có sẵn trên runner và Wrangler ghim phiên bản."
+description: "Vì sao mỗi lần push, GitHub Actions chỉ mất khoảng 25 giây để build Astro và deploy lên Cloudflare Pages: job deploy gọn, Lighthouse chạy song song, cache pnpm, cache build của Astro, Chrome có sẵn trên runner và Wrangler ghim phiên bản."
 pubDate: 2026-11-08
 tags: [ci, github-actions, cloudflare, astro, performance]
 ---
@@ -8,7 +8,8 @@ tags: [ci, github-actions, cloudflare, astro, performance]
 :::tldr
 - **Khoảng 25 giây từ push tới khi site mới lên mạng**, phần job thật sự chạy chỉ khoảng 19 giây.
 - **Cache build của Astro** (`node_modules/.astro`) là thay đổi lớn nhất: bước build giảm từ **16–36 giây xuống 2–5 giây**.
-- **Một job duy nhất**: không chia job, không matrix, không phải chuyển artifact qua lại.
+- **Deploy gói trong một job**: không chia nhỏ, không matrix, không phải chuyển artifact qua lại.
+- **Lighthouse chạy song song ở job riêng**: giữ điểm 100 mà không làm deploy chậm thêm giây nào.
 - **pnpm + cache store**: cài dependency chỉ mất khoảng 2 giây.
 - **Không tải gì thừa**: Mermaid dùng Chrome có sẵn trên runner, Wrangler ghim sẵn trong `devDependencies`.
 - **`cancel-in-progress`**: push liên tục thì chỉ commit mới nhất được deploy.
@@ -81,9 +82,9 @@ Thêm `github.sha` làm key luôn mới, nên cuối mỗi job cache được l�
 Lần chạy đầu tiên sau khi thêm cache vẫn mất 30 giây cho bước build, vì chưa có gì để khôi phục. Từ lần thứ hai trở đi mới thấy hiệu quả.
 :::
 
-## 2. Một job, không chia nhỏ
+## 2. Deploy gói trong một job
 
-Workflow chỉ có một job: checkout, cài, build, deploy. Không có job lint riêng, test riêng hay matrix nhiều phiên bản Node.
+Toàn bộ đường deploy nằm trong một job: checkout, cài, build, deploy. Không có job lint riêng, test riêng hay matrix nhiều phiên bản Node. Ngoại lệ duy nhất là job Lighthouse ở phần 6, và nó không nằm trên đường deploy.
 
 Với một site tĩnh cá nhân, việc chia job không đem lại gì. Mỗi job mới là một runner mới phải khởi động, checkout lại và cài lại dependency, rồi còn phải upload và download artifact `dist/` giữa các job. Một job duy nhất tránh được toàn bộ chi phí đó.
 
@@ -112,7 +113,19 @@ concurrency:
 
 Khi mình push hai commit sát nhau, lần chạy cũ bị hủy ngay để nhường cho commit mới. Không tốn runner cho bản sắp bị ghi đè, và không có chuyện bản cũ deploy xong sau bản mới.
 
-## 6. Site tĩnh là nền tảng của mọi thứ
+## 6. Lighthouse chạy song song, không chặn deploy
+
+Ngoài job deploy, workflow còn một job `lighthouse` để giữ điểm Lighthouse của site ở mức 100. Job này build lại site, rồi chạy Lighthouse CI (`lhci autorun`) trên thư mục `dist/` cho các trang chính, mỗi trang 3 lần. Chỉ cần một trang dưới 100 ở bất kỳ nhóm nào (Performance, Accessibility, Best Practices, SEO) là job thất bại, kèm báo cáo để xem lại. Cách đạt 100 điểm thì mình đã viết ở [bài này](/blog/perfect-lighthouse-score/).
+
+![Một lần chạy workflow trên GitHub Actions: job deploy mất 29s, job lighthouse chạy song song mất 4m 25s, tổng workflow 4m 44s](../../../assets/blog/fast-ci-deploy-and-lighthouse-jobs.webp)
+
+Job này chậm, khoảng **4 phút 25 giây**, vì phải mở Chrome và đo từng trang nhiều lần. Nhưng nó chạy **song song** và không có `needs` nối với deploy, nên deploy không phải chờ. Ở lần chạy trên, cả workflow mất 4 phút 44 giây, còn job deploy vẫn chỉ **29 giây**: site mới đã lên mạng từ lâu trước khi Lighthouse chấm xong.
+
+Đây là chỗ duy nhất mình chấp nhận tách job, vì Lighthouse là bước kiểm tra chất lượng chứ không phải điều kiện để deploy. Gộp vào cùng job thì mỗi lần push phải chờ thêm hơn 4 phút mới thấy site mới. Tách ra chỉ tốn thêm một lần cài và build, vốn chỉ vài giây nhờ cache, đổi lại vòng phản hồi của deploy giữ nguyên.
+
+Với pull request, đặt `lighthouse` làm required check thì PR làm tụt điểm sẽ không merge được. Với push thẳng lên `main`, deploy vẫn diễn ra, còn job Lighthouse đỏ là tín hiệu để mình sửa ngay ở commit sau.
+
+## 7. Site tĩnh là nền tảng của mọi thứ
 
 Tất cả những điều trên chỉ hiệu quả vì site là **HTML tĩnh**. Không có server phải khởi động lại, không có migration database, không có bước health check chờ instance mới sẵn sàng.
 
@@ -122,7 +135,7 @@ Pull request cũng đi qua cùng workflow và nhận một bản preview riêng,
 
 ## Kết
 
-CI nhanh không đến từ runner mạnh hơn hay dịch vụ trả phí. Nó đến từ việc **đo xem từng giây đi đâu**, rồi bỏ đi những việc lặp lại không cần thiết: cache thứ đã tính, không tải thứ đã có, không chia nhỏ thứ không cần chia.
+CI nhanh không đến từ runner mạnh hơn hay dịch vụ trả phí. Nó đến từ việc **đo xem từng giây đi đâu**, rồi bỏ đi những việc lặp lại không cần thiết: cache thứ đã tính, không tải thứ đã có, không chia nhỏ thứ không cần chia, và đẩy việc kiểm tra chậm ra khỏi đường deploy.
 
 Khi CI chỉ mất 25 giây, mình deploy thường xuyên hơn, mỗi thay đổi nhỏ hơn, và lỗi được phát hiện sớm hơn. Vòng phản hồi ngắn là thứ đáng đầu tư nhất.
 
