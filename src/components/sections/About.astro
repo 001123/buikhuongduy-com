@@ -3,7 +3,9 @@ import SectionPage from "../../layouts/SectionPage.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { Image } from "astro:assets";
 import avatar from "../../assets/avatar_cv.webp";
-import { cvUrl } from "../../data/profile";
+import { cvUrl, socials } from "../../data/profile";
+
+const linkedinUrl = socials.find((s) => s.icon === "linkedin")!.href;
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
@@ -75,16 +77,24 @@ const content = {
 ---
 
 <SectionPage section="about" title={t("about.title")} lead={t("about.lead")}>
-  <div class="flow-root">
-    <div class="not-prose mb-6 flex justify-center sm:float-left sm:mb-4 sm:mr-8">
-      <Image
-        src={avatar}
-        alt={content.avatarAlt}
-        width={384}
-        height={384}
-        loading="eager"
-        class="size-36 rounded-2xl border border-paper/20 object-cover shadow-xl shadow-ink/50 sm:size-40"
-      />
+  <div class="flow-root text-justify [&>p:first-of-type]:mt-0">
+    <div class="not-prose mb-6 flex justify-center sm:float-left sm:mt-[0.5em] sm:mb-4 sm:mr-8">
+      <a
+        href={linkedinUrl}
+        target="_blank"
+        rel="noopener"
+        aria-label={`${content.avatarAlt} (LinkedIn)`}
+        class="rounded-2xl glow-hover hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+      >
+        <Image
+          src={avatar}
+          alt={content.avatarAlt}
+          width={384}
+          height={384}
+          loading="eager"
+          class="size-36 rounded-2xl border border-paper/20 object-cover shadow-xl shadow-ink/50 transition-colors hover:border-rice sm:size-40"
+        />
+      </a>
     </div>
     {
       content.intro.map((p, i) =>
