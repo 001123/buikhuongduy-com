@@ -1,5 +1,5 @@
 ---
-// Subtle ripple effect on click/tap. Disabled automatically when the user enables "reduce motion".
+// Subtle ripple effect on mouse/pen clicks. Skipped for touch taps and when the user enables "reduce motion".
 ---
 
 <style is:global>
@@ -40,7 +40,7 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   window.addEventListener("pointerdown", (e) => {
-    if (reduceMotion.matches) return;
+    if (reduceMotion.matches || e.pointerType === "touch") return;
     const ripple = document.createElement("span");
     ripple.className = "click-ripple";
     ripple.setAttribute("aria-hidden", "true");
