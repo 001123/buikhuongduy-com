@@ -142,11 +142,11 @@ const content: Record<
 
 const c = content[lang];
 const linkedin = socials.find((s) => s.icon === "linkedin")?.href ?? "";
+const mailto = `mailto:${email}?subject=${encodeURIComponent(c.mailSubject)}`;
 const data = {
   progress: c.progress,
   results: c.results,
   questions: c.questions,
-  mailto: `mailto:${email}?subject=${encodeURIComponent(c.mailSubject)}`,
 };
 ---
 
@@ -188,7 +188,7 @@ const data = {
     <h3 data-result-title class="mt-4 text-xl font-semibold text-paper"></h3>
     <p data-result-body class="mt-2 text-pretty text-paper/75"></p>
     <div class="mt-6 flex flex-wrap gap-3">
-      <a data-mail class="rounded-full bg-rice px-5 py-2 font-medium text-ink glow-hover hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">{c.mailCta}</a>
+      <a href={mailto} class="rounded-full bg-rice px-5 py-2 font-medium text-ink glow-hover hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">{c.mailCta}</a>
       <a href={linkedin} target="_blank" rel="noopener" class="rounded-full border border-paper/40 px-5 py-2 font-medium text-paper glow-hover hover:border-rice hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">{c.linkedinCta}</a>
       <button type="button" data-action="retry" class="rounded-full px-4 py-2 text-paper/70 hover:text-rice focus-visible:outline-2 focus-visible:outline-rice">{c.retry}</button>
     </div>
@@ -252,7 +252,6 @@ const data = {
         const result = data.results.find((r) => percent >= r.min)!;
         $("[data-result-title]").textContent = result.title;
         $("[data-result-body]").textContent = result.body;
-        $<HTMLAnchorElement>("[data-mail]").href = data.mailto;
         show("result");
 
         const out = $("[data-score]");

@@ -26,3 +26,6 @@ pnpm-debug.log*
 .zvec-grep
 
 tmp/
+
+# Lighthouse CI reports
+.lighthouseci/

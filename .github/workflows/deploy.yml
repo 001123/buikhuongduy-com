@@ -55,3 +55,40 @@ jobs:
             --project-name=buikhuongduy-com
             --branch=${{ github.head_ref || github.ref_name }}
             --commit-hash=${{ github.sha }}
+
+  # Every audited page must score 100 in all Lighthouse categories (see lighthouserc.cjs).
+  # Runs in parallel with deploy; mark it as a required check to block merging regressions.
+  lighthouse:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: actions/cache@v6
+        with:
+          path: node_modules/.astro
+          key: astro-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            astro-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            astro-${{ runner.os }}-
+
+      - run: pnpm build
+
+      - run: pnpm lighthouse
+
+      - name: Upload Lighthouse reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/reports
