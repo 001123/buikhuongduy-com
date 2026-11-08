@@ -25,15 +25,13 @@ const pill =
         href={sectionPaths.contact[lang]}
         transition:name="open-to-work"
         data-open-to-work
-        class="glow-text-hover group absolute top-4 left-4 z-40 inline-flex h-[2.375rem] items-center gap-2.5 rounded-full border border-paper/25 bg-ink/30 pr-4 pl-3.5 text-xs font-medium tracking-wide text-paper/90 shadow-lg shadow-ink/20 backdrop-blur-md hover:border-rice/60 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:top-6 sm:left-6 sm:text-sm"
+        class="glow-text-hover group absolute top-4 left-4 z-40 hidden sm:inline-flex h-[2.375rem] items-center gap-2.5 rounded-full border border-paper/25 bg-ink pr-4 pl-3.5 text-xs font-medium tracking-wide text-paper/90 shadow-lg shadow-ink/20 backdrop-blur-md hover:border-rice/60 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:top-6 sm:left-6 sm:text-[0.8125rem]"
       >
         <span aria-hidden="true" class="relative flex size-2">
           <span class="absolute inset-0 rounded-full bg-rice motion-safe:animate-ping motion-safe:[animation-duration:2.4s]"></span>
           <span class="relative size-2 rounded-full bg-rice shadow-[0_0_8px_rgb(217_181_74/0.9)]"></span>
         </span>
         <span>{t("hero.status")}</span>
-        <span aria-hidden="true" class="hidden text-paper/40 sm:inline">·</span>
-        <span class="hidden text-rice sm:inline">{t("nav.contact")}</span>
         <span aria-hidden="true" class="text-rice transition-transform duration-300 group-hover:translate-x-0.5">→</span>
       </a>
     )
@@ -70,7 +68,7 @@ const pill =
             style={`animation-delay: ${200 + i * 80}ms`}
             class:list={[
               pill,
-              "border-paper/50 bg-ink/40 px-6 py-3 text-base text-paper hover:border-rice hover:bg-ink/60 hover:text-rice sm:min-w-36 sm:px-8 sm:text-lg",
+              "border-paper/50 bg-ink px-6 py-3 text-base text-paper hover:border-rice hover:text-rice sm:min-w-36 sm:px-8 sm:text-lg",
             ]}
           >
             {label}
