@@ -29,6 +29,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@tailwindcss/typography": "^0.5.20",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "wrangler": "^4.158.0"
   }
 }
