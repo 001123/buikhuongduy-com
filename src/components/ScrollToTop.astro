@@ -1,34 +1,31 @@
 ---
-// Lời kết cuối trang: cảm ơn + về trang chủ / lên đầu trang.
-// Chỉ hiện khi trang dài hơn màn hình (người đọc thực sự đã cuộn tới cuối).
+// End-of-page outro: thank-you + go back (home as fallback) / back to top.
+// Shown only when the page is taller than the viewport (the reader actually scrolled to the end).
 import { getLang, homePath, useTranslations } from "../i18n/ui";
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
-const pill =
-  "group inline-flex items-center gap-1.5 rounded-full border border-paper/20 bg-ink/40 px-3.5 py-1.5 text-sm text-paper/60 backdrop-blur-md glow-hover hover:border-rice/60 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
-const icon = "size-4 transition-transform duration-300";
+// Split the prompt around {back}/{top} so both actions sit inline in the sentence.
+const prompt = t("end.prompt").split(/(\{back\}|\{top\})/);
+const link =
+  "cursor-pointer rounded-sm text-paper/80 underline decoration-rice/40 decoration-1 underline-offset-4 transition-colors hover:text-rice hover:decoration-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
 ---
 
-<footer data-scroll-top hidden class="flex flex-col items-center gap-4 pt-10 text-center sm:pt-12">
+<footer data-scroll-top hidden class="mx-auto mt-10 flex w-fit max-w-full flex-col items-center gap-4 rounded-2xl border border-paper/10 bg-ink/60 px-6 pt-0 pb-6 text-center shadow-lg shadow-black/30 backdrop-blur-md sm:mt-12 sm:px-10">
   <span aria-hidden="true" class="h-px w-24 bg-linear-to-r from-transparent via-rice/60 to-transparent"></span>
   <div class="space-y-1">
     <p class="font-serif text-lg text-paper/80 italic">{t("end.thanks")}</p>
-    <p class="text-sm text-paper/50">{t("end.prompt")}</p>
-  </div>
-  <div class="flex flex-wrap justify-center gap-3">
-    <a href={homePath[lang]} class={pill}>
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={`${icon} group-hover:-translate-x-0.5`}>
-        <path d="M15 18l-6-6 6-6"></path>
-      </svg>
-      {t("nav.home")}
-    </a>
-    <button type="button" class={pill}>
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={`${icon} group-hover:-translate-y-0.5`}>
-        <path d="M18 15l-6-6-6 6"></path>
-      </svg>
-      {t("scroll.top")}
-    </button>
+    <p class="text-sm text-paper/50">
+      {prompt.map((part) =>
+        part === "{back}" ? (
+          <a href={homePath[lang]} data-back class={link}>{t("end.back")}</a>
+        ) : part === "{top}" ? (
+          <button type="button" data-top class={link}>{t("end.top")}</button>
+        ) : (
+          part
+        ),
+      )}
+    </p>
   </div>
 </footer>
 
@@ -46,7 +43,7 @@ const icon = "size-4 transition-transform duration-300";
     frame = 0;
     const el = document.querySelector<HTMLElement>("[data-scroll-top]");
     if (!el) return;
-    // Trừ chiều cao của chính khối này để tránh bật/tắt qua lại ở ngưỡng.
+    // Subtract this block's own height to avoid toggling back and forth at the threshold.
     const ownHeight = el.hidden ? 0 : el.offsetHeight;
     const scrollable = document.documentElement.scrollHeight - ownHeight > window.innerHeight + 1;
     if (el.hidden === scrollable) el.hidden = !scrollable;
@@ -60,8 +57,26 @@ const icon = "size-4 transition-transform duration-300";
   new ResizeObserver(schedule).observe(document.body);
   document.addEventListener("astro:page-load", schedule);
 
+  // True when the previous history entry is a page on this site (full load or client-side navigation).
+  function hasInternalHistory() {
+    if (history.state?.index > 0) return true;
+    try {
+      return !!document.referrer && new URL(document.referrer).origin === location.origin;
+    } catch {
+      return false;
+    }
+  }
+
   document.addEventListener("click", (e) => {
-    if (!(e.target instanceof Element) || !e.target.closest("[data-scroll-top] button")) return;
+    if (!(e.target instanceof Element)) return;
+    if (e.target.closest("[data-scroll-top] [data-back]")) {
+      if (e instanceof MouseEvent && (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0)) return;
+      if (!hasInternalHistory()) return; // Fall back to the link's home href.
+      e.preventDefault();
+      history.back();
+      return;
+    }
+    if (!e.target.closest("[data-scroll-top] [data-top]")) return;
     window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
   });
 </script>

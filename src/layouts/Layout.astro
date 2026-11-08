@@ -7,14 +7,22 @@ import { ClientRouter } from "astro:transitions";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import CursorEffects from "../components/CursorEffects.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
-import { getLang, homePath, languages, useTranslations, type Lang } from "../i18n/ui";
+import avatar from "../assets/avatar_cv.webp";
+import { defaultLang, getLang, homePath, languages, locales, useTranslations, type Lang } from "../i18n/ui";
+import { cleanText, structuredData, type ArticleMeta, type PageType } from "../lib/seo";
 
 interface Props {
   title?: string;
   description?: string;
-  /** Đường dẫn của trang này ở từng ngôn ngữ. Mặc định trỏ về trang chủ. */
+  /** Path of this page in each language. Defaults to the home page. */
   alternates?: Partial<Record<Lang, string>>;
-  /** Tắt nút đổi ngôn ngữ cố định khi trang tự đặt nó ở chỗ khác. */
+  /** Languages that have a real translation of this page (for hreflang). Defaults to `alternates`. */
+  translations?: Partial<Record<Lang, string>>;
+  /** schema.org type of this page. */
+  pageType?: PageType;
+  /** Set on blog posts to emit article metadata. */
+  article?: ArticleMeta;
+  /** Disable the fixed language switcher when the page places it elsewhere. */
   floatingLangSwitcher?: boolean;
 }
 
@@ -22,17 +30,41 @@ const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 
 const {
-  title = t("site.name"),
-  description = t("site.description"),
+  title = t("seo.homeTitle"),
+  description: rawDescription = t("site.description"),
   alternates = {},
+  translations,
+  pageType = "ProfilePage",
+  article,
   floatingLangSwitcher = true,
 } = Astro.props;
+const description = cleanText(rawDescription);
 
 const links = Object.fromEntries(
   (Object.keys(languages) as Lang[]).map((l) => [l, alternates[l] ?? homePath[l]]),
 ) as Record<Lang, string>;
-const ogImage = new URL('/og-image.jpg', Astro.site ?? Astro.url);
-const pageUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
+const site = Astro.site ?? Astro.url;
+const ogImage = new URL("/og-image.jpg", site);
+const pageUrl = new URL(Astro.url.pathname, site);
+
+// hreflang: only languages with a real translation, plus x-default on the Vietnamese (primary) version.
+const hreflangs = Object.entries(translations ?? links).map(([l, href]) => [l, new URL(href, site).href]);
+const xDefault = hreflangs.find(([l]) => l === defaultLang)?.[1];
+const otherLocales = (Object.keys(languages) as Lang[]).filter((l) => l !== lang && hreflangs.some(([h]) => h === l));
+
+const ogType = article ? "article" : pageType === "ProfilePage" ? "profile" : "website";
+
+const jsonLd = structuredData({
+  lang,
+  site,
+  pageUrl,
+  title,
+  description,
+  pageType: article ? "WebPage" : pageType,
+  image: ogImage,
+  avatar: new URL(avatar.src, site),
+  article,
+});
 ---
 
 <!doctype html>
@@ -41,29 +73,76 @@ const pageUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta name="author" content={t("site.name")} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href={pageUrl} />
+    {hreflangs.map(([l, href]) => <link rel="alternate" hreflang={l} href={href} />)}
+    {xDefault && <link rel="alternate" hreflang="x-default" href={xDefault} />}
+    <meta property="og:site_name" content={t("site.name")} />
+    <meta property="og:locale" content={locales[lang].og} />
+    {otherLocales.map((l) => <meta property="og:locale:alternate" content={locales[l].og} />)}
+    <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Bui Khuong Duy — Front-End Lead (AI-Native) with 9+ years in React, Next.js, TypeScript, DevOps & K8s" />
+    <meta property="og:image:alt" content={t("seo.ogImageAlt")} />
+    {
+      article ? (
+        <>
+          <meta property="article:published_time" content={article.publishedTime.toISOString()} />
+          {article.modifiedTime && <meta property="article:modified_time" content={article.modifiedTime.toISOString()} />}
+          <meta property="article:author" content={new URL(homePath[lang], site).href} />
+          {article.tags.map((tag) => <meta property="article:tag" content={tag} />)}
+        </>
+      ) : ogType === "profile" && (
+        <>
+          <meta property="profile:first_name" content="Duy" />
+          <meta property="profile:last_name" content={lang === "vi" ? "Bùi" : "Bui"} />
+          <meta property="profile:username" content="buikhuongduy" />
+        </>
+      )
+    }
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@khuongduy1897" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={t("seo.ogImageAlt")} />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" href="/favicon.ico" />
-    {
-      Object.entries(links).map(([l, href]) => (
-        <link rel="alternate" hreflang={l} href={new URL(href, Astro.url)} />
-      ))
-    }
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <ClientRouter />
+    <script is:inline>
+      // Apply the blog reading mode before first paint to avoid a content flash.
+      // A `?mode=` URL param (shared links) wins over the reader's saved preference.
+      (function () {
+        function applyReadingMode(doc, url) {
+          var m = new URL(url).searchParams.get("mode");
+          if (m !== "tldr" && m !== "normal" && m !== "advanced") {
+            try {
+              m = localStorage.getItem("reading-mode");
+            } catch (e) {}
+          }
+          if (m === "tldr" || m === "advanced") doc.documentElement.dataset.readingMode = m;
+        }
+        applyReadingMode(document, location.href);
+        if (!window.__readingModeHooked) {
+          window.__readingModeHooked = true;
+          // View transitions replace <html> attributes; restore the mode on the incoming page before it is swapped in.
+          document.addEventListener("astro:before-swap", function (e) {
+            applyReadingMode(e.newDocument, e.to.href);
+          });
+        }
+      })();
+    </script>
   </head>
   <body class="bg-ink font-sans text-paper antialiased">
     {floatingLangSwitcher && <LanguageSwitcher lang={lang} links={links} />}

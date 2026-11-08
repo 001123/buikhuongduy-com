@@ -1,0 +1,50 @@
+---
+import { render } from "astro:content";
+import SectionPage from "../../layouts/SectionPage.astro";
+import ReadingModes from "../ReadingModes.astro";
+import Mermaid from "../Mermaid.astro";
+import PostActions from "../PostActions.astro";
+import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
+import { formatDate, postAlternates, postTranslations, type Post } from "../../lib/blog";
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+const { Content, remarkPluginFrontmatter } = await render(post);
+const hasModes = Boolean(remarkPluginFrontmatter.hasModes);
+const hasMermaid = Boolean(remarkPluginFrontmatter.hasMermaid);
+const alternates = await postAlternates(post);
+const translations = await postTranslations(post);
+const { title, description, pubDate, updatedDate, tags, draft } = post.data;
+---
+
+<SectionPage
+  section="blog"
+  title={title}
+  lead={description}
+  description={description}
+  alternates={alternates}
+  translations={translations}
+  article={{ headline: title, publishedTime: pubDate, modifiedTime: updatedDate, tags }}
+  backHref={sectionPaths.blog[lang]}
+  backLabel={t("blog.back")}
+>
+  <div slot="meta" class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-paper/60">
+    <span>{t("blog.published")} <time datetime={pubDate.toISOString()}>{formatDate(pubDate, lang)}</time></span>
+    {updatedDate && <span>{t("blog.updated")} <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate, lang)}</time></span>}
+    {draft && <span class="rounded-full border border-lotus/60 px-2 py-0.5 text-xs text-lotus">{t("blog.draft")}</span>}
+    {tags.length > 0 && (
+      <ul class="flex flex-wrap gap-2">
+        {tags.map((tag) => <li class="rounded-full bg-paper/10 px-2.5 py-0.5 text-xs text-paper/70">#{tag}</li>)}
+      </ul>
+    )}
+  </div>
+  {hasModes && <div slot="meta" class="mt-2"><ReadingModes /></div>}
+  {hasModes ? <div class="reading-content"><Content /></div> : <Content />}
+  <PostActions slug={post.id} />
+  {hasMermaid && <Mermaid />}
+</SectionPage>

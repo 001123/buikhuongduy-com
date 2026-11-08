@@ -1,4 +1,4 @@
-/** Trang CV trực tuyến. */
+/** Online CV page. */
 export const cvUrl = "https://cv.buikhuongduy.com";
 
 export const email = "contact@buikhuongduy.com";

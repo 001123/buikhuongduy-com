@@ -1,0 +1,10 @@
+---
+import BlogPost from "../../components/sections/BlogPost.astro";
+import { getPostPaths } from "../../lib/blog";
+
+export const getStaticPaths = () => getPostPaths("vi");
+
+const { post } = Astro.props;
+---
+
+<BlogPost post={post} />

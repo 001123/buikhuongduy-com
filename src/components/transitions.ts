@@ -1,5 +1,5 @@
-// Hiệu ứng khi đổi trang/ngôn ngữ: nội dung cũ mờ dần, nội dung mới hiện ra nhẹ nhàng.
-// Đi tới thì nội dung trôi lên; quay lại thì trôi xuống — biên độ nhỏ để cảm giác liền mạch.
+// Page/language change transition: old content fades out, new content gently fades in.
+// Navigating forward slides content up; going back slides it down — small offset for a seamless feel.
 const out = { duration: "0.16s", easing: "cubic-bezier(0.4, 0, 1, 1)", fillMode: "both" };
 const inn = { duration: "0.38s", delay: "0.05s", easing: "cubic-bezier(0.16, 1, 0.3, 1)", fillMode: "both" };
 

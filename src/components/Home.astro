@@ -6,10 +6,10 @@ import { contentAnim } from "./transitions";
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 
-const primary: Section[] = ["about", "blog", "contact"];
+const primary: Section[] = ["about", "contact", "blog"];
 const links = primary.map((s) => ({ label: t(`nav.${s}`), href: sectionPaths[s][lang] }));
 
-/** Tắt khi đã có việc để ẩn dòng "đang tìm việc". */
+/** Turn off once employed to hide the "open to work" line. */
 const openToWork = true;
 
 const pill =

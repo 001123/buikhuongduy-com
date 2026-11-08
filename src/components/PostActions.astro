@@ -1,0 +1,246 @@
+---
+import { getLang, useTranslations } from "../i18n/ui";
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const t = useTranslations(getLang(Astro.currentLocale));
+const url = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+const facebookHref = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+const button =
+  "inline-flex items-center gap-2 rounded-full no-underline border border-paper/25 bg-ink/40 px-4 py-2 text-sm font-medium text-paper/80 transition-colors hover:border-rice/60 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
+---
+
+<div
+  class="post-actions not-prose mt-12 flex flex-wrap items-center gap-3 border-t border-paper/15 pt-6"
+  data-post-actions
+  data-slug={slug}
+  data-url={url}
+>
+  <button
+    type="button"
+    class:list={[button, "relative touch-manipulation select-none data-liked:border-rice/70 data-liked:text-rice"]}
+    data-like
+    data-label={t("blog.like")}
+    data-label-max={t("blog.likeMax")}
+    data-label-reset={t("blog.likeReset")}
+    title={t("blog.likeHint")}
+  >
+    <svg class="heart size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+    </svg>
+    <span data-like-label class="tabular-nums">{t("blog.like")}</span>
+  </button>
+
+  <a href={facebookHref} target="_blank" rel="noopener noreferrer" class={button} data-share-facebook>
+    <svg class="size-4.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07" />
+    </svg>
+    <span>{t("blog.shareFacebook")}</span>
+  </a>
+
+  <button type="button" class={button} data-copy-link data-label-done={t("blog.copied")}>
+    <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+    <span data-copy-label>{t("blog.copyLink")}</span>
+  </button>
+  <span class="sr-only" role="status" aria-live="polite" data-actions-status></span>
+</div>
+
+<style>
+  [data-like][data-liked] .heart {
+    fill: currentColor;
+  }
+
+  [data-like] .heart {
+    transition: transform 0.15s ease-out;
+  }
+
+  [data-like].holding .heart {
+    transform: scale(0.6);
+    transition: transform 0.7s linear;
+  }
+
+  [data-like].pop .heart {
+    animation: heart-pop 0.3s ease-out;
+  }
+
+  @keyframes heart-pop {
+    40% {
+      transform: scale(1.35);
+    }
+  }
+
+  :global(.like-burst) {
+    position: absolute;
+    left: 1.6rem;
+    top: 0;
+    pointer-events: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-rice);
+    animation: like-burst 0.7s ease-out forwards;
+  }
+
+  @keyframes like-burst {
+    from {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, -1.75rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-like].pop .heart,
+    :global(.like-burst) {
+      animation: none;
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  const LIKES_KEY = "post-likes";
+  const MAX_LIKES = 50;
+
+  function readLikes(): Record<string, number> {
+    try {
+      const value = JSON.parse(localStorage.getItem(LIKES_KEY) ?? "{}");
+      return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+    } catch {
+      return {};
+    }
+  }
+
+  // Canonical post URL plus the current reading mode, so shared links open in that mode.
+  function shareUrl(root: HTMLElement) {
+    const url = new URL(root.dataset.url!);
+    const mode = document.documentElement.dataset.readingMode;
+    if (document.querySelector(".reading-content") && (mode === "tldr" || mode === "advanced")) {
+      url.searchParams.set("mode", mode);
+    }
+    return url.href;
+  }
+
+  function syncFacebookHref(root: HTMLElement) {
+    const link = root.querySelector<HTMLAnchorElement>("[data-share-facebook]");
+    if (link) link.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl(root))}`;
+  }
+
+  function setup(root: HTMLElement) {
+    const slug = root.dataset.slug!;
+    syncFacebookHref(root);
+    const status = root.querySelector<HTMLElement>("[data-actions-status]")!;
+
+    const like = root.querySelector<HTMLButtonElement>("[data-like]")!;
+    const likeLabel = like.querySelector<HTMLElement>("[data-like-label]")!;
+    const renderLike = (count: number) => {
+      like.toggleAttribute("data-liked", count > 0);
+      likeLabel.textContent = count > 0 ? String(count) : (like.dataset.label ?? "");
+      like.setAttribute("aria-label", count > 0 ? `${like.dataset.label} (${count})` : (like.dataset.label ?? ""));
+    };
+    renderLike(readLikes()[slug] ?? 0);
+    // Press and hold to clear this post's likes.
+    let holdTimer: number | undefined;
+    let didReset = false;
+    const cancelHold = () => {
+      clearTimeout(holdTimer);
+      like.classList.remove("holding");
+    };
+    like.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      didReset = false;
+      if (!(readLikes()[slug] > 0)) return;
+      like.classList.add("holding");
+      holdTimer = window.setTimeout(() => {
+        like.classList.remove("holding");
+        const likes = readLikes();
+        delete likes[slug];
+        localStorage.setItem(LIKES_KEY, JSON.stringify(likes));
+        renderLike(0);
+        didReset = true;
+        status.textContent = like.dataset.labelReset ?? "";
+        navigator.vibrate?.(30);
+      }, 700);
+    });
+    ["pointerup", "pointerleave", "pointercancel"].forEach((type) => like.addEventListener(type, cancelHold));
+    like.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    like.addEventListener("click", () => {
+      if (didReset) {
+        didReset = false;
+        return;
+      }
+      const likes = readLikes();
+      const current = likes[slug] ?? 0;
+      if (current >= MAX_LIKES) {
+        status.textContent = like.dataset.labelMax ?? "";
+        return;
+      }
+      likes[slug] = current + 1;
+      localStorage.setItem(LIKES_KEY, JSON.stringify(likes));
+      renderLike(likes[slug]);
+
+      like.classList.remove("pop");
+      void like.offsetWidth; // Restart the animation on rapid clicks.
+      like.classList.add("pop");
+      const burst = document.createElement("span");
+      burst.className = "like-burst";
+      burst.setAttribute("aria-hidden", "true");
+      burst.textContent = "+1";
+      burst.addEventListener("animationend", () => burst.remove());
+      like.append(burst);
+    });
+
+    root.querySelector<HTMLAnchorElement>("[data-share-facebook]")!.addEventListener("click", (e) => {
+      const width = 600;
+      const height = 520;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+      const popup = window.open(
+        (e.currentTarget as HTMLAnchorElement).href,
+        "fb-share",
+        `width=${width},height=${height},left=${left},top=${top}`,
+      );
+      // Fall back to the normal new-tab link if the popup was blocked.
+      if (popup === null) return;
+      popup.opener = null;
+      e.preventDefault();
+    });
+
+    const copy = root.querySelector<HTMLButtonElement>("[data-copy-link]")!;
+    const copyLabel = copy.querySelector<HTMLElement>("[data-copy-label]")!;
+    const idleLabel = copyLabel.textContent;
+    let timer: number | undefined;
+    copy.addEventListener("click", async () => {
+      const url = shareUrl(root);
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        window.prompt("", url);
+        return;
+      }
+      copyLabel.textContent = copy.dataset.labelDone ?? "";
+      status.textContent = copy.dataset.labelDone ?? "";
+      clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        copyLabel.textContent = idleLabel;
+        status.textContent = "";
+      }, 2000);
+    });
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLElement>("[data-post-actions]").forEach(setup);
+  });
+  document.addEventListener("reading-mode-change", () => {
+    document.querySelectorAll<HTMLElement>("[data-post-actions]").forEach(syncFacebookHref);
+  });
+</script>

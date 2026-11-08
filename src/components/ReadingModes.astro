@@ -1,0 +1,64 @@
+---
+import { getLang, useTranslations } from "../i18n/ui";
+
+const t = useTranslations(getLang(Astro.currentLocale));
+const modes = [
+  { id: "tldr", label: t("blog.mode.tldr") },
+  { id: "normal", label: t("blog.mode.normal") },
+  { id: "advanced", label: t("blog.mode.advanced") },
+] as const;
+---
+
+<div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+  <div role="radiogroup" aria-label={t("blog.mode.label")} class="reading-modes inline-flex rounded-full border border-paper/25 bg-ink/40 p-1 text-sm">
+    {
+      modes.map((m) => (
+        <button
+          type="button"
+          role="radio"
+          data-mode-option={m.id}
+          aria-checked={m.id === "normal" ? "true" : "false"}
+          class="rounded-full px-3.5 py-1.5 font-medium text-paper/70 transition-colors hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+        >
+          {m.label}
+        </button>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const KEY = "reading-mode";
+  const MODES = ["tldr", "normal", "advanced"];
+  const isMode = (m: string | null): m is string => m !== null && MODES.includes(m);
+
+  function apply(mode: string) {
+    document.documentElement.dataset.readingMode = mode;
+    document.querySelectorAll<HTMLButtonElement>("[data-mode-option]").forEach((b) => {
+      b.setAttribute("aria-checked", String(b.dataset.modeOption === mode));
+    });
+    // Keep the address bar shareable: `?mode=` reflects the current mode ("normal" is the default, so no param).
+    const url = new URL(location.href);
+    if (mode === "normal") url.searchParams.delete("mode");
+    else url.searchParams.set("mode", mode);
+    if (url.href !== location.href) history.replaceState(history.state, "", url);
+    // Lets content that cannot render while hidden (e.g. Mermaid) catch up.
+    document.dispatchEvent(new CustomEvent("reading-mode-change", { detail: mode }));
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    const options = document.querySelectorAll<HTMLButtonElement>("[data-mode-option]");
+    if (options.length === 0) return;
+    // A shared link's `?mode=` wins for this visit without overwriting the reader's saved preference.
+    const fromUrl = new URL(location.href).searchParams.get("mode");
+    const saved = localStorage.getItem(KEY);
+    apply(isMode(fromUrl) ? fromUrl : isMode(saved) ? saved : "normal");
+    options.forEach((b) => {
+      b.addEventListener("click", () => {
+        const mode = b.dataset.modeOption!;
+        localStorage.setItem(KEY, mode);
+        apply(mode);
+      });
+    });
+  });
+</script>

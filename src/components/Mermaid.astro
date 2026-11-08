@@ -1,0 +1,315 @@
+---
+/**
+ * Renders `<pre class="mermaid">` blocks on the client and opens them in a zoomable viewer on click.
+ * Mermaid is loaded only on pages that use it.
+ */
+import { getLang, useTranslations } from "../i18n/ui";
+
+const t = useTranslations(getLang(Astro.currentLocale));
+const btn =
+  "inline-flex size-9 items-center justify-center rounded-full text-paper/80 transition-colors hover:bg-paper/10 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
+const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round", class: "size-5" } as const;
+---
+
+<dialog
+  id="diagram-viewer"
+  aria-label={t("diagram.dialog")}
+  data-open-label={t("diagram.open")}
+  class="m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-paper backdrop:bg-ink/85 backdrop:backdrop-blur-sm"
+>
+  <div class="flex h-full flex-col">
+    <div class="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center p-3 sm:p-4">
+      <div class="pointer-events-auto flex items-center gap-0.5 rounded-full border border-paper/20 bg-ink/80 p-1 shadow-2xl shadow-ink/60 backdrop-blur-md">
+        <button type="button" data-action="zoom-out" class={btn} aria-label={t("diagram.zoomOut")} title={`${t("diagram.zoomOut")} (−)`}>
+          <svg {...icon}><circle cx="11" cy="11" r="7"></circle><path d="M8 11h6M20 20l-4-4"></path></svg>
+        </button>
+        <button
+          type="button"
+          data-action="reset"
+          class="h-9 min-w-16 rounded-full px-2 text-center text-sm tabular-nums text-paper/80 transition-colors hover:bg-paper/10 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+          aria-label={t("diagram.reset")}
+          title={`${t("diagram.reset")} (0)`}
+        >
+          <span data-zoom-level aria-live="polite">100%</span>
+        </button>
+        <button type="button" data-action="zoom-in" class={btn} aria-label={t("diagram.zoomIn")} title={`${t("diagram.zoomIn")} (+)`}>
+          <svg {...icon}><circle cx="11" cy="11" r="7"></circle><path d="M8 11h6M11 8v6M20 20l-4-4"></path></svg>
+        </button>
+        <span aria-hidden="true" class="mx-1 h-5 w-px bg-paper/20"></span>
+        <button type="button" data-action="fit" class={btn} aria-label={t("diagram.fit")} title={t("diagram.fit")}>
+          <svg {...icon}><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
+        </button>
+        <button type="button" data-action="actual" class={btn} aria-label={t("diagram.actual")} title={`${t("diagram.actual")} (1)`}>
+          <span aria-hidden="true" class="text-xs font-semibold">1:1</span>
+        </button>
+        <button type="button" data-action="download" class={btn} aria-label={t("diagram.download")} title={t("diagram.download")}>
+          <svg {...icon}><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
+        </button>
+        <span aria-hidden="true" class="mx-1 h-5 w-px bg-paper/20"></span>
+        <button type="button" data-action="close" class={btn} aria-label={t("diagram.close")} title={`${t("diagram.close")} (Esc)`}>
+          <svg {...icon}><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+    </div>
+    <div data-viewport class="relative flex-1 cursor-grab touch-none overflow-hidden select-none active:cursor-grabbing">
+      <div data-stage class="absolute top-0 left-0 origin-top-left"></div>
+    </div>
+    <p class="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-center text-xs text-paper/50">{t("diagram.hint")}</p>
+  </div>
+</dialog>
+
+<script>
+  let mermaidReady: Promise<typeof import("mermaid").default> | undefined;
+
+  function loadMermaid() {
+    mermaidReady ??= import("mermaid").then(({ default: mermaid }) => {
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "strict",
+        theme: "base",
+        fontFamily: '"Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif',
+        themeVariables: {
+          darkMode: true,
+          background: "#2b1d12",
+          primaryColor: "#4a2f1c",
+          primaryTextColor: "#f6ecd9",
+          primaryBorderColor: "#d9b54a",
+          secondaryColor: "#3a2617",
+          tertiaryColor: "#2b1d12",
+          lineColor: "#d9b54a",
+          textColor: "#f6ecd9",
+          noteBkgColor: "#4a2f1c",
+          noteTextColor: "#f6ecd9",
+          noteBorderColor: "#e9a3b4",
+          actorBkg: "#4a2f1c",
+          actorBorder: "#d9b54a",
+          actorTextColor: "#f6ecd9",
+          signalColor: "#f6ecd9",
+          signalTextColor: "#f6ecd9",
+        },
+      });
+      return mermaid;
+    });
+    return mermaidReady;
+  }
+
+  /* ---------- Viewer ---------- */
+
+  const MIN = 0.1;
+  const MAX = 8;
+  const STEP = 1.25;
+
+  const view = { scale: 1, x: 0, y: 0, width: 0, height: 0 };
+  let dialog: HTMLDialogElement;
+  let viewport: HTMLElement;
+  let stage: HTMLElement;
+  let level: HTMLElement;
+  let currentSvg: SVGSVGElement | null = null;
+
+  const clamp = (v: number) => Math.min(MAX, Math.max(MIN, v));
+
+  function paint() {
+    stage.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
+    level.textContent = `${Math.round(view.scale * 100)}%`;
+  }
+
+  /** Zooms to `next`, keeping the point (cx, cy) of the viewport fixed. */
+  function zoomTo(next: number, cx = viewport.clientWidth / 2, cy = viewport.clientHeight / 2) {
+    const scale = clamp(next);
+    view.x = cx - ((cx - view.x) * scale) / view.scale;
+    view.y = cy - ((cy - view.y) * scale) / view.scale;
+    view.scale = scale;
+    paint();
+  }
+
+  function center(scale: number) {
+    view.scale = clamp(scale);
+    view.x = (viewport.clientWidth - view.width * view.scale) / 2;
+    view.y = (viewport.clientHeight - view.height * view.scale) / 2;
+    paint();
+  }
+
+  function fit() {
+    const pad = 48;
+    const sx = (viewport.clientWidth - pad * 2) / view.width;
+    const sy = (viewport.clientHeight - pad * 2) / view.height;
+    center(Math.min(sx, sy, MAX));
+  }
+
+  function open(source: SVGSVGElement) {
+    const svg = source.cloneNode(true) as SVGSVGElement;
+    const box = source.viewBox.baseVal;
+    view.width = box?.width || source.getBoundingClientRect().width;
+    view.height = box?.height || source.getBoundingClientRect().height;
+    svg.removeAttribute("style");
+    svg.setAttribute("width", String(view.width));
+    svg.setAttribute("height", String(view.height));
+    stage.replaceChildren(svg);
+    currentSvg = svg;
+    dialog.showModal();
+    fit();
+  }
+
+  function download() {
+    if (!currentSvg) return;
+    const xml = new XMLSerializer().serializeToString(currentSvg);
+    const url = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml" }));
+    const a = Object.assign(document.createElement("a"), { href: url, download: "diagram.svg" });
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function bindViewer() {
+    dialog = document.querySelector<HTMLDialogElement>("#diagram-viewer")!;
+    if (!dialog || dialog.dataset.bound) return;
+    dialog.dataset.bound = "true";
+    viewport = dialog.querySelector("[data-viewport]")!;
+    stage = dialog.querySelector("[data-stage]")!;
+    level = dialog.querySelector("[data-zoom-level]")!;
+
+    const actions: Record<string, () => void> = {
+      "zoom-in": () => zoomTo(view.scale * STEP),
+      "zoom-out": () => zoomTo(view.scale / STEP),
+      fit,
+      reset: fit,
+      actual: () => center(1),
+      download,
+      close: () => dialog.close(),
+    };
+    dialog.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((b) => {
+      b.addEventListener("click", () => actions[b.dataset.action!]?.());
+    });
+
+    dialog.addEventListener("keydown", (e) => {
+      const key = { "+": "zoom-in", "=": "zoom-in", "-": "zoom-out", "0": "reset", "1": "actual" }[e.key];
+      if (key) {
+        e.preventDefault();
+        actions[key]();
+      }
+    });
+    dialog.addEventListener("close", () => {
+      stage.replaceChildren();
+      currentSvg = null;
+    });
+
+    viewport.addEventListener(
+      "wheel",
+      (e) => {
+        e.preventDefault();
+        const rect = viewport.getBoundingClientRect();
+        zoomTo(view.scale * Math.exp(-e.deltaY * 0.0015), e.clientX - rect.left, e.clientY - rect.top);
+      },
+      { passive: false },
+    );
+
+    // Drag to pan, two fingers to pinch-zoom.
+    const pointers = new Map<number, { x: number; y: number }>();
+    let pinch = 0;
+    viewport.addEventListener("pointerdown", (e) => {
+      viewport.setPointerCapture(e.pointerId);
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    });
+    viewport.addEventListener("pointermove", (e) => {
+      const prev = pointers.get(e.pointerId);
+      if (!prev) return;
+      const pos = { x: e.clientX, y: e.clientY };
+      pointers.set(e.pointerId, pos);
+      if (pointers.size === 1) {
+        view.x += pos.x - prev.x;
+        view.y += pos.y - prev.y;
+        paint();
+      } else if (pointers.size === 2) {
+        const [a, b] = [...pointers.values()];
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        const rect = viewport.getBoundingClientRect();
+        if (pinch) zoomTo((view.scale * dist) / pinch, (a.x + b.x) / 2 - rect.left, (a.y + b.y) / 2 - rect.top);
+        pinch = dist;
+      }
+    });
+    const release = (e: PointerEvent) => {
+      pointers.delete(e.pointerId);
+      if (pointers.size < 2) pinch = 0;
+    };
+    viewport.addEventListener("pointerup", release);
+    viewport.addEventListener("pointercancel", release);
+    viewport.addEventListener("dblclick", (e) => {
+      const rect = viewport.getBoundingClientRect();
+      zoomTo(view.scale * 2, e.clientX - rect.left, e.clientY - rect.top);
+    });
+  }
+
+  /** Makes a rendered diagram open the viewer on click or Enter/Space. */
+  function makeExpandable(pre: HTMLElement) {
+    if (pre.dataset.expandable) return;
+    pre.dataset.expandable = "true";
+    pre.tabIndex = 0;
+    pre.setAttribute("role", "button");
+    pre.setAttribute("aria-label", dialog.dataset.openLabel ?? "");
+    const openThis = () => {
+      const svg = pre.querySelector("svg");
+      if (svg) open(svg);
+    };
+    pre.addEventListener("click", openThis);
+    pre.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openThis();
+      }
+    });
+  }
+
+  /** Renders visible diagrams only: Mermaid measures text, which fails inside `display: none`. */
+  async function renderVisible() {
+    const nodes = [...document.querySelectorAll<HTMLElement>("pre.mermaid:not([data-processed])")].filter(
+      (n) => n.offsetParent !== null,
+    );
+    if (nodes.length > 0) {
+      const mermaid = await loadMermaid();
+      await mermaid.run({ nodes });
+    }
+    document.querySelectorAll<HTMLElement>("pre.mermaid[data-processed]").forEach(makeExpandable);
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    bindViewer();
+    renderVisible();
+  });
+  document.addEventListener("reading-mode-change", renderVisible);
+</script>
+
+<style is:global>
+  pre.mermaid {
+    margin-block: 1.75em;
+    overflow-x: auto;
+    border: 1px solid rgb(246 236 217 / 0.15);
+    border-radius: 1rem;
+    background: rgb(43 29 18 / 0.5);
+    padding: 1.25rem;
+    text-align: center;
+    color: transparent; /* hide raw source until rendered */
+  }
+
+  pre.mermaid[data-processed] {
+    color: inherit;
+  }
+
+  pre.mermaid[data-expandable] {
+    cursor: zoom-in;
+    transition: border-color 250ms;
+  }
+
+  pre.mermaid[data-expandable]:hover {
+    border-color: var(--color-rice);
+  }
+
+  pre.mermaid[data-expandable]:focus-visible {
+    outline: 2px solid var(--color-rice);
+    outline-offset: 2px;
+  }
+
+  pre.mermaid svg {
+    margin-inline: auto;
+    max-width: 100%;
+    height: auto;
+  }
+</style>
