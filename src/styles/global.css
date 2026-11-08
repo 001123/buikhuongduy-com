@@ -146,6 +146,13 @@
   animation: none;
 }
 
+/* The home-only "open to work" pill disappears at once when leaving home,
+   instead of lingering as a fading box over the incoming page. */
+::view-transition-old(open-to-work) {
+  animation: none;
+  opacity: 0;
+}
+
 ::view-transition-group(*) {
   animation-duration: 0.35s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);

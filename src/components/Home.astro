@@ -24,15 +24,15 @@ const pill =
       <a
         href={sectionPaths.contact[lang]}
         transition:name="open-to-work"
+        transition:animate="none"
         data-open-to-work
-        class="glow-text-hover group absolute top-4 left-4 z-40 hidden sm:inline-flex h-[2.375rem] items-center gap-2.5 rounded-full border border-paper/25 bg-ink pr-4 pl-3.5 text-xs font-medium tracking-wide text-paper/90 shadow-lg shadow-ink/20 backdrop-blur-md hover:border-rice/60 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:top-6 sm:left-6 sm:text-[0.8125rem]"
+        class="glow-text-hover group absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 z-40 inline-flex -translate-x-1/2 whitespace-nowrap sm:bottom-auto sm:translate-x-0 h-[2.375rem] items-center gap-2.5 rounded-full border border-paper/25 bg-ink pr-4 pl-[0.9375rem] text-xs font-medium tracking-wide text-paper/90 shadow-lg shadow-ink/20 hover:border-rice/60 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:top-6 sm:left-6 sm:text-[0.8125rem]"
       >
-        <span aria-hidden="true" class="relative flex size-2">
-          <span class="absolute inset-0 rounded-full bg-rice motion-safe:animate-ping motion-safe:[animation-duration:2.4s]"></span>
-          <span class="relative size-2 rounded-full bg-rice shadow-[0_0_8px_rgb(217_181_74/0.9)]"></span>
-        </span>
+        <svg data-envelope aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-rice">
+          <rect x="3" y="5.5" width="18" height="13" rx="2" />
+          <path d="M3 6.5l9 6 9-6" />
+        </svg>
         <span>{t("hero.status")}</span>
-        <span aria-hidden="true" class="text-rice transition-transform duration-300 group-hover:translate-x-0.5">→</span>
       </a>
     )
   }
@@ -83,13 +83,21 @@ const pill =
   /* Badge "open to work" fades in on its own right after the intro animations so it catches the eye.
      Pure CSS delay (not tied to window load) keeps the last visual change early for Speed Index. */
   [data-open-to-work] {
+    /* Rises from below on mobile (pinned to the bottom), drops from above on larger screens (top-left corner). */
+    --open-to-work-from: 8px;
     animation: open-to-work-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.9s both;
+  }
+
+  @media (min-width: 40rem) {
+    [data-open-to-work] {
+      --open-to-work-from: -8px;
+    }
   }
 
   @keyframes open-to-work-in {
     from {
       opacity: 0;
-      transform: translateY(-8px) scale(0.96);
+      transform: translateY(var(--open-to-work-from)) scale(0.96);
     }
     to {
       opacity: 1;
@@ -97,9 +105,38 @@ const pill =
     }
   }
 
+  /* Envelope wiggles like a new-mail notification while the badge is hovered or focused. */
+  [data-open-to-work]:hover [data-envelope],
+  [data-open-to-work]:focus-visible [data-envelope] {
+    animation: envelope-wiggle 0.6s ease-in-out;
+  }
+
+  @keyframes envelope-wiggle {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    15% {
+      transform: rotate(-14deg);
+    }
+    30% {
+      transform: rotate(12deg);
+    }
+    45% {
+      transform: rotate(-9deg);
+    }
+    60% {
+      transform: rotate(6deg);
+    }
+    75% {
+      transform: rotate(-3deg);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    [data-open-to-work] {
-      animation: none;
+    [data-open-to-work],
+    [data-open-to-work] [data-envelope] {
+      animation: none !important;
     }
   }
 </style>
