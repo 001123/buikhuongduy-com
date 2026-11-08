@@ -97,7 +97,7 @@ const buildMonth = {
         target="_blank"
         rel="noopener"
         aria-label={`${content.avatarAlt} (LinkedIn)`}
-        class="rounded-2xl glow-hover hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+        class="rounded-full glow-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
       >
         <Image
           src={avatar}
@@ -105,7 +105,7 @@ const buildMonth = {
           width={384}
           height={384}
           loading="eager"
-          class="size-36 rounded-2xl border border-paper/20 object-cover shadow-xl shadow-ink/50 transition-colors hover:border-rice sm:size-40"
+          class="size-36 rounded-full border border-paper/20 object-cover shadow-xl shadow-ink/50 transition-colors hover:border-rice sm:size-40"
         />
       </a>
     </div>
@@ -140,7 +140,7 @@ const buildMonth = {
         <time data-current-month data-lang={lang} datetime={buildMonth.iso}>{buildMonth.label}</time>
       </p>
       <p class="font-medium text-paper">
-        {t("about.hire")} <a href={sectionPaths.contact[lang]} class="text-rice no-underline hover:underline">{t("about.hireLink")} →</a>
+        {t("about.hire")} <a href={sectionPaths.contact[lang]} class="text-rice underline decoration-rice/50 underline-offset-4 hover:decoration-rice">{t("about.hireLink")} →</a>
       </p>
     </li>
     {
