@@ -1,5 +1,5 @@
 import { cvUrl, email, socials } from "../data/profile";
-import { homePath, languages, locales, ui, type Lang } from "../i18n/ui";
+import { homePath, languages, locales, sectionPaths, ui, type Lang } from "../i18n/ui";
 
 /** schema.org type of the page itself. */
 export type PageType = "WebPage" | "ProfilePage" | "ContactPage" | "CollectionPage";
@@ -95,6 +95,18 @@ export function structuredData(input: StructuredDataInput) {
   const graph: Record<string, unknown>[] = [person, organization, website, page];
 
   if (article) {
+    const breadcrumbId = `${pageUrl.href}#breadcrumb`;
+    page.breadcrumb = { "@id": breadcrumbId };
+    const crumbs = [
+      { name: t["nav.home"], item: abs(homePath[lang]) },
+      { name: t["nav.blog"], item: abs(sectionPaths.blog[lang]) },
+      { name: article.headline, item: pageUrl.href },
+    ];
+    graph.push({
+      "@type": "BreadcrumbList",
+      "@id": breadcrumbId,
+      itemListElement: crumbs.map((crumb, i) => ({ "@type": "ListItem", position: i + 1, ...crumb })),
+    });
     graph.push({
       "@type": "BlogPosting",
       "@id": `${pageUrl.href}#article`,
