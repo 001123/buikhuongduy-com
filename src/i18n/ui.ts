@@ -20,6 +20,7 @@ export const ui = {
     "nav.cv": "CV",
     "nav.home": "Trang chủ",
     "lang.switch": "Chuyển ngôn ngữ",
+    "scroll.top": "Lên đầu trang",
 
     "about.title": "Giới Thiệu",
     "about.lead": "Đôi lời về mình, những gì mình làm và con đường đã đi qua.",
@@ -49,6 +50,7 @@ export const ui = {
     "nav.cv": "Résumé",
     "nav.home": "Home",
     "lang.switch": "Change language",
+    "scroll.top": "Back to top",
 
     "about.title": "About",
     "about.lead": "A little about me, what I do and the path that led here.",

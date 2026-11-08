@@ -6,6 +6,7 @@ import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import CursorEffects from "../components/CursorEffects.astro";
+import ScrollToTop from "../components/ScrollToTop.astro";
 import { getLang, homePath, languages, useTranslations, type Lang } from "../i18n/ui";
 
 interface Props {
@@ -67,6 +68,7 @@ const pageUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
   <body class="bg-ink font-sans text-paper antialiased">
     {floatingLangSwitcher && <LanguageSwitcher lang={lang} links={links} />}
     <slot />
+    <ScrollToTop label={t("scroll.top")} />
     <CursorEffects />
     <script>
       document.addEventListener("astro:after-swap", () => {
