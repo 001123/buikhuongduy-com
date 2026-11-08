@@ -8,6 +8,8 @@ interface Props {
 }
 
 const { dim = false } = Astro.props;
+// Under the 75% dim overlay fine detail is invisible, so content pages get one small, low-quality
+// variant: it arrives sooner and competes less with fonts, which keeps Speed Index low.
 
 /**
  * 24px-wide blurred preview of bg-home.webp, inlined so the first paint already shows the scene
@@ -29,7 +31,8 @@ const placeholder =
     alt=""
     formats={["avif", "webp"]}
     fallbackFormat="webp"
-    widths={[640, 960, 1280, bgHome.width]}
+    widths={dim ? [640] : [640, 960, 1280, bgHome.width]}
+    quality={dim ? 40 : undefined}
     sizes="100vw"
     loading="eager"
     fetchpriority="high"
