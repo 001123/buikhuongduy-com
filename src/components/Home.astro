@@ -9,12 +9,35 @@ const t = useTranslations(lang);
 const primary: Section[] = ["about", "blog", "contact"];
 const links = primary.map((s) => ({ label: t(`nav.${s}`), href: sectionPaths[s][lang] }));
 
+/** Tắt khi đã có việc để ẩn dòng "đang tìm việc". */
+const openToWork = true;
+
 const pill =
   "motion-safe:animate-fade-up rounded-full border backdrop-blur-md shadow-lg shadow-ink/30 text-center font-medium tracking-wide glow-hover hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] active:duration-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
 ---
 
 <main class="relative isolate flex min-h-dvh flex-col items-center justify-start overflow-hidden px-6 pt-[16dvh] pb-16 sm:pt-[12dvh]">
   <Background />
+
+  {
+    openToWork && (
+      <a
+        href={sectionPaths.contact[lang]}
+        transition:name="open-to-work"
+        data-open-to-work
+        class="glow-text-hover group absolute top-4 left-4 z-40 inline-flex h-[2.375rem] items-center gap-2.5 rounded-full border border-paper/25 bg-ink/30 pr-4 pl-3.5 text-xs font-medium tracking-wide text-paper/90 shadow-lg shadow-ink/20 backdrop-blur-md hover:border-rice/60 hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:top-6 sm:left-6 sm:text-sm"
+      >
+        <span aria-hidden="true" class="relative flex size-2">
+          <span class="absolute inset-0 rounded-full bg-rice motion-safe:animate-ping motion-safe:[animation-duration:2.4s]"></span>
+          <span class="relative size-2 rounded-full bg-rice shadow-[0_0_8px_rgb(217_181_74/0.9)]"></span>
+        </span>
+        <span>{t("hero.status")}</span>
+        <span aria-hidden="true" class="hidden text-paper/40 sm:inline">·</span>
+        <span class="hidden text-rice sm:inline">{t("nav.contact")}</span>
+        <span aria-hidden="true" class="text-rice transition-transform duration-300 group-hover:translate-x-0.5">→</span>
+      </a>
+    )
+  }
 
   <div class="flex flex-col items-center gap-6 sm:gap-8" transition:name="content-home" transition:animate={contentAnim}>
     <h1 class="motion-safe:animate-fade-up text-center font-serif text-[clamp(2.25rem,10vw,4.5rem)] font-semibold tracking-wide text-balance text-paper text-glow">
@@ -57,3 +80,56 @@ const pill =
     </nav>
   </div>
 </main>
+
+<style>
+  /* Badge "open to work" stays hidden until the page has fully loaded, then fades in on its own so it catches the eye. */
+  [data-open-to-work]:not([data-ready]) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  [data-open-to-work][data-ready] {
+    animation: open-to-work-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes open-to-work-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-open-to-work][data-ready] {
+      animation: none;
+    }
+  }
+</style>
+
+<noscript>
+  <style>
+    [data-open-to-work] {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+  </style>
+</noscript>
+
+<script>
+  // Wait for the full load (background image included) plus a short pause after the intro animations.
+  const REVEAL_DELAY_MS = 500;
+
+  function reveal() {
+    const el = document.querySelector<HTMLElement>("[data-open-to-work]");
+    if (!el || "ready" in el.dataset) return;
+    const show = () => setTimeout(() => (el.dataset.ready = ""), REVEAL_DELAY_MS);
+    if (document.readyState === "complete") show();
+    else window.addEventListener("load", show, { once: true });
+  }
+
+  document.addEventListener("astro:page-load", reveal);
+</script>

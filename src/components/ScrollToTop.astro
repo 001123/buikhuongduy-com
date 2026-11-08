@@ -1,66 +1,40 @@
 ---
-// Nút lên đầu trang: chỉ xuất hiện khi trang dài (≥ 2 màn hình) và người dùng đã cuộn xuống.
-// Vòng viền mảnh thể hiện tiến độ cuộn.
-interface Props {
-  label: string;
-}
+// Lời kết cuối trang: cảm ơn + về trang chủ / lên đầu trang.
+// Chỉ hiện khi trang dài hơn màn hình (người đọc thực sự đã cuộn tới cuối).
+import { getLang, homePath, useTranslations } from "../i18n/ui";
 
-const { label } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+const pill =
+  "group inline-flex items-center gap-1.5 rounded-full border border-paper/20 bg-ink/40 px-3.5 py-1.5 text-sm text-paper/60 backdrop-blur-md glow-hover hover:border-rice/60 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
+const icon = "size-4 transition-transform duration-300";
 ---
 
-<button
-  type="button"
-  id="scroll-to-top"
-  aria-label={label}
-  title={label}
-  tabindex="-1"
-  class="scroll-top group fixed right-4 bottom-4 z-50 grid size-11 place-items-center rounded-full bg-ink/50 text-paper/80 shadow-lg shadow-ink/40 backdrop-blur-md glow-hover hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:right-6 sm:bottom-6"
->
-  <svg aria-hidden="true" viewBox="0 0 44 44" class="absolute inset-0 size-full -rotate-90">
-    <circle cx="22" cy="22" r="21" fill="none" stroke="currentColor" stroke-opacity="0.2" stroke-width="1" />
-    <circle
-      class="scroll-top-progress"
-      cx="22"
-      cy="22"
-      r="21"
-      fill="none"
-      stroke="var(--color-rice)"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      pathLength="1"
-      stroke-dasharray="1"
-      stroke-dashoffset="1"></circle>
-  </svg>
-  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 transition-transform duration-300 group-hover:-translate-y-0.5">
-    <path d="M18 15l-6-6-6 6"></path>
-  </svg>
-</button>
+<footer data-scroll-top hidden class="flex flex-col items-center gap-4 pt-10 text-center sm:pt-12">
+  <span aria-hidden="true" class="h-px w-24 bg-linear-to-r from-transparent via-rice/60 to-transparent"></span>
+  <div class="space-y-1">
+    <p class="font-serif text-lg text-paper/80 italic">{t("end.thanks")}</p>
+    <p class="text-sm text-paper/50">{t("end.prompt")}</p>
+  </div>
+  <div class="flex flex-wrap justify-center gap-3">
+    <a href={homePath[lang]} class={pill}>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={`${icon} group-hover:-translate-x-0.5`}>
+        <path d="M15 18l-6-6 6-6"></path>
+      </svg>
+      {t("nav.home")}
+    </a>
+    <button type="button" class={pill}>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={`${icon} group-hover:-translate-y-0.5`}>
+        <path d="M18 15l-6-6-6 6"></path>
+      </svg>
+      {t("scroll.top")}
+    </button>
+  </div>
+</footer>
 
 <style>
-  .scroll-top {
-    opacity: 0;
-    visibility: hidden;
-    translate: 0 0.75rem;
-    transition:
-      opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-      translate 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-      visibility 0s linear 0.4s,
-      color 250ms,
-      box-shadow 250ms;
-  }
-
-  .scroll-top[data-visible] {
-    opacity: 1;
-    visibility: visible;
-    translate: 0 0;
-    transition-delay: 0s;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-top,
-    .scroll-top[data-visible] {
-      translate: none;
-    }
+  [data-scroll-top]:not([hidden]) {
+    animation: var(--animate-fade-up);
   }
 </style>
 
@@ -70,34 +44,24 @@ const { label } = Astro.props;
 
   function update() {
     frame = 0;
-    const btn = document.getElementById("scroll-to-top");
-    if (!btn) return;
-
-    const viewport = window.innerHeight;
-    const scrollable = document.documentElement.scrollHeight - viewport;
-    // Trang ngắn hơn ~2 màn hình thì không cần nút.
-    const isLong = scrollable > viewport;
-    const visible = isLong && window.scrollY > viewport * 0.75;
-
-    btn.toggleAttribute("data-visible", visible);
-    btn.tabIndex = visible ? 0 : -1;
-
-    const progress = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
-    btn.querySelector<SVGCircleElement>(".scroll-top-progress")?.setAttribute("stroke-dashoffset", String(1 - progress));
+    const el = document.querySelector<HTMLElement>("[data-scroll-top]");
+    if (!el) return;
+    // Trừ chiều cao của chính khối này để tránh bật/tắt qua lại ở ngưỡng.
+    const ownHeight = el.hidden ? 0 : el.offsetHeight;
+    const scrollable = document.documentElement.scrollHeight - ownHeight > window.innerHeight + 1;
+    if (el.hidden === scrollable) el.hidden = !scrollable;
   }
 
   function schedule() {
     if (!frame) frame = requestAnimationFrame(update);
   }
 
-  window.addEventListener("scroll", schedule, { passive: true });
   window.addEventListener("resize", schedule, { passive: true });
-  new ResizeObserver(schedule).observe(document.documentElement);
+  new ResizeObserver(schedule).observe(document.body);
+  document.addEventListener("astro:page-load", schedule);
 
   document.addEventListener("click", (e) => {
-    if (!(e.target instanceof Element) || !e.target.closest("#scroll-to-top")) return;
+    if (!(e.target instanceof Element) || !e.target.closest("[data-scroll-top] button")) return;
     window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
   });
-
-  document.addEventListener("astro:page-load", schedule);
 </script>

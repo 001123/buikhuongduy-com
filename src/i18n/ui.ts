@@ -16,11 +16,14 @@ export const ui = {
     "nav.label": "Điều hướng chính",
     "nav.about": "Giới Thiệu",
     "nav.blog": "Blog",
-    "nav.contact": "Liên Hệ",
+    "nav.contact": "Kết Nối",
     "nav.cv": "CV",
     "nav.home": "Trang chủ",
     "lang.switch": "Chuyển ngôn ngữ",
     "scroll.top": "Lên đầu trang",
+    "end.thanks": "Cảm ơn bạn đã đọc đến cuối.",
+    "end.prompt": "Bạn muốn quay về trang chủ hay đọc lại từ đầu?",
+    "hero.status": "Sẵn sàng cho cơ hội mới",
 
     "about.title": "Giới Thiệu",
     "about.lead": "Đôi lời về mình, những gì mình làm và con đường đã đi qua.",
@@ -35,8 +38,8 @@ export const ui = {
     "blog.lead": "Ghi chép, suy nghĩ và những điều mình học được.",
     "blog.empty": "Bài viết đầu tiên đang được chuẩn bị.",
 
-    "contact.title": "Liên Hệ",
-    "contact.lead": "Bạn muốn hợp tác, trao đổi hay chỉ đơn giản là chào hỏi? Mình luôn sẵn lòng.",
+    "contact.title": "Kết Nối",
+    "contact.lead": "Mình đang sẵn sàng cho công việc mới, đặc biệt là vai trò Frontend Lead hoặc AI\u2060-\u2060native engineering. Nếu đội của bạn đang tìm người, hãy kết nối với mình nhé!",
     "contact.email": "Email",
   },
   en: {
@@ -51,6 +54,9 @@ export const ui = {
     "nav.home": "Home",
     "lang.switch": "Change language",
     "scroll.top": "Back to top",
+    "end.thanks": "Thanks for reading to the end.",
+    "end.prompt": "Would you like to head back home or start again from the top?",
+    "hero.status": "Open to new opportunities",
 
     "about.title": "About",
     "about.lead": "A little about me, what I do and the path that led here.",
@@ -66,7 +72,7 @@ export const ui = {
     "blog.empty": "The first post is on its way.",
 
     "contact.title": "Contact",
-    "contact.lead": "Want to collaborate, talk shop or just say hi? I'd love to hear from you.",
+    "contact.lead": "I'm open to new roles, especially Frontend Lead or AI\u2060-\u2060native engineering positions. If your team is hiring, let's connect!",
     "contact.email": "Email",
   },
 } as const satisfies Record<Lang, Record<string, string>>;

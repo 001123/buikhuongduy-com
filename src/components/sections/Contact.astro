@@ -1,6 +1,7 @@
 ---
 import SectionPage from "../../layouts/SectionPage.astro";
 import ContactIcon, { type IconName } from "../ContactIcon.astro";
+import HireQuiz from "../HireQuiz.astro";
 import { getLang, useTranslations } from "../../i18n/ui";
 import { cvUrl, email, socials } from "../../data/profile";
 
@@ -15,6 +16,7 @@ const links: { label: string; icon: IconName; value: string; href: string }[] = 
 ---
 
 <SectionPage section="contact" title={t("contact.title")} lead={t("contact.lead")}>
+  <HireQuiz lang={lang} />
   <ul class="not-prose divide-y divide-paper/15 overflow-hidden rounded-2xl border border-paper/20 bg-ink/40 backdrop-blur-md">
     {
       links.map((l) => (

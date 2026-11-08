@@ -2,6 +2,7 @@
 import Layout from "./Layout.astro";
 import Background from "../components/Background.astro";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
+import ScrollToTop from "../components/ScrollToTop.astro";
 import { contentAnim } from "../components/transitions";
 import { getLang, homePath, sectionPaths, useTranslations, type Section } from "../i18n/ui";
 
@@ -36,11 +37,12 @@ const t = useTranslations(lang);
       <header class="mb-10 flex flex-col items-start gap-4">
         <h1 class="font-serif text-[clamp(2rem,8vw,3.5rem)] font-semibold tracking-wide text-paper">{title}</h1>
         <span aria-hidden="true" class="h-px w-24 bg-linear-to-r from-rice to-transparent sm:w-40"></span>
-        <p class="text-lg text-paper/80">{lead}</p>
+        <p class="text-lg text-pretty text-paper/80">{lead}</p>
       </header>
       <div class="prose prose-invert max-w-none prose-headings:font-serif prose-headings:text-paper prose-a:text-rice prose-a:glow-text-hover prose-strong:text-paper">
         <slot />
       </div>
     </article>
+    <ScrollToTop />
   </main>
 </Layout>
