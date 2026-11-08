@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
@@ -14,6 +14,29 @@ import remarkMermaid from './src/lib/remark-mermaid.mjs';
 // https://astro.build/config
 export default defineConfig({
   site: SITE,
+  // Self-hosted fonts with preloads and metric-matched fallbacks, so the swap causes no layout shift.
+  fonts: [
+    {
+      provider: fontProviders.fontsource(),
+      name: 'Be Vietnam Pro',
+      cssVariable: '--font-be-vietnam-pro',
+      weights: [400, 500],
+      subsets: ['latin', 'latin-ext', 'vietnamese'],
+      fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: 'Playfair Display',
+      cssVariable: '--font-playfair-display',
+      weights: ['400 900'],
+      subsets: ['latin', 'latin-ext', 'vietnamese'],
+      fallbacks: ['Georgia', 'serif'],
+    },
+  ],
+  // The site CSS is small; inlining it removes the render-blocking request.
+  build: {
+    inlineStylesheets: 'always',
+  },
   i18n: {
     locales: ['vi', 'en'],
     defaultLocale: 'vi',

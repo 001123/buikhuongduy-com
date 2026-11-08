@@ -1,9 +1,7 @@
 ---
-import "@fontsource-variable/playfair-display/wght.css";
-import "@fontsource/be-vietnam-pro/400.css";
-import "@fontsource/be-vietnam-pro/500.css";
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
+import { Font } from "astro:assets";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import CursorEffects from "../components/CursorEffects.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
@@ -123,6 +121,8 @@ const jsonLd = structuredData({
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
+    <Font cssVariable="--font-be-vietnam-pro" preload={[{ weight: 400, subset: "latin" }, { weight: 400, subset: "vietnamese" }]} />
+    <Font cssVariable="--font-playfair-display" preload={[{ style: "normal", subset: "latin" }, { style: "normal", subset: "vietnamese" }]} />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" href="/favicon.ico" />

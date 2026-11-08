@@ -2,8 +2,8 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-serif: "Playfair Display Variable", ui-serif, Georgia, serif;
-  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair-display);
+  --font-sans: var(--font-be-vietnam-pro);
 
   --color-ink: #2b1d12;
   --color-wood: #4a2f1c;

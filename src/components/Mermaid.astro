@@ -1,7 +1,7 @@
 ---
 /**
- * Renders `<pre class="mermaid">` blocks on the client and opens them in a zoomable viewer on click.
- * Mermaid is loaded only on pages that use it.
+ * Opens build-time rendered Mermaid diagrams (`<figure class="mermaid">`, see remark-mermaid.mjs)
+ * in a zoomable viewer. Included only on pages that have diagrams.
  */
 import { getLang, useTranslations } from "../i18n/ui";
 
@@ -54,45 +54,11 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     <div data-viewport class="relative flex-1 cursor-grab touch-none overflow-hidden select-none active:cursor-grabbing">
       <div data-stage class="absolute top-0 left-0 origin-top-left"></div>
     </div>
-    <p class="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-center text-xs text-paper/50">{t("diagram.hint")}</p>
+    <p class="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-center text-xs text-paper/60">{t("diagram.hint")}</p>
   </div>
 </dialog>
 
 <script>
-  let mermaidReady: Promise<typeof import("mermaid").default> | undefined;
-
-  function loadMermaid() {
-    mermaidReady ??= import("mermaid").then(({ default: mermaid }) => {
-      mermaid.initialize({
-        startOnLoad: false,
-        securityLevel: "strict",
-        theme: "base",
-        fontFamily: '"Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif',
-        themeVariables: {
-          darkMode: true,
-          background: "#2b1d12",
-          primaryColor: "#4a2f1c",
-          primaryTextColor: "#f6ecd9",
-          primaryBorderColor: "#d9b54a",
-          secondaryColor: "#3a2617",
-          tertiaryColor: "#2b1d12",
-          lineColor: "#d9b54a",
-          textColor: "#f6ecd9",
-          noteBkgColor: "#4a2f1c",
-          noteTextColor: "#f6ecd9",
-          noteBorderColor: "#e9a3b4",
-          actorBkg: "#4a2f1c",
-          actorBorder: "#d9b54a",
-          actorTextColor: "#f6ecd9",
-          signalColor: "#f6ecd9",
-          signalTextColor: "#f6ecd9",
-        },
-      });
-      return mermaid;
-    });
-    return mermaidReady;
-  }
-
   /* ---------- Viewer ---------- */
 
   const MIN = 0.1;
@@ -238,47 +204,38 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     });
   }
 
-  /** Makes a rendered diagram open the viewer on click or Enter/Space. */
-  function makeExpandable(pre: HTMLElement) {
-    if (pre.dataset.expandable) return;
-    pre.dataset.expandable = "true";
-    pre.tabIndex = 0;
-    pre.setAttribute("role", "button");
-    pre.setAttribute("aria-label", dialog.dataset.openLabel ?? "");
+  /** Adds an expand button to each diagram; clicking the diagram itself also opens the viewer. */
+  function makeExpandable(figure: HTMLElement) {
+    if (figure.dataset.expandable) return;
+    figure.dataset.expandable = "true";
     const openThis = () => {
-      const svg = pre.querySelector("svg");
+      const svg = figure.querySelector("svg");
       if (svg) open(svg);
     };
-    pre.addEventListener("click", openThis);
-    pre.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        openThis();
-      }
+    const button = Object.assign(document.createElement("button"), {
+      type: "button",
+      className: "mermaid-expand",
+      innerHTML:
+        '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>',
     });
-  }
-
-  /** Renders visible diagrams only: Mermaid measures text, which fails inside `display: none`. */
-  async function renderVisible() {
-    const nodes = [...document.querySelectorAll<HTMLElement>("pre.mermaid:not([data-processed])")].filter(
-      (n) => n.offsetParent !== null,
-    );
-    if (nodes.length > 0) {
-      const mermaid = await loadMermaid();
-      await mermaid.run({ nodes });
-    }
-    document.querySelectorAll<HTMLElement>("pre.mermaid[data-processed]").forEach(makeExpandable);
+    button.setAttribute("aria-label", dialog.dataset.openLabel ?? "");
+    button.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openThis();
+    });
+    figure.append(button);
+    figure.addEventListener("click", openThis);
   }
 
   document.addEventListener("astro:page-load", () => {
     bindViewer();
-    renderVisible();
+    document.querySelectorAll<HTMLElement>("figure.mermaid").forEach(makeExpandable);
   });
-  document.addEventListener("reading-mode-change", renderVisible);
 </script>
 
 <style is:global>
-  pre.mermaid {
+  figure.mermaid {
+    position: relative;
     margin-block: 1.75em;
     overflow-x: auto;
     border: 1px solid rgb(246 236 217 / 0.15);
@@ -286,30 +243,50 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     background: rgb(43 29 18 / 0.5);
     padding: 1.25rem;
     text-align: center;
-    color: transparent; /* hide raw source until rendered */
   }
 
-  pre.mermaid[data-processed] {
-    color: inherit;
-  }
-
-  pre.mermaid[data-expandable] {
+  figure.mermaid[data-expandable] {
     cursor: zoom-in;
     transition: border-color 250ms;
   }
 
-  pre.mermaid[data-expandable]:hover {
+  figure.mermaid[data-expandable]:hover {
     border-color: var(--color-rice);
   }
 
-  pre.mermaid[data-expandable]:focus-visible {
+  figure.mermaid svg {
+    margin-inline: auto;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .mermaid-expand {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    color: rgb(246 236 217 / 0.8);
+    background: rgb(43 29 18 / 0.7);
+    transition: color 250ms, background-color 250ms;
+  }
+
+  .mermaid-expand:hover {
+    color: var(--color-rice);
+    background: rgb(246 236 217 / 0.1);
+  }
+
+  .mermaid-expand:focus-visible {
     outline: 2px solid var(--color-rice);
     outline-offset: 2px;
   }
 
-  pre.mermaid svg {
-    margin-inline: auto;
-    max-width: 100%;
-    height: auto;
+  .mermaid-expand svg {
+    width: 1rem;
+    height: 1rem;
   }
 </style>
