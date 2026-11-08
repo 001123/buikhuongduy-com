@@ -67,7 +67,7 @@ const pill =
         links.map(({ label, href }, i) => (
           <a
             href={href}
-            style={`animation-delay: ${300 + i * 120}ms`}
+            style={`animation-delay: ${200 + i * 80}ms`}
             class:list={[
               pill,
               "border-paper/50 bg-ink/40 px-6 py-3 text-base text-paper hover:border-rice hover:bg-ink/60 hover:text-rice sm:min-w-36 sm:px-8 sm:text-lg",
@@ -82,14 +82,10 @@ const pill =
 </main>
 
 <style>
-  /* Badge "open to work" stays hidden until the page has fully loaded, then fades in on its own so it catches the eye. */
-  [data-open-to-work]:not([data-ready]) {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  [data-open-to-work][data-ready] {
-    animation: open-to-work-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* Badge "open to work" fades in on its own right after the intro animations so it catches the eye.
+     Pure CSS delay (not tied to window load) keeps the last visual change early for Speed Index. */
+  [data-open-to-work] {
+    animation: open-to-work-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.9s both;
   }
 
   @keyframes open-to-work-in {
@@ -104,32 +100,8 @@ const pill =
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-open-to-work][data-ready] {
+    [data-open-to-work] {
       animation: none;
     }
   }
 </style>
-
-<noscript>
-  <style>
-    [data-open-to-work] {
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-  </style>
-</noscript>
-
-<script>
-  // Wait for the full load (background image included) plus a short pause after the intro animations.
-  const REVEAL_DELAY_MS = 500;
-
-  function reveal() {
-    const el = document.querySelector<HTMLElement>("[data-open-to-work]");
-    if (!el || "ready" in el.dataset) return;
-    const show = () => setTimeout(() => (el.dataset.ready = ""), REVEAL_DELAY_MS);
-    if (document.readyState === "complete") show();
-    else window.addEventListener("load", show, { once: true });
-  }
-
-  document.addEventListener("astro:page-load", reveal);
-</script>

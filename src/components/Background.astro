@@ -8,9 +8,22 @@ interface Props {
 }
 
 const { dim = false } = Astro.props;
+
+/**
+ * 24px-wide blurred preview of bg-home.webp, inlined so the first paint already shows the scene
+ * instead of a flat colour (big Speed Index win). Regenerate if the image changes:
+ * sharp("src/assets/bg-home.webp").resize(24).webp({ quality: 40 }).toBuffer() → base64.
+ */
+const placeholder =
+  "data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAACQBQCdASoYABIAPu1sq1EppaOiqAqpMB2JZACdG1/tv8Ax73Bex/CZyzb9eS0rVQRUGXrFAAD+z+upRi3hOJtVGCBI4H9mh9HICE+41IBiNImXdWefz17r+RauDsDgOxcFyxGLd5ZyqJyUJCEzcYJROkFyW2GSKFE43N7RxtFxaBFQ//WAAyaBtcbEbwkXZ901o91mc56q1GjDAAA=";
 ---
 
-<div class="fixed inset-0 -z-20" transition:name="home-bg" transition:animate="none">
+<div class="fixed inset-0 -z-20 overflow-hidden bg-[#87694a]" transition:name="home-bg" transition:animate="none">
+  <div
+    aria-hidden="true"
+    class="absolute inset-0 scale-110 bg-cover bg-[55%_center] blur-xl"
+    style={`background-image: url(${placeholder})`}
+  ></div>
   <Picture
     src={bgHome}
     alt=""
@@ -20,7 +33,7 @@ const { dim = false } = Astro.props;
     sizes="100vw"
     loading="eager"
     fetchpriority="high"
-    pictureAttributes={{ class: "block h-full w-full" }}
+    pictureAttributes={{ class: "relative block h-full w-full" }}
     class="h-full w-full object-cover object-[55%_center]"
   />
 </div>
