@@ -1,31 +1,47 @@
 ---
-// End-of-page outro: thank-you + go back (home as fallback) / back to top.
+// End-of-page outro: thank-you + go back (home as fallback) / back to top / home.
 // Shown only when the page is taller than the viewport (the reader actually scrolled to the end).
 import { getLang, homePath, useTranslations } from "../i18n/ui";
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
-// Split the prompt around {back}/{top} so both actions sit inline in the sentence.
-const prompt = t("end.prompt").split(/(\{back\}|\{top\})/);
-const link =
-  "cursor-pointer rounded-sm text-paper/80 underline decoration-rice/40 decoration-1 underline-offset-4 transition-colors hover:text-rice hover:decoration-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
+// Each action is a full-width button on its own row.
+const button =
+  "flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-paper/15 px-5 py-2.5 text-sm text-paper/80 transition-colors hover:border-rice/60 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
+// Lucide-style stroke icons (24x24 viewBox).
+const icons = {
+  back: ["M19 12H5", "M12 19l-7-7 7-7"],
+  top: ["M12 19V5", "M5 12l7-7 7 7"],
+  home: ["M3 10.5 12 3l9 7.5", "M5 9v11a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9"],
+};
+const svg = {
+  "aria-hidden": "true",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  "stroke-width": "2",
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round",
+  class: "size-4 shrink-0",
+} as const;
 ---
 
 <footer data-scroll-top hidden class="mx-auto mt-10 flex w-fit max-w-full flex-col items-center gap-4 rounded-2xl border border-paper/10 bg-ink px-6 pt-0 pb-6 text-center shadow-lg shadow-black/30 sm:mt-12 sm:px-10">
   <span aria-hidden="true" class="h-px w-24 bg-linear-to-r from-transparent via-rice/60 to-transparent"></span>
-  <div class="space-y-2">
-    <p class="font-serif text-lg text-paper/80">{t("end.thanks")}</p>
-    <p class="text-sm text-paper/60">
-      {prompt.map((part) =>
-        part === "{back}" ? (
-          <a href={homePath[lang]} data-back class={link}>{t("end.back")}</a>
-        ) : part === "{top}" ? (
-          <button type="button" data-top class={link}>{t("end.top")}</button>
-        ) : (
-          part
-        ),
-      )}
-    </p>
+  <p class="font-serif text-lg text-paper/80">{t("end.thanks")}</p>
+  <div class="flex w-full flex-col gap-3">
+    <a href={homePath[lang]} data-back class={button}>
+      <svg {...svg}>{icons.back.map((d) => <path d={d} />)}</svg>
+      <span class="inline-block first-letter:uppercase">{t("end.back")}</span>
+    </a>
+    <button type="button" data-top class={button}>
+      <svg {...svg}>{icons.top.map((d) => <path d={d} />)}</svg>
+      <span class="inline-block first-letter:uppercase">{t("end.top")}</span>
+    </button>
+    <a href={homePath[lang]} class={button}>
+      <svg {...svg}>{icons.home.map((d) => <path d={d} />)}</svg>
+      <span class="inline-block first-letter:uppercase">{t("end.home")}</span>
+    </a>
   </div>
 </footer>
 

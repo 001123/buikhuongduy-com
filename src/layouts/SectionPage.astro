@@ -54,14 +54,14 @@ const pageTypes: Record<Section, PageType> = {
   article={article}
   floatingLangSwitcher={false}
 >
-  <main class="relative isolate min-h-dvh px-4 py-10 sm:px-6 sm:py-16">
+  <main class="relative isolate min-h-dvh px-2.5 py-4 sm:px-6 sm:py-8">
     <Background dim />
 
-    <article class="relative mx-auto max-w-[54rem] rounded-3xl border border-paper/15 bg-ink px-6 pt-7 pb-10 shadow-2xl shadow-ink/50 sm:px-12 sm:pt-9 sm:pb-14" transition:name={`content-${section}`} transition:animate={contentAnim}>
+    <article class="relative mx-auto max-w-[54rem] rounded-2xl border border-paper/15 bg-ink px-4 pt-5 pb-8 sm:rounded-3xl shadow-2xl shadow-ink/50 sm:px-12 sm:pt-9 sm:pb-14" transition:name={`content-${section}`} transition:animate={contentAnim}>
       <!-- Subtle golden light streak along the top edge -->
       <span aria-hidden="true" class="pointer-events-none absolute inset-x-[30%] -top-px h-px bg-gradient-to-r from-transparent via-rice/55 to-transparent"></span>
       <span aria-hidden="true" class="pointer-events-none absolute inset-x-[38%] -top-1.5 h-3 rounded-full bg-rice/[0.08] blur-md"></span>
-      <div class="mb-7 flex items-center justify-between gap-3 sm:mb-9">
+      <div class="mb-6 flex items-center justify-between gap-3 sm:mb-9">
         <a
           href={backHref}
           class="inline-flex items-center gap-1.5 rounded-full border border-paper/40 bg-ink/40 px-3 py-1.5 text-sm font-medium text-paper shadow-lg shadow-ink/30 backdrop-blur-md glow-hover hover:border-rice hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
@@ -73,13 +73,13 @@ const pageTypes: Record<Section, PageType> = {
         </a>
         <LanguageSwitcher lang={lang} links={alternates} class="" />
       </div>
-      <header class="mb-10 flex flex-col items-start gap-4">
-        <h1 class="font-serif text-[clamp(2rem,8vw,3.5rem)] font-semibold tracking-wide text-paper">{title}</h1>
+      <header class="mb-8 flex flex-col items-start gap-3 sm:mb-10 sm:gap-4">
+        <h1 class="font-serif text-[clamp(1.75rem,7vw,3.5rem)] leading-tight font-semibold tracking-wide text-paper">{title}</h1>
         <span aria-hidden="true" class="h-px w-24 bg-linear-to-r from-rice to-transparent sm:w-40"></span>
-        <p class="text-lg text-pretty text-paper/80">{lead}</p>
+        <p class="text-base text-pretty text-paper/80 sm:text-lg">{lead}</p>
         <slot name="meta" />
       </header>
-      <div class="prose prose-invert max-w-none [--tw-prose-invert-body:color-mix(in_oklab,var(--color-paper)_88%,transparent)] prose-headings:font-serif prose-headings:text-paper prose-a:text-rice prose-a:glow-text-hover prose-strong:text-paper">
+      <div class="prose prose-invert max-w-none max-sm:text-[0.9375rem] [--tw-prose-invert-body:color-mix(in_oklab,var(--color-paper)_88%,transparent)] prose-headings:font-serif prose-headings:text-paper prose-a:text-rice prose-a:glow-text-hover prose-strong:text-paper">
         <slot />
       </div>
     </article>

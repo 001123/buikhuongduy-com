@@ -29,9 +29,9 @@ export const ui = {
     "nav.back": "Trở lại",
     "scroll.top": "Lên đầu trang",
     "end.thanks": "Cảm ơn bạn đã đọc đến cuối.",
-    "end.prompt": "Bạn muốn {back} hay {top}?",
     "end.back": "trở lại trang trước",
     "end.top": "đọc lại từ đầu",
+    "end.home": "về trang chủ",
     "hero.status": "Sẵn sàng cho cơ hội mới",
 
     "about.title": "Giới Thiệu",
@@ -128,9 +128,9 @@ export const ui = {
     "nav.back": "Back",
     "scroll.top": "Back to top",
     "end.thanks": "Thanks for reading to the end.",
-    "end.prompt": "Would you like to {back} or {top}?",
     "end.back": "go back",
     "end.top": "start again from the top",
+    "end.home": "go to the homepage",
     "hero.status": "Open to new opportunities",
 
     "about.title": "About",

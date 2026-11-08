@@ -1,4 +1,5 @@
 ---
+import { contentAnim } from "./transitions";
 import { languages, useTranslations, type Lang } from "../i18n/ui";
 
 interface Props {
@@ -15,7 +16,7 @@ const t = useTranslations(lang);
 <nav
   aria-label={t("lang.switch")}
   transition:name="lang-switcher"
-  transition:animate="none"
+  transition:animate={contentAnim}
   class:list={[
     "flex items-center gap-1 rounded-full border border-paper/40 bg-ink p-1 pl-3 text-sm font-medium text-paper shadow-lg shadow-ink/30",
     className,
@@ -39,12 +40,8 @@ const t = useTranslations(lang);
     (Object.keys(languages) as Lang[]).map((l) =>
       l === lang ? (
         <span aria-current="true" title={languages[l]} class="relative px-2.5 py-1 uppercase text-ink">
-          <span
-            aria-hidden="true"
-            transition:name="lang-pill"
-            class="absolute inset-0 rounded-full bg-paper"
-          ></span>
-          <span class="relative" transition:name={`lang-label-${l}`}>{l}</span>
+          <span aria-hidden="true" class="absolute inset-0 rounded-full bg-paper"></span>
+          <span class="relative">{l}</span>
         </span>
       ) : (
         <a
@@ -54,7 +51,7 @@ const t = useTranslations(lang);
           title={languages[l]}
           class="rounded-full px-2.5 py-1 uppercase glow-hover hover:text-rice active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
         >
-          <span class="relative inline-block" transition:name={`lang-label-${l}`}>{l}</span>
+          <span class="relative inline-block">{l}</span>
         </a>
       ),
     )

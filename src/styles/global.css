@@ -120,32 +120,15 @@
 /* Background overlay changes darkness more slowly and smoothly than the content. */
 ::view-transition-old(home-overlay),
 ::view-transition-new(home-overlay) {
-  animation-duration: 0.45s;
+  animation-duration: 0.3s;
   animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
 }
 
-/* The active language's pill slides to its new position. */
-::view-transition-group(lang-pill) {
-  animation-duration: 0.35s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* VI/EN labels swap instantly (no fade) and stay above the sliding pill.
-   The browser stacks layers by the old page's DOM order, so labels may end up under the pill — always bring them to the top. */
-::view-transition-group(lang-label-vi),
-::view-transition-group(lang-label-en) {
+/* The language switcher fades with the page content (same timing) but does not slide between
+   positions. Keep it above the card: layers stack by the old page's DOM order, and on home the
+   switcher comes first in <body>, so the incoming card would cover it. */
+::view-transition-group(lang-switcher) {
   z-index: 1;
-  animation: none;
-}
-
-::view-transition-old(lang-label-vi),
-::view-transition-old(lang-label-en) {
-  animation: none;
-  opacity: 0;
-}
-
-::view-transition-new(lang-label-vi),
-::view-transition-new(lang-label-en) {
   animation: none;
 }
 
@@ -157,7 +140,7 @@
 }
 
 ::view-transition-group(*) {
-  animation-duration: 0.35s;
+  animation-duration: 0.25s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
