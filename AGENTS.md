@@ -24,4 +24,5 @@ Consult these guides before working on related tasks:
 ## Rules
 
 - Code, names, comments: English.
-- Chat: reply in the conversation's language.
+- Chat: reply in the conversation's language.- Slugs (page routes, blog post filenames, content IDs): English, lowercase kebab-case, ASCII only. Never use Vietnamese slugs. Both languages share the same slug; English pages only add the `/en/` prefix (`/about/` ↔ `/en/about/`). Section paths live in `sectionPaths` in `src/i18n/ui.ts`.
+- When renaming a published slug, add a 301 from the old path in `public/_redirects` (Cloudflare Pages).

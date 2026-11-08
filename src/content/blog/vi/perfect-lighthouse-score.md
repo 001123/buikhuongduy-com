@@ -119,7 +119,7 @@ Form góp ý cuối bài dùng `mailto:`, nên không cần backend hay dịch v
 ## 4. SEO: để máy hiểu trang
 
 - `description`, `canonical` và Open Graph cho từng trang; mỗi bài có **ảnh OG riêng** sinh lúc build bằng Satori + resvg.
-- **Song ngữ chuẩn**: cặp `hreflang` cho vi/en kể cả khi slug khác nhau (`/gioi-thieu/` ↔ `/en/about/`), có `x-default`.
+- **Song ngữ chuẩn**: cặp `hreflang` cho vi/en (`/about/` ↔ `/en/about/`), có `x-default`.
 - `sitemap`, `robots.txt` và dữ liệu có cấu trúc **JSON-LD** (`ProfilePage`, `BlogPosting`).
 - Thêm `llms.txt` để các mô hình ngôn ngữ cũng đọc được tóm tắt về site.
 
@@ -130,4 +130,4 @@ Không có bước nào ở trên phức tạp. Cái khó là làm đủ, và ki
 Đây mới là bản tóm tắt. Bản đầy đủ gồm cấu hình chi tiết, số đo trước/sau từng bước và checklist mình dùng cho mỗi lần deploy.
 Nếu bạn muốn xem bản đó, hoặc cần một người mang tư duy hiệu năng và chất lượng này vào sản phẩm của bạn: **mình đang sẵn sàng cho cơ hội mới**.
 
-[Liên hệ với mình](/lien-he/), mình rất vui được trao đổi.
+[Liên hệ với mình](/contact/), mình rất vui được trao đổi.

@@ -119,7 +119,7 @@ The feedback form at the end of each post uses `mailto:`, so it needs no backend
 ## 4. SEO: helping machines understand the page
 
 - `description`, `canonical` and Open Graph on every page; each post gets its **own OG image**, generated at build time with Satori + resvg.
-- **Proper bilingual setup**: `hreflang` pairs for vi/en even when slugs differ (`/gioi-thieu/` ↔ `/en/about/`), plus `x-default`.
+- **Proper bilingual setup**: `hreflang` pairs for vi/en (`/about/` ↔ `/en/about/`), plus `x-default`.
 - `sitemap`, `robots.txt` and **JSON-LD** structured data (`ProfilePage`, `BlogPosting`).
 - An `llms.txt` file so language models can read a summary of the site too.
 

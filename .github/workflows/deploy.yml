@@ -31,6 +31,15 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Astro build cache: downloaded fonts, optimized images and the content data store.
+      - uses: actions/cache@v6
+        with:
+          path: node_modules/.astro
+          key: astro-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            astro-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            astro-${{ runner.os }}-
+
       - run: pnpm build
 
       # Production deploy on main (served at buikhuongduy.com); preview deploy for PRs.

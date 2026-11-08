@@ -13,7 +13,7 @@ Personal site and bilingual blog of **Bui Khuong Duy**: a fast, content-first we
 ## Highlights
 
 - **Zero JavaScript by default.** Pages ship as static HTML; small scripts are added only where interaction needs them.
-- **Bilingual by design.** Vietnamese at the root, English under `/en/`, with localized slugs (`/gioi-thieu/` ↔ `/en/about/`), a language switcher, and `hreflang` pairs in the sitemap.
+- **Bilingual by design.** Vietnamese at the root, English under `/en/`, with shared English slugs (`/about/` ↔ `/en/about/`), a language switcher, and `hreflang` pairs in the sitemap.
 - **Reading modes.** Posts can offer *TL;DR*, *Normal*, and *Advanced* views, authored with `:::tldr` / `:::advanced` directives through a custom remark plugin. The chosen mode persists and is shareable via `?mode=`.
 - **Build-time Mermaid.** Diagrams render to inline SVG during the build with the site's theme and font, so readers download no diagram runtime.
 - **Generated Open Graph images.** Each post gets its own 1200×630 card, rendered with Satori and resvg.

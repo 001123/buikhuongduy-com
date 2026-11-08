@@ -24,7 +24,7 @@ Nên blog này vừa là sổ tay của mình, vừa là chỗ để chia sẻ v
 
 ## Mong bạn góp ý
 
-Nếu thấy chỗ nào sai, chưa rõ, hoặc có cách hay hơn, mong bạn [nhắn cho mình](/lien-he/).
+Nếu thấy chỗ nào sai, chưa rõ, hoặc có cách hay hơn, mong bạn [nhắn cho mình](/contact/).
 Mỗi lời góp ý thật lòng đều giúp mình tiến bộ.
 
 Hẹn gặp bạn ở bài sau.

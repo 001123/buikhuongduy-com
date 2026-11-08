@@ -235,7 +235,7 @@ export type Section = "about" | "blog" | "contact";
 
 /** Path of each section in each language. */
 export const sectionPaths: Record<Section, Record<Lang, string>> = {
-  about: { vi: "/gioi-thieu/", en: "/en/about/" },
+  about: { vi: "/about/", en: "/en/about/" },
   blog: { vi: "/blog/", en: "/en/blog/" },
-  contact: { vi: "/lien-he/", en: "/en/contact/" },
+  contact: { vi: "/contact/", en: "/en/contact/" },
 };
