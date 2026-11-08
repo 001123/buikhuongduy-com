@@ -9,6 +9,8 @@ export interface ArticleMeta {
   publishedTime: Date;
   modifiedTime?: Date;
   tags: string[];
+  /** Path of the post's generated OG image. */
+  image?: string;
 }
 
 interface StructuredDataInput {

@@ -1,9 +1,8 @@
 ---
 title: Vì sao mình chọn Astro cho trang cá nhân
-description: Bài mẫu minh họa 3 chế độ đọc TL;DR, Bình thường và Nâng cao.
+description: "0 KB JavaScript mặc định, viết bài bằng Markdown, chỉ thêm tương tác khi thật sự cần: lý do mình dựng trang cá nhân bằng Astro thay vì Next.js."
 pubDate: 2026-11-08
 tags: [astro, frontend]
-draft: true
 ---
 
 :::tldr

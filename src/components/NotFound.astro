@@ -1,0 +1,272 @@
+---
+// 404 page: "404" is written in ink, a red seal is stamped beside it, and lotus petals drift across the rice fields.
+// Hosts serve one /404.html for every missing URL, so both languages are rendered and the matching one
+// is shown from the URL prefix (/en/…) before first paint.
+import Background from "./Background.astro";
+import { contentAnim } from "./transitions";
+import { defaultLang, homePath, languages, sectionPaths, ui, useTranslations, type Lang, type Section } from "../i18n/ui";
+
+const sections: Section[] = ["about", "blog", "contact"];
+const versions = (Object.keys(languages) as Lang[]).map((lang) => {
+  const t = useTranslations(lang);
+  const [sealTop, sealBottom] = t("notFound.seal").split("|");
+  return {
+    lang,
+    t,
+    sealTop,
+    sealBottom,
+    links: [
+      { label: t("nav.home"), href: homePath[lang] },
+      ...sections.map((s) => ({ label: t(`nav.${s}`), href: sectionPaths[s][lang] })),
+    ],
+  };
+});
+const titles = Object.fromEntries(
+  (Object.keys(languages) as Lang[]).map((l) => [l, `${ui[l]["notFound.seoTitle"]} · ${ui[l]["site.name"]}`]),
+);
+
+// Deterministic pseudo-random values so every build renders the same petals.
+let seed = 7;
+const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+const petals = Array.from({ length: 14 }, () => ({
+  left: Math.round(rand() * 100),
+  size: 8 + Math.round(rand() * 10),
+  duration: 11 + Math.round(rand() * 10),
+  delay: -Math.round(rand() * 20),
+  drift: Math.round(rand() * 160 - 80),
+  spin: Math.round(rand() * 540 + 180),
+  gold: rand() < 0.35,
+}));
+
+const pill =
+  "motion-safe:animate-fade-up rounded-full border border-paper/45 bg-ink/40 px-5 py-2.5 text-sm font-medium text-paper shadow-lg shadow-ink/30 backdrop-blur-md glow-hover hover:-translate-y-0.5 hover:border-rice hover:text-rice active:translate-y-0 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:px-6 sm:text-base";
+---
+
+<main class="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-16">
+  <Background dim />
+
+  <div aria-hidden="true" class="petals pointer-events-none fixed inset-0 -z-[5] overflow-hidden">
+    {
+      petals.map((p) => (
+        <span
+          class:list={["petal", p.gold && "petal--gold"]}
+          style={`--left:${p.left}%;--size:${p.size}px;--dur:${p.duration}s;--delay:${p.delay}s;--drift:${p.drift}px;--spin:${p.spin}deg`}
+        />
+      ))
+    }
+  </div>
+
+  <svg aria-hidden="true" class="absolute size-0">
+    <defs>
+      <filter id="ink-bleed" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="4" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" />
+      </filter>
+      <linearGradient id="ink-fill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f6ecd9" />
+        <stop offset="100%" stop-color="#d9b54a" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  {
+    versions.map(({ lang, t, sealTop, sealBottom, links }) => (
+      <div
+        data-nf-lang={lang}
+        lang={lang}
+        hidden={lang !== defaultLang}
+        class="flex w-full max-w-2xl flex-col items-center gap-6 text-center sm:gap-7"
+        transition:name={`content-404-${lang}`}
+        transition:animate={contentAnim}
+      >
+        <div class="relative w-full max-w-[34rem]">
+          <svg aria-hidden="true" viewBox="0 0 600 230" class="ink w-full overflow-visible">
+            <text x="50%" y="200" text-anchor="middle" class="ink__text" filter="url(#ink-bleed)">404</text>
+          </svg>
+
+          <button
+            type="button"
+            data-seal
+            title={t("notFound.restamp")}
+            aria-label={t("notFound.restamp")}
+            class="seal absolute top-[6%] right-[1%] grid size-16 cursor-pointer place-items-center rounded-md bg-[#b3322a] font-serif text-[0.8rem] leading-tight font-semibold tracking-wider text-[#fbe9e4] uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rice sm:size-20 sm:text-base"
+          >
+            <span class="pointer-events-none flex flex-col">
+              <span>{sealTop}</span>
+              <span>{sealBottom}</span>
+            </span>
+          </button>
+        </div>
+
+        <h1 class="motion-safe:animate-fade-up -mt-2 font-serif text-[clamp(1.75rem,6vw,2.75rem)] font-semibold tracking-wide text-paper text-glow [animation-delay:1.6s]">
+          <span class="sr-only">404 · </span>
+          {t("notFound.title")}
+        </h1>
+
+        <blockquote class="motion-safe:animate-fade-up font-serif text-lg leading-relaxed text-paper/85 italic text-glow-soft [animation-delay:1.9s] sm:text-xl">
+          <p>{t("notFound.verse1")}</p>
+          <p>{t("notFound.verse2")}</p>
+        </blockquote>
+
+        <span aria-hidden="true" class="motion-safe:animate-fade-up h-px w-24 bg-linear-to-r from-transparent via-rice to-transparent [animation-delay:2.1s] sm:w-40" />
+
+        <div class="motion-safe:animate-fade-up space-y-2 text-sm text-paper/70 [animation-delay:2.2s] sm:text-base">
+          <p>{t("notFound.lead")}</p>
+          <p data-missing-wrap hidden>
+            {t("notFound.path")}:
+            <code data-missing-path class="ml-1 rounded-md border border-paper/15 bg-ink/60 px-2 py-0.5 font-mono text-[0.85em] break-all text-rice" />
+          </p>
+        </div>
+
+        <nav aria-label={t("notFound.suggest")} class="flex flex-col items-center gap-3">
+          <p class="motion-safe:animate-fade-up text-xs tracking-[0.2em] text-paper/50 uppercase [animation-delay:2.3s]">{t("notFound.suggest")}</p>
+          <ul class="flex flex-wrap justify-center gap-3">
+            {links.map(({ label, href }, i) => (
+              <li>
+                <a href={href} class={pill} style={`animation-delay:${2400 + i * 100}ms`}>
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    ))
+  }
+
+  <!-- Runs before first paint (and again after view-transition swaps) to show the visitor's language. -->
+  <script is:inline define:vars={{ titles, defaultLang }}>
+    (function () {
+      var lang = /^\/en(\/|$)/.test(location.pathname) ? "en" : defaultLang;
+      document.documentElement.lang = lang;
+      document.title = titles[lang];
+      document.querySelectorAll("[data-nf-lang]").forEach(function (el) {
+        el.hidden = el.getAttribute("data-nf-lang") !== lang;
+      });
+    })();
+  </script>
+</main>
+
+<script>
+  function init() {
+    let path = location.pathname;
+    try {
+      path = decodeURI(path);
+    } catch {}
+    document.querySelectorAll<HTMLElement>("[data-missing-path]").forEach((code) => (code.textContent = path));
+    document.querySelectorAll<HTMLElement>("[data-missing-wrap]").forEach((wrap) => (wrap.hidden = false));
+
+    // Clicking the seal replays the stamp animation.
+    document.querySelectorAll<HTMLElement>("[data-seal]").forEach((seal) =>
+      seal.addEventListener("click", () => {
+        seal.classList.remove("seal--again");
+        void seal.offsetWidth;
+        seal.classList.add("seal--again");
+      }),
+    );
+  }
+
+  document.addEventListener("astro:page-load", init);
+</script>
+
+<style>
+  .ink__text {
+    font-family: var(--font-serif);
+    font-size: 210px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    fill: url(#ink-fill);
+    stroke: var(--color-rice);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    paint-order: stroke;
+  }
+
+  .seal {
+    transform: rotate(-9deg);
+    opacity: 0.92;
+    /* Inner border like a carved stamp. */
+    box-shadow:
+      inset 0 0 0 3px #b3322a,
+      inset 0 0 0 4px rgb(251 233 228 / 0.55),
+      0 10px 24px rgb(0 0 0 / 0.4);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ink__text {
+      fill-opacity: 0;
+      stroke-dasharray: 1400;
+      stroke-dashoffset: 1400;
+      animation:
+        ink-draw 1.8s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards,
+        ink-fill 0.9s ease-out 1.5s forwards;
+    }
+
+    .seal {
+      opacity: 0;
+      animation: stamp 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) 1.9s forwards;
+    }
+
+    .seal--again {
+      animation: stamp 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+    }
+
+    .petal {
+      position: absolute;
+      top: -5%;
+      left: var(--left);
+      width: var(--size);
+      height: calc(var(--size) * 1.4);
+      border-radius: 80% 0 80% 0;
+      background: linear-gradient(135deg, #f7d3dc, var(--color-lotus));
+      opacity: 0.75;
+      filter: drop-shadow(0 2px 3px rgb(43 29 18 / 0.4));
+      animation: fall var(--dur) linear var(--delay) infinite;
+    }
+
+    .petal--gold {
+      background: linear-gradient(135deg, #f2dc92, var(--color-rice));
+      border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+      opacity: 0.6;
+    }
+  }
+
+  @keyframes ink-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes ink-fill {
+    to {
+      fill-opacity: 1;
+    }
+  }
+
+  @keyframes stamp {
+    0% {
+      opacity: 0;
+      transform: rotate(-20deg) scale(2.4);
+    }
+    70% {
+      opacity: 0.95;
+      transform: rotate(-8deg) scale(0.94);
+    }
+    100% {
+      opacity: 0.92;
+      transform: rotate(-9deg) scale(1);
+    }
+  }
+
+  @keyframes fall {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    50% {
+      transform: translate3d(calc(var(--drift) * -0.5), 55vh, 0) rotate(calc(var(--spin) / 2));
+    }
+    100% {
+      transform: translate3d(var(--drift), 112vh, 0) rotate(var(--spin));
+    }
+  }
+</style>

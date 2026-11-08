@@ -4,6 +4,7 @@ import SectionPage from "../../layouts/SectionPage.astro";
 import ReadingModes from "../ReadingModes.astro";
 import Mermaid from "../Mermaid.astro";
 import PostActions from "../PostActions.astro";
+import PostFeedback from "../PostFeedback.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { formatDate, postAlternates, postTranslations, type Post } from "../../lib/blog";
 
@@ -29,7 +30,7 @@ const { title, description, pubDate, updatedDate, tags, draft } = post.data;
   description={description}
   alternates={alternates}
   translations={translations}
-  article={{ headline: title, publishedTime: pubDate, modifiedTime: updatedDate, tags }}
+  article={{ headline: title, publishedTime: pubDate, modifiedTime: updatedDate, tags, image: `/og/${post.id}.png` }}
   backHref={sectionPaths.blog[lang]}
   backLabel={t("blog.back")}
 >
@@ -46,5 +47,6 @@ const { title, description, pubDate, updatedDate, tags, draft } = post.data;
   {hasModes && <div slot="meta" class="mt-2"><ReadingModes /></div>}
   {hasModes ? <div class="reading-content"><Content /></div> : <Content />}
   <PostActions slug={post.id} />
+  <PostFeedback slug={post.id} title={title} />
   {hasMermaid && <Mermaid />}
 </SectionPage>

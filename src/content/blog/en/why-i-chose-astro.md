@@ -1,9 +1,8 @@
 ---
 title: Why I Chose Astro for My Personal Site
-description: "A sample post showing the 3 reading modes: TL;DR, Normal and Advanced."
+description: "Zero JavaScript by default, posts in Markdown, and interactivity only where it matters: why I built my personal site with Astro instead of Next.js."
 pubDate: 2026-11-08
 tags: [astro, frontend]
-draft: true
 ---
 
 :::tldr

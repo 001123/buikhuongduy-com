@@ -1,0 +1,203 @@
+---
+/** Post rating and feedback form. Sends via mailto: because the site has no backend. */
+import { getLang, useTranslations } from "../i18n/ui";
+import { email } from "../data/profile";
+
+interface Props {
+  slug: string;
+  title: string;
+}
+
+const { slug, title } = Astro.props;
+const t = useTranslations(getLang(Astro.currentLocale));
+const url = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+const ratingLabels = [
+  t("feedback.rating1"),
+  t("feedback.rating2"),
+  t("feedback.rating3"),
+  t("feedback.rating4"),
+  t("feedback.rating5"),
+];
+const id = `feedback-${slug.replace(/[^\w-]/g, "-")}`;
+---
+
+<form
+  class="post-feedback not-prose mt-6"
+  data-post-feedback
+  data-slug={slug}
+  data-title={title}
+  data-url={url}
+  data-email={email}
+  data-subject={t("feedback.mailSubject")}
+  data-body-post={t("feedback.mailPost")}
+  data-body-link={t("feedback.mailLink")}
+  data-body-rating={t("feedback.mailRating")}
+  data-body-comment={t("feedback.mailComment")}
+  data-labels={JSON.stringify(ratingLabels)}
+  data-label-sent={t("feedback.sent")}
+  novalidate
+>
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+    <span id={`${id}-title`} class="text-sm font-medium text-paper/80">{t("feedback.title")}</span>
+    <div class="flex items-center" role="radiogroup" aria-labelledby={`${id}-title`}>
+      {
+        ratingLabels.map((label, i) => (
+          <label
+            class="star cursor-pointer rounded-md p-1 text-paper/35 transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-1 has-focus-visible:outline-rice"
+            title={label}
+          >
+            <input type="radio" name="rating" value={i + 1} class="sr-only" />
+            <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95L12 2.5z" />
+            </svg>
+            <span class="sr-only">{`${i + 1}/5 – ${label}`}</span>
+          </label>
+        ))
+      }
+    </div>
+    <span class="text-sm font-medium text-rice" data-rating-label aria-hidden="true"></span>
+  </div>
+
+  <div class="feedback-details mt-4" data-feedback-details hidden>
+    <label for={`${id}-comment`} class="block text-sm text-paper/70">{t("feedback.commentLabel")}</label>
+    <textarea
+      id={`${id}-comment`}
+      name="comment"
+      rows="3"
+      maxlength="1500"
+      placeholder={t("feedback.commentPlaceholder")}
+      class="mt-2 block w-full resize-y rounded-xl border border-paper/20 bg-ink/50 px-3.5 py-2.5 text-sm text-paper placeholder:text-paper/35 focus-visible:border-rice/60 focus-visible:outline-none"
+    ></textarea>
+  
+    <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <button
+        type="submit"
+        class="inline-flex items-center gap-2 rounded-full border border-rice/50 bg-rice/10 px-4 py-2 text-sm font-medium text-rice transition-colors hover:border-rice hover:bg-rice/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+      >
+        <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 2 11 13" />
+          <path d="M22 2 15 22l-4-9-9-4 20-7Z" />
+        </svg>
+        <span>{t("feedback.submit")}</span>
+      </button>
+      <p class="text-xs text-paper/50">
+        {t("feedback.hint")}
+        <a href={`mailto:${email}`} class="text-paper/70 underline decoration-paper/30 underline-offset-2 hover:text-rice">{email}</a>
+      </p>
+    </div>
+  </div>
+  <p class="mt-2 text-sm text-rice empty:hidden" role="status" aria-live="polite" data-feedback-status></p>
+</form>
+
+<style>
+  .star.on {
+    color: var(--color-rice);
+  }
+
+  .star.on svg {
+    fill: currentColor;
+  }
+
+  .star svg {
+    transition: transform 0.15s ease-out;
+  }
+
+  .star:hover svg {
+    transform: scale(1.12);
+  }
+
+  .feedback-details.reveal {
+    animation: feedback-reveal 0.25s ease-out;
+  }
+
+  @keyframes feedback-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-0.25rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .star:hover svg {
+      transform: none;
+    }
+
+    .feedback-details.reveal {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const RATINGS_KEY = "post-ratings";
+
+  function readRatings(): Record<string, number> {
+    try {
+      const value = JSON.parse(localStorage.getItem(RATINGS_KEY) ?? "{}");
+      return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function setup(form: HTMLFormElement) {
+    const { slug, title, url, email } = form.dataset as Record<string, string>;
+    const labels: string[] = JSON.parse(form.dataset.labels ?? "[]");
+    const stars = [...form.querySelectorAll<HTMLLabelElement>(".star")];
+    const radios = stars.map((star) => star.querySelector<HTMLInputElement>("input")!);
+    const ratingLabel = form.querySelector<HTMLElement>("[data-rating-label]")!;
+    const status = form.querySelector<HTMLElement>("[data-feedback-status]")!;
+    const comment = form.querySelector<HTMLTextAreaElement>("textarea")!;
+    const details = form.querySelector<HTMLElement>("[data-feedback-details]")!;
+    // Reveal the feedback form once the reader picks a star (including re-picking a saved rating).
+    const reveal = () => {
+      if (!details.hidden) return;
+      details.hidden = false;
+      details.classList.add("reveal");
+    };
+
+    const selected = () => Number(radios.find((r) => r.checked)?.value ?? 0);
+    const paint = (value: number) => {
+      stars.forEach((star, i) => star.classList.toggle("on", i < value));
+      ratingLabel.textContent = value > 0 ? labels[value - 1] : "";
+    };
+
+    const saved = readRatings()[slug];
+    if (saved >= 1 && saved <= 5) radios[saved - 1].checked = true;
+    paint(selected());
+
+    stars.forEach((star, i) => {
+      star.addEventListener("pointerenter", () => paint(i + 1));
+      star.addEventListener("pointerleave", () => paint(selected()));
+    });
+    radios.forEach((radio) => radio.addEventListener("click", reveal));
+    radios.forEach((radio) =>
+      radio.addEventListener("change", () => {
+        const value = selected();
+        paint(value);
+        status.textContent = "";
+        const ratings = readRatings();
+        ratings[slug] = value;
+        localStorage.setItem(RATINGS_KEY, JSON.stringify(ratings));
+      }),
+    );
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const rating = selected();
+      const text = comment.value.trim();
+      if (!rating) return;
+      const d = form.dataset;
+      const lines = [`${d.bodyPost}: ${title}`, `${d.bodyLink}: ${url}`];
+      lines.push(`${d.bodyRating}: ${"★".repeat(rating)}${"☆".repeat(5 - rating)} (${rating}/5 – ${labels[rating - 1]})`);
+      if (text) lines.push("", `${d.bodyComment}:`, text);
+      const subject = `${d.subject}: ${title}`;
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
+      status.textContent = d.labelSent ?? "";
+    });
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLFormElement>("[data-post-feedback]").forEach(setup);
+  });
+</script>

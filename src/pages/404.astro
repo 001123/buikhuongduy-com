@@ -1,0 +1,17 @@
+---
+import Layout from "../layouts/Layout.astro";
+import NotFound from "../components/NotFound.astro";
+import { useTranslations } from "../i18n/ui";
+
+const t = useTranslations("vi");
+---
+
+<Layout
+  title={`${t("notFound.seoTitle")} · ${t("site.name")}`}
+  description={t("notFound.description")}
+  pageType="WebPage"
+  floatingLangSwitcher={false}
+  noindex
+>
+  <NotFound />
+</Layout>
