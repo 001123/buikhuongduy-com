@@ -2,7 +2,7 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-serif: var(--font-playfair-display);
+  --font-serif: var(--font-fraunces);
   --font-sans: var(--font-be-vietnam-pro);
 
   --color-ink: #2b1d12;

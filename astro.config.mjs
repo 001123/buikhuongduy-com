@@ -26,8 +26,8 @@ export default defineConfig({
     },
     {
       provider: fontProviders.fontsource(),
-      name: 'Playfair Display',
-      cssVariable: '--font-playfair-display',
+      name: 'Fraunces',
+      cssVariable: '--font-fraunces',
       weights: ['400 900'],
       subsets: ['latin', 'latin-ext', 'vietnamese'],
       fallbacks: ['Georgia', 'serif'],
