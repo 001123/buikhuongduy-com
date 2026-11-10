@@ -6,6 +6,9 @@ import avatar from "../../assets/avatar_cv.webp";
 import { cvUrl, socials } from "../../data/profile";
 
 const linkedinUrl = socials.find((s) => s.icon === "linkedin")!.href;
+const kdLabsName = "KD Labs";
+const kdLabsUrl = "https://kd.io.vn";
+const linkClass = "no-underline hover:underline";
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
@@ -122,6 +125,17 @@ const buildMonth = {
               </svg>
             </a>
           </p>
+        ) : p.includes(kdLabsName) ? (
+          <p>
+            {p.split(kdLabsName).map((part, j) =>
+              j === 0 ? part : (
+                <Fragment>
+                  <a href={kdLabsUrl} target="_blank" rel="noopener" class={linkClass}>{kdLabsName}</a>
+                  {part}
+                </Fragment>
+              ),
+            )}
+          </p>
         ) : (
           <p>{p}</p>
         ),
@@ -149,7 +163,14 @@ const buildMonth = {
           <span aria-hidden="true" class="absolute top-2 -left-[1.82rem] size-2.5 rounded-full bg-rice"></span>
           <p class="text-sm text-rice">{job.period}</p>
           <p class="font-medium text-paper">
-            {job.role} · <span class="text-paper/80">{job.org}</span>
+            {job.role} ·{" "}
+            {job.org === kdLabsName ? (
+              <a href={kdLabsUrl} target="_blank" rel="noopener" class="text-paper/80 underline decoration-paper/30 underline-offset-4 hover:text-rice hover:decoration-rice">
+                {job.org}
+              </a>
+            ) : (
+              <span class="text-paper/80">{job.org}</span>
+            )}
           </p>
           <p class="text-paper/70">{job.note}</p>
         </li>
