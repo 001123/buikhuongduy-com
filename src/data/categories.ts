@@ -9,7 +9,7 @@ import type { Lang } from "../i18n/ui";
  *
  * Kept free of `astro:content` imports so `content.config.ts` and `astro.config.mjs` can use it.
  */
-export const categorySlugs = ["ai", "react", "nextjs", "typescript", "astro", "performance", "devops"] as const;
+export const categorySlugs = ["ai", "react", "nextjs", "typescript", "astro", "performance", "devops", "web-platform"] as const;
 
 export type CategorySlug = (typeof categorySlugs)[number];
 
@@ -124,6 +124,20 @@ export const categories: Record<CategorySlug, Record<Lang, CategoryCopy>> = {
       title: "DevOps and CI/CD Articles",
       description: "DevOps articles by Bui Khuong Duy: CI/CD, GitHub Actions, Cloudflare, Kubernetes and fast, reliable builds and deploys.",
       intro: "CI/CD, GitHub Actions, Cloudflare and Kubernetes: how I keep builds and deploys fast, lean and reliable.",
+    },
+  },
+  "web-platform": {
+    vi: {
+      name: "Web Platform",
+      title: "Bài viết về Web Platform",
+      description: "Bài viết về Web Platform của Bùi Khương Duy: API mới của trình duyệt, tiêu chuẩn web, bảo mật và cách áp dụng chúng vào ứng dụng thật.",
+      intro: "API mới của trình duyệt, tiêu chuẩn web và tính năng bảo mật: mình đọc, thử và ghi lại cách đưa chúng vào ứng dụng thật.",
+    },
+    en: {
+      name: "Web Platform",
+      title: "Web Platform Articles",
+      description: "Web Platform articles by Bui Khuong Duy: new browser APIs, web standards, security features and how to apply them in real apps.",
+      intro: "New browser APIs, web standards and security features: what I read, try out and how to bring them into real apps.",
     },
   },
 };
