@@ -1,5 +1,6 @@
 import { cvUrl, email, socials } from "../data/profile";
 import { homePath, languages, locales, sectionPaths, ui, type Lang } from "../i18n/ui";
+import type { PageDates } from "./git-dates";
 
 /** schema.org type of the page itself. */
 export type PageType = "WebPage" | "ProfilePage" | "ContactPage" | "CollectionPage";
@@ -29,6 +30,8 @@ interface StructuredDataInput {
   breadcrumbs?: Crumb[];
   /** Paths of the items a CollectionPage lists, in order. */
   itemList?: string[];
+  /** When the page was first published and last changed (`dateCreated`/`dateModified`). */
+  dates?: PageDates;
 }
 
 export interface Crumb {
@@ -47,6 +50,12 @@ const kdLabs = {
   sameAs: ["https://github.com/kd-labs-io"],
 };
 
+/** KD Labs description per language, worded as on kd.io.vn. */
+const kdLabsDescription: Record<Lang, string> = {
+  vi: "KD Labs là AI-Native Software & Research Lab sáng lập bởi Bùi Khương Duy — nghiên cứu và phát triển phần mềm tích hợp AI Agent, kiến trúc hệ thống phân tán, hạ tầng Cloud-Native Kubernetes (K8s) và các ứng dụng đề cao quyền riêng tư.",
+  en: "KD Labs is an AI-native software and research lab founded by Bui Khuong Duy, building AI-agent software, distributed system architectures, cloud-native Kubernetes infrastructure and privacy-first apps.",
+};
+
 /** Remove invisible characters (such as word joiners) that should not reach search snippets. */
 export function cleanText(text: string): string {
   return text.replace(/[​-‍⁠﻿]/g, "");
@@ -54,7 +63,7 @@ export function cleanText(text: string): string {
 
 /** JSON-LD graph describing the site owner, the bilingual site and the current page. */
 export function structuredData(input: StructuredDataInput) {
-  const { lang, site, pageUrl, title, description, pageType, image, avatar, article, itemList } = input;
+  const { lang, site, pageUrl, title, description, pageType, image, avatar, article, itemList, dates } = input;
   const t = ui[lang];
   const abs = (path: string) => new URL(path, site).href;
   const personId = abs("/#person");
@@ -98,10 +107,12 @@ export function structuredData(input: StructuredDataInput) {
     inLanguage,
     isPartOf: { "@id": websiteId },
     primaryImageOfPage: image.href,
+    ...(dates?.created ? { dateCreated: dates.created.toISOString() } : {}),
+    ...(dates?.modified ? { dateModified: dates.modified.toISOString() } : {}),
     ...(pageType === "ProfilePage" ? { mainEntity: { "@id": personId } } : { about: { "@id": personId } }),
   };
 
-  const organization = { ...kdLabs, founder: { "@id": personId } };
+  const organization = { ...kdLabs, description: kdLabsDescription[lang], founder: { "@id": personId } };
 
   const graph: Record<string, unknown>[] = [person, organization, website, page];
 

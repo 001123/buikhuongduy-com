@@ -6,6 +6,7 @@ import ScrollToTop from "../components/ScrollToTop.astro";
 import { contentAnim } from "../components/transitions";
 import { getLang, homePath, sectionPaths, useTranslations, type Lang, type Section } from "../i18n/ui";
 import type { ArticleMeta, Crumb, PageType } from "../lib/seo";
+import type { PageDates } from "../lib/git-dates";
 
 interface Props {
   section: Section;
@@ -28,6 +29,8 @@ interface Props {
   breadcrumbs?: Crumb[];
   /** Paths listed by a CollectionPage, for JSON-LD. */
   itemList?: string[];
+  /** When the page was first published and last changed, for JSON-LD. */
+  dates?: PageDates;
 }
 
 const lang = getLang(Astro.currentLocale);
@@ -45,6 +48,7 @@ const {
   noindex,
   breadcrumbs,
   itemList,
+  dates,
 } = Astro.props;
 
 const pageTypes: Record<Section, PageType> = {
@@ -64,6 +68,7 @@ const pageTypes: Record<Section, PageType> = {
   noindex={noindex}
   breadcrumbs={breadcrumbs}
   itemList={itemList}
+  dates={dates}
   floatingLangSwitcher={false}
 >
   <main class="relative isolate min-h-dvh px-2.5 py-4 sm:px-6 sm:py-8">

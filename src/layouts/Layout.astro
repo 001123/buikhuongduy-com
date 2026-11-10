@@ -4,9 +4,9 @@ import { ClientRouter } from "astro:transitions";
 import { Font } from "astro:assets";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import CursorEffects from "../components/CursorEffects.astro";
-import avatar from "../assets/avatar_cv.webp";
 import { defaultLang, getLang, homePath, languages, locales, useTranslations, type Lang } from "../i18n/ui";
 import { cleanText, structuredData, type ArticleMeta, type Crumb, type PageType } from "../lib/seo";
+import type { PageDates } from "../lib/git-dates";
 
 interface Props {
   title?: string;
@@ -27,6 +27,8 @@ interface Props {
   breadcrumbs?: Crumb[];
   /** Paths listed by a CollectionPage, for JSON-LD. */
   itemList?: string[];
+  /** When the page was first published and last changed, for JSON-LD. */
+  dates?: PageDates;
 }
 
 const lang = getLang(Astro.currentLocale);
@@ -43,6 +45,7 @@ const {
   noindex = false,
   breadcrumbs,
   itemList,
+  dates,
 } = Astro.props;
 const description = cleanText(rawDescription);
 
@@ -70,10 +73,12 @@ const jsonLd = structuredData({
   description,
   pageType: article ? "WebPage" : pageType,
   image: ogImage,
-  avatar: new URL(avatar.src, site),
+  // Stable URL served by src/pages/avatar.webp.ts (hashed asset names change between builds).
+  avatar: new URL("/avatar.webp", site),
   article,
   breadcrumbs,
   itemList,
+  dates,
 });
 ---
 

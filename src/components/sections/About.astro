@@ -4,6 +4,10 @@ import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { Image } from "astro:assets";
 import avatar from "../../assets/avatar_cv.webp";
 import { cvUrl, socials } from "../../data/profile";
+import { gitDates } from "../../lib/git-dates";
+
+// The About page's content lives in this file and the shared profile data.
+const dates = gitDates(["src/components/sections/About.astro", "src/data/profile.ts"]);
 
 const linkedinUrl = socials.find((s) => s.icon === "linkedin")!.href;
 const kdLabsName = "KD Labs";
@@ -92,7 +96,7 @@ const buildMonth = {
 };
 ---
 
-<SectionPage section="about" title={t("about.title")} lead={t("about.lead")}>
+<SectionPage section="about" title={t("about.title")} lead={t("about.lead")} dates={dates}>
   <div class="flow-root text-justify [&>p:first-of-type]:mt-0">
     <div class="not-prose mb-6 flex justify-center sm:float-left sm:mt-[0.5em] sm:mb-4 sm:mr-8">
       <a

@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Full history: the build reads commit dates for JSON-LD dateCreated/dateModified (src/lib/git-dates.ts).
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
         with:
