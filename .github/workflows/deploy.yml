@@ -44,9 +44,10 @@ jobs:
             astro-${{ runner.os }}-
 
       # GA4 Measurement ID (public, not a secret): repository variable PUBLIC_GA4_ID.
+      # Production (main) only, so PR preview deploys on *.pages.dev do not send hits to the real property.
       - run: pnpm build
         env:
-          PUBLIC_GA4_ID: ${{ vars.PUBLIC_GA4_ID }}
+          PUBLIC_GA4_ID: ${{ github.ref == 'refs/heads/main' && vars.PUBLIC_GA4_ID || '' }}
 
       # Production deploy on main (served at buikhuongduy.com); preview deploy for PRs.
       - name: Deploy
