@@ -1,0 +1,39 @@
+---
+import SectionPage from "../../layouts/SectionPage.astro";
+import CategoryNav from "../CategoryNav.astro";
+import PostList from "../PostList.astro";
+import type { CategorySlug } from "../../data/categories";
+import { getLang, sectionPaths, useTranslations, type Lang } from "../../i18n/ui";
+import { categoryPath, postUrl, type Post } from "../../lib/blog";
+
+interface Props {
+  category: { slug: CategorySlug; name: string; title: string; description: string; intro: string; posts: Post[] };
+  alternates: Record<Lang, string>;
+  translations: Partial<Record<Lang, string>>;
+  noindex: boolean;
+}
+
+const { category, alternates, translations, noindex } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+---
+
+<SectionPage
+  section="blog"
+  title={category.title}
+  lead={category.intro}
+  description={category.description}
+  alternates={alternates}
+  translations={translations}
+  noindex={noindex}
+  breadcrumbs={[
+    { name: t("nav.blog"), path: sectionPaths.blog[lang] },
+    { name: category.name, path: categoryPath(lang, category.slug) },
+  ]}
+  itemList={category.posts.map(postUrl)}
+  backHref={sectionPaths.blog[lang]}
+  backLabel={t("blog.back")}
+>
+  <CategoryNav current={category.slug} />
+  <PostList posts={category.posts} />
+</SectionPage>

@@ -2,6 +2,7 @@
 title: "What Is AI-Native? How It Differs from Just Adding AI"
 description: "AI-Native means a product, process, or team is designed around AI from the start, not a chatbot button added to an old system. This post explains the idea, how it differs from AI-enabled, and the signs of a truly AI-Native product."
 pubDate: 2026-11-09
+category: ai
 tags: [ai, product, engineering]
 ---
 

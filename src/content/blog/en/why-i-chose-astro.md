@@ -2,6 +2,7 @@
 title: Why I Chose Astro for My Personal Site
 description: "Zero JavaScript by default, posts in Markdown, and interactivity only where it matters: why I built my personal site with Astro instead of Next.js."
 pubDate: 2026-11-08
+category: astro
 tags: [astro, frontend]
 ---
 

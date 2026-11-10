@@ -9,6 +9,8 @@ export interface ArticleMeta {
   publishedTime: Date;
   modifiedTime?: Date;
   tags: string[];
+  /** Name of the post's category (`articleSection`). */
+  section?: string;
   /** Path of the post's generated OG image. */
   image?: string;
 }
@@ -23,6 +25,15 @@ interface StructuredDataInput {
   image: URL;
   avatar: URL;
   article?: ArticleMeta;
+  /** Breadcrumb trail after Home, ending with the current page. Defaults to Blog › post on articles. */
+  breadcrumbs?: Crumb[];
+  /** Paths of the items a CollectionPage lists, in order. */
+  itemList?: string[];
+}
+
+export interface Crumb {
+  name: string;
+  path: string;
 }
 
 /** KD Labs, the owner's company. Shares its `@id` with the JSON-LD on kd.io.vn so both sites describe one entity. */
@@ -43,7 +54,7 @@ export function cleanText(text: string): string {
 
 /** JSON-LD graph describing the site owner, the bilingual site and the current page. */
 export function structuredData(input: StructuredDataInput) {
-  const { lang, site, pageUrl, title, description, pageType, image, avatar, article } = input;
+  const { lang, site, pageUrl, title, description, pageType, image, avatar, article, itemList } = input;
   const t = ui[lang];
   const abs = (path: string) => new URL(path, site).href;
   const personId = abs("/#person");
@@ -94,19 +105,29 @@ export function structuredData(input: StructuredDataInput) {
 
   const graph: Record<string, unknown>[] = [person, organization, website, page];
 
-  if (article) {
+  const breadcrumbs =
+    input.breadcrumbs ??
+    (article ? [{ name: t["nav.blog"], path: sectionPaths.blog[lang] }, { name: article.headline, path: pageUrl.pathname }] : undefined);
+  if (breadcrumbs) {
     const breadcrumbId = `${pageUrl.href}#breadcrumb`;
     page.breadcrumb = { "@id": breadcrumbId };
-    const crumbs = [
-      { name: t["nav.home"], item: abs(homePath[lang]) },
-      { name: t["nav.blog"], item: abs(sectionPaths.blog[lang]) },
-      { name: article.headline, item: pageUrl.href },
-    ];
+    const crumbs = [{ name: t["nav.home"], path: homePath[lang] }, ...breadcrumbs];
     graph.push({
       "@type": "BreadcrumbList",
       "@id": breadcrumbId,
-      itemListElement: crumbs.map((crumb, i) => ({ "@type": "ListItem", position: i + 1, ...crumb })),
+      itemListElement: crumbs.map((crumb, i) => ({ "@type": "ListItem", position: i + 1, name: crumb.name, item: abs(crumb.path) })),
     });
+  }
+
+  if (itemList && pageType === "CollectionPage") {
+    page.mainEntity = {
+      "@type": "ItemList",
+      numberOfItems: itemList.length,
+      itemListElement: itemList.map((path, i) => ({ "@type": "ListItem", position: i + 1, url: abs(path) })),
+    };
+  }
+
+  if (article) {
     graph.push({
       "@type": "BlogPosting",
       "@id": `${pageUrl.href}#article`,
@@ -119,6 +140,7 @@ export function structuredData(input: StructuredDataInput) {
       datePublished: article.publishedTime.toISOString(),
       dateModified: (article.modifiedTime ?? article.publishedTime).toISOString(),
       keywords: article.tags,
+      ...(article.section ? { articleSection: article.section } : {}),
       author: { "@id": personId },
       publisher: { "@id": personId },
     });

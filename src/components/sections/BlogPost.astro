@@ -6,7 +6,8 @@ import Mermaid from "../Mermaid.astro";
 import PostActions from "../PostActions.astro";
 import PostFeedback from "../PostFeedback.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
-import { formatDate, postAlternates, postTranslations, type Post } from "../../lib/blog";
+import { categories } from "../../data/categories";
+import { categoryPath, formatDate, postAlternates, postTranslations, postUrl, relatedPosts, type Post } from "../../lib/blog";
 
 interface Props {
   post: Post;
@@ -20,7 +21,14 @@ const hasModes = Boolean(remarkPluginFrontmatter.hasModes);
 const hasMermaid = Boolean(remarkPluginFrontmatter.hasMermaid);
 const alternates = await postAlternates(post);
 const translations = await postTranslations(post);
-const { title, description, pubDate, updatedDate, tags, draft } = post.data;
+const { title, description, pubDate, updatedDate, tags, draft, category } = post.data;
+const cat = category ? { name: categories[category][lang].name, path: categoryPath(lang, category) } : undefined;
+const breadcrumbs = [
+  { name: t("nav.blog"), path: sectionPaths.blog[lang] },
+  ...(cat ? [cat] : []),
+  { name: title, path: postUrl(post) },
+];
+const related = await relatedPosts(post);
 ---
 
 <SectionPage
@@ -30,11 +38,17 @@ const { title, description, pubDate, updatedDate, tags, draft } = post.data;
   description={description}
   alternates={alternates}
   translations={translations}
-  article={{ headline: title, publishedTime: pubDate, modifiedTime: updatedDate, tags, image: `/og/${post.id}.png` }}
+  article={{ headline: title, publishedTime: pubDate, modifiedTime: updatedDate, tags, section: cat?.name, image: `/og/${post.id}.png` }}
+  breadcrumbs={breadcrumbs}
   backHref={sectionPaths.blog[lang]}
   backLabel={t("blog.back")}
 >
   <div slot="meta" class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-paper/60">
+    {cat && (
+      <a href={cat.path} class="rounded-full border border-rice/50 px-2.5 py-0.5 text-xs font-medium text-rice transition-colors hover:border-rice hover:bg-rice/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
+        {cat.name}
+      </a>
+    )}
     <span>{t("blog.published")} <time datetime={pubDate.toISOString()}>{formatDate(pubDate, lang)}</time></span>
     {updatedDate && <span>{t("blog.updated")} <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate, lang)}</time></span>}
     {draft && <span class="rounded-full border border-lotus/60 px-2 py-0.5 text-xs text-lotus">{t("blog.draft")}</span>}
@@ -46,6 +60,21 @@ const { title, description, pubDate, updatedDate, tags, draft } = post.data;
   </div>
   {hasModes && <div slot="meta" class="mt-2"><ReadingModes /></div>}
   {hasModes ? <div class="reading-content"><Content /></div> : <Content />}
+  {related.length > 0 && (
+    <section class="not-prose mt-12 border-t border-paper/15 pt-8" aria-labelledby="related-heading">
+      <h2 id="related-heading" class="font-serif text-xl font-semibold text-paper sm:text-2xl">{t("blog.related")}</h2>
+      <ul class="mt-4 grid gap-3">
+        {related.map((p) => (
+          <li>
+            <a href={postUrl(p)} class="group block rounded-xl border border-paper/15 bg-ink/40 px-4 py-3 transition-colors hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
+              <span class="block font-medium text-paper group-hover:text-rice">{p.data.title}</span>
+              <span class="mt-1 block line-clamp-2 text-sm text-paper/65">{p.data.description}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
   <PostActions slug={post.id} />
   <PostFeedback slug={post.id} title={title} />
   {hasMermaid && <Mermaid />}

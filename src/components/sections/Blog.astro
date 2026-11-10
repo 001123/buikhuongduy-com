@@ -1,42 +1,24 @@
 ---
 import SectionPage from "../../layouts/SectionPage.astro";
+import CategoryNav from "../CategoryNav.astro";
+import PostList from "../PostList.astro";
 import { getLang, useTranslations } from "../../i18n/ui";
-import { formatDate, getPosts, postUrl } from "../../lib/blog";
+import { getPosts, postUrl } from "../../lib/blog";
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 const posts = await getPosts(lang);
 ---
 
-<SectionPage section="blog" title={t("blog.title")} lead={t("blog.lead")}>
+<SectionPage section="blog" title={t("blog.title")} lead={t("blog.lead")} itemList={posts.map(postUrl)}>
   {
     posts.length === 0 ? (
       <p class="text-paper/70 italic">{t("blog.empty")}</p>
     ) : (
-      <ul class="not-prose grid gap-6 lg:auto-rows-fr lg:grid-cols-2">
-        {posts.map((post) => (
-          <li>
-            <a
-              href={postUrl(post)}
-              class="group flex h-full flex-col rounded-2xl border border-paper/15 bg-ink/40 p-5 transition-colors hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:p-6"
-            >
-              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-paper/60">
-                <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate, lang)}</time>
-                {post.data.draft && <span class="rounded-full border border-lotus/60 px-2 py-0.5 text-xs text-lotus">{t("blog.draft")}</span>}
-              </div>
-              <h2 class="mt-2 line-clamp-2 font-serif text-2xl font-semibold text-paper group-hover:text-rice">{post.data.title}</h2>
-              <p class="mt-2 line-clamp-3 text-pretty text-paper/75">{post.data.description}</p>
-              {post.data.tags.length > 0 && (
-                <ul class="mt-auto flex flex-wrap gap-2 pt-3">
-                  {post.data.tags.map((tag) => (
-                    <li class="rounded-full bg-paper/10 px-2.5 py-0.5 text-xs text-paper/70">#{tag}</li>
-                  ))}
-                </ul>
-              )}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <>
+        <CategoryNav />
+        <PostList posts={posts} />
+      </>
     )
   }
 </SectionPage>

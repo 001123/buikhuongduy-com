@@ -2,6 +2,7 @@
 title: "Why I Built KD Code When There Are So Many ADEs"
 description: "There is already Cursor, Zed, dedicated extensions for Claude Code and Codex, and a dozen agent orchestration apps, so why build another VS Code extension? This post explains why I made KD Code: no lock-in to one agent, no leaving VS Code, and comparing several agents in git worktrees as the main workflow."
 pubDate: 2026-11-09
+category: ai
 tags: [ai, agents, vscode, open-source]
 ---
 

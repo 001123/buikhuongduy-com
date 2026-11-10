@@ -1,6 +1,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import { categorySlugs } from "./data/categories";
 
 /**
  * Blog posts live in `src/content/blog/<lang>/<slug>.md`.
@@ -17,6 +18,8 @@ const blog = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
+    /** One topic from `src/data/categories.ts`; a typo fails the build. */
+    category: z.enum(categorySlugs).optional(),
     tags: z.array(z.string()).default([]),
     /** Drafts are visible in `astro dev` only. */
     draft: z.boolean().default(false),

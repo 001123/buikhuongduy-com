@@ -1,0 +1,39 @@
+---
+import { categories } from "../data/categories";
+import { getLang, useTranslations } from "../i18n/ui";
+import { formatDate, postUrl, type Post } from "../lib/blog";
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+---
+
+<ul class="not-prose grid gap-6 lg:auto-rows-fr lg:grid-cols-2">
+  {posts.map((post) => (
+    <li>
+      <a
+        href={postUrl(post)}
+        class="group flex h-full flex-col rounded-2xl border border-paper/15 bg-ink/40 p-5 transition-colors hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:p-6"
+      >
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-paper/60">
+          {post.data.category && <span class="font-medium text-rice/90">{categories[post.data.category][lang].name}</span>}
+          <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate, lang)}</time>
+          {post.data.draft && <span class="rounded-full border border-lotus/60 px-2 py-0.5 text-xs text-lotus">{t("blog.draft")}</span>}
+        </div>
+        <h2 class="mt-2 line-clamp-2 font-serif text-2xl font-semibold text-paper group-hover:text-rice">{post.data.title}</h2>
+        <p class="mt-2 line-clamp-3 text-pretty text-paper/75">{post.data.description}</p>
+        {post.data.tags.length > 0 && (
+          <ul class="mt-auto flex flex-wrap gap-2 pt-3">
+            {post.data.tags.map((tag) => (
+              <li class="rounded-full bg-paper/10 px-2.5 py-0.5 text-xs text-paper/70">#{tag}</li>
+            ))}
+          </ul>
+        )}
+      </a>
+    </li>
+  ))}
+</ul>

@@ -2,6 +2,7 @@
 title: "CI Under 30 Seconds: Build and Deploy a Personal Site to Cloudflare Pages"
 description: "Why each push takes only about 25 seconds for GitHub Actions to build Astro and deploy to Cloudflare Pages: a lean deploy job, Lighthouse running in parallel, a pnpm cache, an Astro build cache, Chrome already on the runner and a pinned Wrangler version."
 pubDate: 2026-11-08
+category: devops
 tags: [ci, github-actions, cloudflare, astro, performance]
 ---
 

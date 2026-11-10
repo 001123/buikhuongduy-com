@@ -5,7 +5,7 @@ import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
 import { contentAnim } from "../components/transitions";
 import { getLang, homePath, sectionPaths, useTranslations, type Lang, type Section } from "../i18n/ui";
-import type { ArticleMeta, PageType } from "../lib/seo";
+import type { ArticleMeta, Crumb, PageType } from "../lib/seo";
 
 interface Props {
   section: Section;
@@ -22,6 +22,12 @@ interface Props {
   /** Back link target. Defaults to the home page. */
   backHref?: string;
   backLabel?: string;
+  /** Keep this page out of search results. */
+  noindex?: boolean;
+  /** Breadcrumb trail after Home, for JSON-LD. */
+  breadcrumbs?: Crumb[];
+  /** Paths listed by a CollectionPage, for JSON-LD. */
+  itemList?: string[];
 }
 
 const lang = getLang(Astro.currentLocale);
@@ -36,6 +42,9 @@ const {
   alternates = sectionPaths[section],
   backHref = homePath[lang],
   backLabel = t("nav.home"),
+  noindex,
+  breadcrumbs,
+  itemList,
 } = Astro.props;
 
 const pageTypes: Record<Section, PageType> = {
@@ -52,6 +61,9 @@ const pageTypes: Record<Section, PageType> = {
   translations={translations}
   pageType={pageTypes[section]}
   article={article}
+  noindex={noindex}
+  breadcrumbs={breadcrumbs}
+  itemList={itemList}
   floatingLangSwitcher={false}
 >
   <main class="relative isolate min-h-dvh px-2.5 py-4 sm:px-6 sm:py-8">

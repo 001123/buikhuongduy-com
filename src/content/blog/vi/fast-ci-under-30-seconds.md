@@ -2,6 +2,7 @@
 title: "CI dưới 30 giây: build và deploy trang cá nhân lên Cloudflare Pages"
 description: "Vì sao mỗi lần push, GitHub Actions chỉ mất khoảng 25 giây để build Astro và deploy lên Cloudflare Pages: job deploy gọn, Lighthouse chạy song song, cache pnpm, cache build của Astro, Chrome có sẵn trên runner và Wrangler ghim phiên bản."
 pubDate: 2026-11-08
+category: devops
 tags: [ci, github-actions, cloudflare, astro, performance]
 ---
 

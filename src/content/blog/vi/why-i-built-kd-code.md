@@ -2,6 +2,7 @@
 title: "Tại sao mình làm KD Code giữa rất nhiều lựa chọn ADE"
 description: "Đã có Cursor, Zed, extension riêng của Claude Code, Codex và cả chục app điều phối agent, vậy sao còn làm thêm một extension VS Code? Bài này kể lý do mình làm KD Code: không khoá vào một agent, không rời VS Code, và coi việc so sánh nhiều agent trên git worktree là luồng chính."
 pubDate: 2026-11-09
+category: ai
 tags: [ai, agents, vscode, open-source]
 ---
 
