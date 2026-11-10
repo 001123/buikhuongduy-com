@@ -55,7 +55,8 @@ export default defineConfig({
       provider: fontProviders.fontsource(),
       name: 'Fraunces',
       cssVariable: '--font-fraunces',
-      weights: ['400 900'],
+      // Static weights actually used (400 body/quotes, 600 headings, 700 404 seal); the variable file is ~120 KB per subset.
+      weights: [400, 600, 700],
       subsets: ['latin', 'latin-ext', 'vietnamese'],
       fallbacks: ['Georgia', 'serif'],
     },
