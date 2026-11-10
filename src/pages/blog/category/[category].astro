@@ -1,8 +1,0 @@
----
-import BlogCategory from "../../../components/sections/BlogCategory.astro";
-import { getCategoryPaths } from "../../../lib/blog";
-
-export const getStaticPaths = () => getCategoryPaths("vi");
----
-
-<BlogCategory {...Astro.props} />
