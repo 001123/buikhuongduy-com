@@ -43,7 +43,10 @@ jobs:
             astro-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
             astro-${{ runner.os }}-
 
+      # GA4 Measurement ID (public, not a secret): repository variable PUBLIC_GA4_ID.
       - run: pnpm build
+        env:
+          PUBLIC_GA4_ID: ${{ vars.PUBLIC_GA4_ID }}
 
       # Production deploy on main (served at buikhuongduy.com); preview deploy for PRs.
       - name: Deploy
@@ -86,7 +89,10 @@ jobs:
             astro-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
             astro-${{ runner.os }}-
 
+      # Audit with GA4 loaded, but under a dummy ID so CI runs do not show up in the real property.
       - run: pnpm build
+        env:
+          PUBLIC_GA4_ID: G-LHCI000000
 
       - run: pnpm lighthouse
 

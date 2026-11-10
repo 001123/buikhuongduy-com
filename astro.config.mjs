@@ -3,6 +3,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
+import partytown from '@astrojs/partytown';
 import { readdirSync, readFileSync } from 'node:fs';
 import { sectionPaths } from './src/i18n/ui.ts';
 import { categoryIndexMinPosts } from './src/data/categories.ts';
@@ -73,6 +74,8 @@ export default defineConfig({
     },
   },
   integrations: [
+    // GA4 runs in a web worker; see src/components/Analytics.astro.
+    partytown(),
     sitemap({
       i18n: {
         defaultLocale: 'vi',

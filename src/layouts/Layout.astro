@@ -4,6 +4,7 @@ import { ClientRouter } from "astro:transitions";
 import { Font } from "astro:assets";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import CursorEffects from "../components/CursorEffects.astro";
+import Analytics from "../components/Analytics.astro";
 import { defaultLang, getLang, homePath, languages, locales, useTranslations, type Lang } from "../i18n/ui";
 import { cleanText, structuredData, type ArticleMeta, type Crumb, type PageType } from "../lib/seo";
 import type { PageDates } from "../lib/git-dates";
@@ -146,6 +147,7 @@ const jsonLd = structuredData({
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <ClientRouter />
+    <Analytics />
     <script is:inline>
       // Apply the blog reading mode before first paint to avoid a content flash.
       // A `?mode=` URL param (shared links) wins over the reader's saved preference.

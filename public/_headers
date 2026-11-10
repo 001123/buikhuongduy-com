@@ -3,9 +3,11 @@
 # Inline scripts/styles come from Astro (view transitions, hoisted scripts) and build-time Mermaid SVGs.
 # Cloudflare Web Analytics: the zone injects beacon.min.js from static.cloudflareinsights.com, which posts to cloudflareinsights.com.
 # `data:` in script-src: Astro's view-transition router injects an empty `data:` module script to await inline modules.
+# GA4 via Partytown: the worker is a `blob:` URL, fetches gtag.js from googletagmanager.com and runs it with `new Function`
+# ('unsafe-eval'); hits go to *.google-analytics.com / *.analytics.google.com.
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' data: https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' data: https://static.cloudflareinsights.com https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; font-src 'self'; connect-src 'self' https://cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
   Cross-Origin-Opener-Policy: same-origin
