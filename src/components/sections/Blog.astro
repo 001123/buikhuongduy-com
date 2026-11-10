@@ -1,23 +1,45 @@
 ---
 import SectionPage from "../../layouts/SectionPage.astro";
 import CategoryNav from "../CategoryNav.astro";
+import Pagination from "../Pagination.astro";
 import PostList from "../PostList.astro";
-import { getLang, useTranslations } from "../../i18n/ui";
-import { getPosts, postUrl } from "../../lib/blog";
+import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
+import { blogPageAlternates, getPosts, pageCount, pagePath, pagePosts, postUrl } from "../../lib/blog";
 
+interface Props {
+  /** Listing page number; page 1 is the blog index. */
+  page?: number;
+}
+
+const { page = 1 } = Astro.props;
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
-const posts = await getPosts(lang);
+const base = sectionPaths.blog[lang];
+const all = await getPosts(lang);
+const total = pageCount(all.length);
+const posts = pagePosts(all, page);
+const { translations, alternates } = await blogPageAlternates(page);
+const pageLabel = `${t("blog.page")} ${page}`;
 ---
 
-<SectionPage section="blog" title={t("blog.title")} lead={t("blog.lead")} itemList={posts.map(postUrl)}>
+<SectionPage
+  section="blog"
+  title={t("blog.title")}
+  lead={t("blog.lead")}
+  page={page}
+  alternates={page > 1 ? alternates : undefined}
+  translations={page > 1 ? translations : undefined}
+  breadcrumbs={page > 1 ? [{ name: t("nav.blog"), path: base }, { name: pageLabel, path: pagePath(base, page) }] : undefined}
+  itemList={posts.map(postUrl)}
+>
   {
-    posts.length === 0 ? (
+    all.length === 0 ? (
       <p class="text-paper/70 italic">{t("blog.empty")}</p>
     ) : (
       <>
         <CategoryNav />
         <PostList posts={posts} />
+        <Pagination base={base} current={page} total={total} />
       </>
     )
   }

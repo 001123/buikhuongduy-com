@@ -31,6 +31,8 @@ interface Props {
   itemList?: string[];
   /** When the page was first published and last changed, for JSON-LD. */
   dates?: PageDates;
+  /** Listing page number; pages after the first get it in the document title and description. */
+  page?: number;
 }
 
 const lang = getLang(Astro.currentLocale);
@@ -49,7 +51,13 @@ const {
   breadcrumbs,
   itemList,
   dates,
+  page = 1,
 } = Astro.props;
+
+// Keep titles and descriptions unique across listing pages.
+const pageLabel = page > 1 ? `${t("blog.page")} ${page}` : "";
+const docTitle = [title, pageLabel, t("site.name")].filter(Boolean).join(" · ");
+const docDescription = pageLabel ? `${description} (${pageLabel})` : description;
 
 const pageTypes: Record<Section, PageType> = {
   about: "ProfilePage",
@@ -59,8 +67,8 @@ const pageTypes: Record<Section, PageType> = {
 ---
 
 <Layout
-  title={`${title} · ${t("site.name")}`}
-  description={description}
+  title={docTitle}
+  description={docDescription}
   alternates={alternates}
   translations={translations}
   pageType={pageTypes[section]}

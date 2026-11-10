@@ -3,3 +3,9 @@
 /gioi-thieu /about/ 301
 /lien-he/ /contact/ 301
 /lien-he /contact/ 301
+
+# Listing page 1 lives at the listing root.
+/blog/page/1/ /blog/ 301
+/en/blog/page/1/ /en/blog/ 301
+/blog/category/:category/page/1/ /blog/category/:category/ 301
+/en/blog/category/:category/page/1/ /en/blog/category/:category/ 301

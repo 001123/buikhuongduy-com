@@ -1,0 +1,9 @@
+---
+import Blog from "../../../../components/sections/Blog.astro";
+import { getBlogPagePaths } from "../../../../lib/blog";
+
+// Blog index pages 2…N; page 1 is ../index.astro.
+export const getStaticPaths = () => getBlogPagePaths("en");
+---
+
+<Blog page={Astro.props.page} />
