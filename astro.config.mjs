@@ -13,6 +13,7 @@ import { unified } from '@astrojs/markdown-remark';
 import remarkDirective from 'remark-directive';
 import remarkReadingModes from './src/lib/remark-reading-modes.mjs';
 import remarkMermaid from './src/lib/remark-mermaid.mjs';
+import rehypePostImages from './src/lib/rehype-post-images.mjs';
 
 /**
  * Published posts read straight from frontmatter: the sitemap hooks run before content collections are available.
@@ -143,6 +144,7 @@ export default defineConfig({
   markdown: {
     processor: unified({
       remarkPlugins: [remarkDirective, remarkReadingModes, remarkMermaid],
+      rehypePlugins: [rehypePostImages],
     }),
   },
   vite: {

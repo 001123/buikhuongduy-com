@@ -147,7 +147,8 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
   }
 
   async function openImage(source: HTMLImageElement) {
-    const src = source.currentSrc || source.src;
+    // `src` is the full-size fallback; `currentSrc` may be a small srcset candidate that blurs when zoomed.
+    const src = source.src || source.currentSrc;
     const img = new Image();
     img.src = src;
     img.alt = source.alt;
