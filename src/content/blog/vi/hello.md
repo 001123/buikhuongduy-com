@@ -1,7 +1,7 @@
 ---
 title: Lời chào
 description: "Bài viết đầu tiên: nơi mình ghi lại kiến thức, kinh nghiệm, và mong nhận được góp ý chân thành từ bạn."
-pubDate: 2026-11-08
+pubDate: 2026-11-08T16:35:00+07:00
 tags: [blog]
 ---
 

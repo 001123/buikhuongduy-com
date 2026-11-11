@@ -1,7 +1,7 @@
 ---
 title: "What PageSpeed Insights Is and How to Read Its Report"
 description: "A guide to PageSpeed Insights (pagespeed.web.dev): CrUX field data versus Lighthouse lab data, how the Performance score is calculated, Core Web Vitals, why scores vary between runs and how to use PSI well."
-pubDate: 2026-11-10
+pubDate: 2026-11-10T16:10:00+07:00
 category: performance
 tags: [performance, pagespeed-insights, lighthouse, core-web-vitals]
 ---

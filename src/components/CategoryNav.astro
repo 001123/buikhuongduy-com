@@ -13,8 +13,8 @@ const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 const cats = await getCategories(lang);
 const chip =
-  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
-const idle = "border-paper/20 text-paper/80 hover:border-rice hover:text-rice";
+  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
+const idle = "glow-hover border-paper/20 text-paper/80 hover:border-rice hover:text-rice";
 const active = "border-rice bg-rice/10 text-rice";
 ---
 

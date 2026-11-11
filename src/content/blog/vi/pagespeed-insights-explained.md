@@ -1,7 +1,7 @@
 ---
 title: "PageSpeed Insights là gì và đọc báo cáo thế nào cho đúng"
 description: "Giải thích PageSpeed Insights (pagespeed.web.dev): khác nhau giữa dữ liệu thực tế CrUX và dữ liệu lab Lighthouse, cách tính điểm Performance, Core Web Vitals, vì sao điểm dao động giữa các lần chạy và cách dùng PSI hiệu quả."
-pubDate: 2026-11-10
+pubDate: 2026-11-10T16:10:00+07:00
 category: performance
 tags: [performance, pagespeed-insights, lighthouse, core-web-vitals]
 ---

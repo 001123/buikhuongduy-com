@@ -1,7 +1,7 @@
 ---
 title: "Kubernetes for Frontend Developers: Enough to Deploy a Next.js App"
 description: "Kubernetes explained from a frontend point of view: containers, Pods, Deployments, Services, Ingress, ConfigMaps, Secrets, probes and autoscaling, with a Next.js deployment example and the mistakes frontend apps commonly hit on a cluster."
-pubDate: 2026-11-10
+pubDate: 2026-11-10T16:24:00+07:00
 category: devops
 tags: [kubernetes, docker, nextjs, devops, frontend]
 ---

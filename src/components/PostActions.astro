@@ -10,7 +10,7 @@ const t = useTranslations(getLang(Astro.currentLocale));
 const url = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 const facebookHref = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
 const button =
-  "inline-flex items-center gap-2 rounded-full no-underline border border-paper/25 bg-ink/40 px-4 py-2 text-sm font-medium text-paper/80 transition-colors hover:border-rice/60 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
+  "inline-flex items-center gap-2 rounded-full no-underline border border-paper/25 bg-ink/40 px-4 py-2 text-sm font-medium text-paper/80 glow-hover hover:border-rice/60 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
 ---
 
 <div

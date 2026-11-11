@@ -165,5 +165,15 @@ export async function relatedPosts(post: Post, limit = 3): Promise<Post[]> {
 }
 
 export function formatDate(date: Date, lang: Lang): string {
-  return new Intl.DateTimeFormat(locales[lang].bcp47, { day: "numeric", month: "long", year: "numeric" }).format(date);
+  return new Intl.DateTimeFormat(locales[lang].bcp47, { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Ho_Chi_Minh" }).format(date);
+}
+
+/** Date plus time (Vietnam time). Date-only frontmatter values (UTC midnight) fall back to the date alone. */
+export function formatDateTime(date: Date, lang: Lang): string {
+  const dateOnly = date.getUTCHours() === 0 && date.getUTCMinutes() === 0 && date.getUTCSeconds() === 0;
+  if (dateOnly) return formatDate(date, lang);
+  const opts = { timeZone: "Asia/Ho_Chi_Minh" } as const;
+  const day = new Intl.DateTimeFormat(locales[lang].bcp47, { ...opts, day: "numeric", month: "long", year: "numeric" }).format(date);
+  const time = new Intl.DateTimeFormat(locales[lang].bcp47, { ...opts, hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
+  return `${day} · ${time}`;
 }

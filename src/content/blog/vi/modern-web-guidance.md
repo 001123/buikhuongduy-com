@@ -1,7 +1,7 @@
 ---
 title: "Modern Web Guidance 1.0: dạy coding agent viết web cho đúng chuẩn"
 description: "Ngày 10/11/2026, Chrome phát hành Modern Web Guidance 1.0, bộ skill đưa best practice, dữ liệu Baseline và kinh nghiệm của kỹ sư trình duyệt vào coding agent. Bài này tóm tắt những gì mới, vì sao nên dùng, cách cài, quy trình modernize codebase và cách kết hợp với Chrome DevTools for agents."
-pubDate: 2026-11-11
+pubDate: 2026-11-11T02:22:00+07:00
 category: ai
 tags: [ai, coding-agent, chrome, web-platform, accessibility, performance]
 ---

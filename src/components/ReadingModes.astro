@@ -3,25 +3,35 @@ import { getLang, useTranslations } from "../i18n/ui";
 
 const t = useTranslations(getLang(Astro.currentLocale));
 const modes = [
-  { id: "tldr", label: t("blog.mode.tldr") },
-  { id: "normal", label: t("blog.mode.normal") },
-  { id: "advanced", label: t("blog.mode.advanced") },
+  { id: "tldr", label: t("blog.mode.tldr"), hint: t("blog.mode.tldrHint") },
+  { id: "normal", label: t("blog.mode.normal"), hint: t("blog.mode.normalHint") },
+  { id: "advanced", label: t("blog.mode.advanced"), hint: t("blog.mode.advancedHint") },
 ] as const;
 ---
 
 <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-  <div role="radiogroup" aria-label={t("blog.mode.label")} class="reading-modes inline-flex rounded-full border border-paper/25 bg-ink/40 p-1 text-sm">
+  <div role="radiogroup" aria-label={t("blog.mode.label")} class="reading-modes inline-flex rounded-lg border border-paper/25 bg-ink/40 p-1 text-sm">
     {
       modes.map((m) => (
-        <button
-          type="button"
-          role="radio"
-          data-mode-option={m.id}
-          aria-checked={m.id === "normal" ? "true" : "false"}
-          class="rounded-full px-3.5 py-1.5 font-medium text-paper/70 transition-colors hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
-        >
-          {m.label}
-        </button>
+        <span class="group relative inline-flex">
+          <button
+            type="button"
+            role="radio"
+            data-mode-option={m.id}
+            aria-checked={m.id === "normal" ? "true" : "false"}
+            aria-describedby={`mode-hint-${m.id}`}
+            class="rounded-md border border-transparent px-3.5 py-1.5 cursor-pointer font-medium text-paper/70 transition-[color,background-color] duration-200 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+          >
+            {m.label}
+          </button>
+          <span
+            id={`mode-hint-${m.id}`}
+            role="tooltip"
+            class="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-md border border-paper/15 bg-ink px-2.5 py-1 text-xs text-paper/85 opacity-0 shadow-lg transition duration-150 group-hover:translate-y-0 group-hover:opacity-100 group-has-focus-visible:translate-y-0 group-has-focus-visible:opacity-100"
+          >
+            {m.hint}
+          </span>
+        </span>
       ))
     }
   </div>

@@ -1,7 +1,7 @@
 ---
 title: "I Added Google Analytics and My Lighthouse Score Stayed at 100: Why?"
 description: "Adding gtag.js (GA4) made my personal site 154 KiB heavier, yet Lighthouse still scores 100/100. What the Performance score actually measures, what Partytown changes, an experiment comparing gtag on the main thread with gtag in a worker, and what lab scores cannot see."
-pubDate: 2026-11-10
+pubDate: 2026-11-10T23:01:00+07:00
 category: performance
 tags: [performance, lighthouse, google-analytics, partytown, javascript]
 ---

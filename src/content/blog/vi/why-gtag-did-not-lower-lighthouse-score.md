@@ -1,7 +1,7 @@
 ---
 title: "Thêm Google Analytics mà điểm Lighthouse vẫn 100: vì sao?"
 description: "Mình thêm gtag.js (GA4) vào trang cá nhân, trang nặng thêm 154 KiB nhưng Lighthouse vẫn 100/100. Bài này giải thích điểm Performance thật sự đo gì, Partytown thay đổi điều gì, thí nghiệm so sánh gtag chạy trực tiếp và chạy trong worker, và những thứ điểm lab không thấy."
-pubDate: 2026-11-10
+pubDate: 2026-11-10T23:01:00+07:00
 category: performance
 tags: [performance, lighthouse, google-analytics, partytown, javascript]
 ---

@@ -1,7 +1,7 @@
 ---
 title: "Zero hosting cost, millions of requests: how?"
 description: "This personal site costs nothing to host yet can take millions of requests. Here is why: static HTML, Cloudflare Pages serving from the edge, free and unlimited static asset requests, CI on GitHub Actions, and the things that would end the zero-cost setup."
-pubDate: 2026-11-10
+pubDate: 2026-11-10T23:20:00+07:00
 category: devops
 tags: [cloudflare, cloudflare-pages, static-site, hosting, github-actions]
 ---

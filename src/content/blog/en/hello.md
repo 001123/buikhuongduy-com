@@ -1,7 +1,7 @@
 ---
 title: Hello
 description: "My first post: a place to write down what I learn, share my experience, and hear your honest feedback."
-pubDate: 2026-11-08
+pubDate: 2026-11-08T16:35:00+07:00
 tags: [blog]
 ---
 

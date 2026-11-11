@@ -170,8 +170,8 @@ html[data-reading-mode="advanced"] .reading-content > .mode-tldr {
 html:not([data-reading-mode="tldr"], [data-reading-mode="advanced"]) [data-mode-option="normal"],
 html[data-reading-mode="tldr"] [data-mode-option="tldr"],
 html[data-reading-mode="advanced"] [data-mode-option="advanced"] {
-  background: var(--color-rice);
-  color: var(--color-ink);
+  background: rgb(217 181 74 / 0.08);
+  color: var(--color-rice);
 }
 
 .mode-advanced {

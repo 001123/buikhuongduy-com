@@ -1,7 +1,7 @@
 ---
 title: "Claude Fable 5.2: mạnh hơn, nhanh hơn và rẻ hơn Fable 5.1"
 description: "Ngày 9/11/2026, Anthropic ra mắt Claude Fable 5.2 và Claude Mythos 5.2. Bài này tóm tắt những gì mới: điểm benchmark, giá, tốc độ, các thí nghiệm đáng chú ý, khi nào nên dùng Fable thay vì Opus 5.5, và những điểm cần lưu ý khi gọi qua API."
-pubDate: 2026-11-10
+pubDate: 2026-11-10T23:27:00+07:00
 category: ai
 tags: [ai, claude, anthropic, llm]
 ---

@@ -1,7 +1,7 @@
 ---
 title: "Đạt 100/100/100/100 Lighthouse cho trang cá nhân: những gì mình đã làm"
 description: "Tổng hợp các kỹ thuật giúp trang cá nhân đạt điểm tuyệt đối Lighthouse ở cả Performance, Accessibility, Best Practices và SEO: HTML tĩnh, CSS inline, font tự host không layout shift, ảnh LCP ưu tiên, Mermaid render lúc build."
-pubDate: 2026-11-08
+pubDate: 2026-11-08T22:25:00+07:00
 category: performance
 tags: [performance, lighthouse, astro, seo, accessibility]
 ---

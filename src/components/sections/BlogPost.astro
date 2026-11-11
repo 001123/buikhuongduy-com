@@ -2,12 +2,12 @@
 import { render } from "astro:content";
 import SectionPage from "../../layouts/SectionPage.astro";
 import ReadingModes from "../ReadingModes.astro";
-import Mermaid from "../Mermaid.astro";
+import MediaViewer from "../MediaViewer.astro";
 import PostActions from "../PostActions.astro";
 import PostFeedback from "../PostFeedback.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { categories } from "../../data/categories";
-import { categoryPath, formatDate, postAlternates, postTranslations, postUrl, relatedPosts, type Post } from "../../lib/blog";
+import { categoryPath, formatDateTime, postAlternates, postTranslations, postUrl, relatedPosts, type Post } from "../../lib/blog";
 
 interface Props {
   post: Post;
@@ -19,6 +19,8 @@ const t = useTranslations(lang);
 const { Content, remarkPluginFrontmatter } = await render(post);
 const hasModes = Boolean(remarkPluginFrontmatter.hasModes);
 const hasMermaid = Boolean(remarkPluginFrontmatter.hasMermaid);
+// Markdown or inline HTML images; the viewer (and its script) ships only when there is something to zoom.
+const hasImages = /!\[[^\]]*\]\(|<img\b/i.test(post.body ?? "");
 const alternates = await postAlternates(post);
 const translations = await postTranslations(post);
 const { title, description, pubDate, updatedDate, tags, draft, category } = post.data;
@@ -45,12 +47,12 @@ const related = await relatedPosts(post);
 >
   <div slot="meta" class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-paper/60">
     {cat && (
-      <a href={cat.path} class="rounded-full border border-rice/50 px-2.5 py-0.5 text-xs font-medium text-rice transition-colors hover:border-rice hover:bg-rice/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
+      <a href={cat.path} class="rounded-full border border-rice/50 px-2.5 py-0.5 text-xs font-medium text-rice glow-hover hover:border-rice hover:bg-rice/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
         {cat.name}
       </a>
     )}
-    <span>{t("blog.published")} <time datetime={pubDate.toISOString()}>{formatDate(pubDate, lang)}</time></span>
-    {updatedDate && <span>{t("blog.updated")} <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate, lang)}</time></span>}
+    <span>{t("blog.published")} <time datetime={pubDate.toISOString()}>{formatDateTime(pubDate, lang)}</time></span>
+    {updatedDate && <span>{t("blog.updated")} <time datetime={updatedDate.toISOString()}>{formatDateTime(updatedDate, lang)}</time></span>}
     {draft && <span class="rounded-full border border-lotus/60 px-2 py-0.5 text-xs text-lotus">{t("blog.draft")}</span>}
     {tags.length > 0 && (
       <ul class="flex flex-wrap gap-2">
@@ -66,7 +68,7 @@ const related = await relatedPosts(post);
       <ul class="mt-4 grid gap-3">
         {related.map((p) => (
           <li>
-            <a href={postUrl(p)} class="group block rounded-xl border border-paper/15 bg-ink/40 px-4 py-3 transition-colors hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
+            <a href={postUrl(p)} class="group block rounded-xl border border-paper/15 bg-ink/40 px-4 py-3 glow-hover hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
               <span class="block font-medium text-paper group-hover:text-rice">{p.data.title}</span>
               <span class="mt-1 block line-clamp-2 text-sm text-paper/65">{p.data.description}</span>
             </a>
@@ -77,5 +79,5 @@ const related = await relatedPosts(post);
   )}
   <PostActions slug={post.id} />
   <PostFeedback slug={post.id} title={title} />
-  {hasMermaid && <Mermaid />}
+  {(hasMermaid || hasImages) && <MediaViewer />}
 </SectionPage>

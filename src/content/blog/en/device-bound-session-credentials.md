@@ -1,7 +1,7 @@
 ---
 title: "Device Bound Session Credentials (DBSC): Binding Login Sessions to the Device"
 description: "Stolen session cookies let attackers skip passwords and 2FA entirely. Device Bound Session Credentials (DBSC) in Chrome bind a session to a hardware-backed key on the user's device. This post explains how DBSC works, the three changes your server needs, and the fallback cases to plan for."
-pubDate: 2026-11-10
+pubDate: 2026-11-11T00:29:00+07:00
 category: web-platform
 tags: [web-platform, security, chrome, authentication, cookies]
 ---

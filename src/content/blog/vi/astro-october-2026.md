@@ -1,7 +1,7 @@
 ---
 title: "Astro tháng 10/2026: build timings, prerender song song và vài thứ đáng thử"
 description: "Điểm lại bản tin Astro tháng 10/2026: Astro 7.4 với cờ --timings, image service tách build/runtime, prerender song song, trang redirect tuỳ biến, và kết quả khi mình chạy thử trên chính trang này."
-pubDate: 2026-11-10
+pubDate: 2026-11-10T16:06:00+07:00
 category: astro
 tags: [astro, performance]
 ---

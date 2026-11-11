@@ -1,7 +1,8 @@
 ---
 /**
- * Opens build-time rendered Mermaid diagrams (`<figure class="mermaid">`, see remark-mermaid.mjs)
- * in a zoomable viewer. Included only on pages that have diagrams.
+ * Lightbox for post media: build-time rendered Mermaid diagrams (`<figure class="mermaid">`, see remark-mermaid.mjs)
+ * and images in the post body. Mouse wheel / trackpad / pinch to zoom, drag to pan, double-click or double-tap to toggle zoom.
+ * Included only on pages that have diagrams or images.
  */
 import { getLang, useTranslations } from "../i18n/ui";
 
@@ -12,49 +13,54 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
 ---
 
 <dialog
-  id="diagram-viewer"
-  aria-label={t("diagram.dialog")}
-  data-open-label={t("diagram.open")}
-  class="m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-paper backdrop:bg-ink/85 backdrop:backdrop-blur-sm"
+  id="media-viewer"
+  aria-label={t("viewer.dialog")}
+  data-open-diagram={t("viewer.openDiagram")}
+  data-open-image={t("viewer.openImage")}
+  class="not-prose m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-paper backdrop:bg-ink/50 backdrop:backdrop-blur-[2px] open:flex sm:items-center sm:justify-center sm:p-6 lg:p-10"
 >
-  <div class="flex h-full flex-col">
-    <div class="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center p-3 sm:p-4">
-      <div class="pointer-events-auto flex items-center gap-0.5 rounded-full border border-paper/20 bg-ink/80 p-1 shadow-2xl shadow-ink/60 backdrop-blur-md">
-        <button type="button" data-action="zoom-out" class={btn} aria-label={t("diagram.zoomOut")} title={`${t("diagram.zoomOut")} (−)`}>
+  <!-- Framed panel on larger screens; the dialog padding around it acts as the backdrop (click to close). -->
+  <div data-panel class="flex h-full w-full flex-col overflow-hidden bg-ink sm:max-w-7xl sm:rounded-2xl sm:border sm:border-paper/15 sm:shadow-2xl sm:shadow-black/60">
+    <div class="z-10 flex shrink-0 justify-center border-b border-paper/10 p-2">
+      <div class="flex items-center gap-0.5">
+        <button type="button" data-action="zoom-out" class={btn} aria-label={t("viewer.zoomOut")} title={`${t("viewer.zoomOut")} (−)`}>
           <svg {...icon}><circle cx="11" cy="11" r="7"></circle><path d="M8 11h6M20 20l-4-4"></path></svg>
         </button>
         <button
           type="button"
           data-action="reset"
           class="h-9 min-w-16 rounded-full px-2 text-center text-sm tabular-nums text-paper/80 transition-colors hover:bg-paper/10 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
-          aria-label={t("diagram.reset")}
-          title={`${t("diagram.reset")} (0)`}
+          aria-label={t("viewer.reset")}
+          title={`${t("viewer.reset")} (0)`}
         >
           <span data-zoom-level aria-live="polite">100%</span>
         </button>
-        <button type="button" data-action="zoom-in" class={btn} aria-label={t("diagram.zoomIn")} title={`${t("diagram.zoomIn")} (+)`}>
+        <button type="button" data-action="zoom-in" class={btn} aria-label={t("viewer.zoomIn")} title={`${t("viewer.zoomIn")} (+)`}>
           <svg {...icon}><circle cx="11" cy="11" r="7"></circle><path d="M8 11h6M11 8v6M20 20l-4-4"></path></svg>
         </button>
         <span aria-hidden="true" class="mx-1 h-5 w-px bg-paper/20"></span>
-        <button type="button" data-action="fit" class={btn} aria-label={t("diagram.fit")} title={t("diagram.fit")}>
+        <button type="button" data-action="fit" class={btn} aria-label={t("viewer.fit")} title={t("viewer.fit")}>
           <svg {...icon}><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
         </button>
-        <button type="button" data-action="actual" class={btn} aria-label={t("diagram.actual")} title={`${t("diagram.actual")} (1)`}>
+        <button type="button" data-action="actual" class={btn} aria-label={t("viewer.actual")} title={`${t("viewer.actual")} (1)`}>
           <span aria-hidden="true" class="text-xs font-semibold">1:1</span>
         </button>
-        <button type="button" data-action="download" class={btn} aria-label={t("diagram.download")} title={t("diagram.download")}>
+        <button type="button" data-action="download" class={btn} aria-label={t("viewer.download")} title={t("viewer.download")}>
           <svg {...icon}><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
         </button>
         <span aria-hidden="true" class="mx-1 h-5 w-px bg-paper/20"></span>
-        <button type="button" data-action="close" class={btn} aria-label={t("diagram.close")} title={`${t("diagram.close")} (Esc)`}>
+        <button type="button" data-action="close" class={btn} aria-label={t("viewer.close")} title={`${t("viewer.close")} (Esc)`}>
           <svg {...icon}><path d="M6 6l12 12M18 6L6 18"></path></svg>
         </button>
       </div>
     </div>
-    <div data-viewport class="relative flex-1 cursor-grab touch-none overflow-hidden select-none active:cursor-grabbing">
+    <div data-viewport class="relative min-h-0 flex-1 cursor-grab touch-none overflow-hidden select-none active:cursor-grabbing">
       <div data-stage class="absolute top-0 left-0 origin-top-left"></div>
     </div>
-    <p class="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-center text-xs text-paper/60">{t("diagram.hint")}</p>
+    <div class="flex shrink-0 flex-col items-center gap-1 border-t border-paper/10 px-4 py-2.5 text-center">
+      <p data-caption hidden class="max-w-3xl text-sm text-paper/85"></p>
+      <p class="text-xs text-paper/55 max-sm:hidden">{t("viewer.hint")}</p>
+    </div>
   </div>
 </dialog>
 
@@ -64,13 +70,19 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
   const MIN = 0.1;
   const MAX = 8;
   const STEP = 1.25;
+  /** Movement (px) below which a pointer press counts as a tap, not a drag. */
+  const TAP = 6;
 
   const view = { scale: 1, x: 0, y: 0, width: 0, height: 0 };
   let dialog: HTMLDialogElement;
   let viewport: HTMLElement;
   let stage: HTMLElement;
   let level: HTMLElement;
-  let currentSvg: SVGSVGElement | null = null;
+  let caption: HTMLElement;
+  /** What the download button saves: an inline SVG or an image URL. */
+  let current: { svg: SVGSVGElement } | { src: string } | null = null;
+  /** Raster images are not upscaled when fitted (they would only get blurry). */
+  let raster = false;
 
   const clamp = (v: number) => Math.min(MAX, Math.max(MIN, v));
 
@@ -95,43 +107,92 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     paint();
   }
 
-  function fit() {
-    const pad = 48;
+  function fitScale() {
+    const pad = viewport.clientWidth < 640 ? 12 : 48;
     const sx = (viewport.clientWidth - pad * 2) / view.width;
     const sy = (viewport.clientHeight - pad * 2) / view.height;
-    center(Math.min(sx, sy, MAX));
+    return Math.min(sx, sy, raster ? 1 : MAX);
   }
 
-  function open(source: SVGSVGElement) {
-    const svg = source.cloneNode(true) as SVGSVGElement;
-    const box = source.viewBox.baseVal;
-    view.width = box?.width || source.getBoundingClientRect().width;
-    view.height = box?.height || source.getBoundingClientRect().height;
-    svg.removeAttribute("style");
-    svg.setAttribute("width", String(view.width));
-    svg.setAttribute("height", String(view.height));
-    stage.replaceChildren(svg);
-    currentSvg = svg;
+  const fit = () => center(fitScale());
+
+  /** Double-click / double-tap: zoom in on the point, or back to fit when already zoomed in. */
+  function toggleZoom(cx: number, cy: number) {
+    const base = fitScale();
+    if (view.scale > base * 1.05) fit();
+    else zoomTo(Math.max(base * 2.5, 1), cx, cy);
+  }
+
+  function show(node: Element, width: number, height: number, label: string) {
+    view.width = width;
+    view.height = height;
+    stage.replaceChildren(node);
+    caption.textContent = label;
+    caption.hidden = !label;
     dialog.showModal();
     fit();
   }
 
+  function openSvg(source: SVGSVGElement) {
+    const svg = source.cloneNode(true) as SVGSVGElement;
+    const box = source.viewBox.baseVal;
+    const width = box?.width || source.getBoundingClientRect().width;
+    const height = box?.height || source.getBoundingClientRect().height;
+    svg.removeAttribute("style");
+    svg.setAttribute("width", String(width));
+    svg.setAttribute("height", String(height));
+    current = { svg };
+    raster = false;
+    show(svg, width, height, "");
+  }
+
+  async function openImage(source: HTMLImageElement) {
+    const src = source.currentSrc || source.src;
+    const img = new Image();
+    img.src = src;
+    img.alt = source.alt;
+    img.draggable = false;
+    img.decoding = "async";
+    try {
+      await img.decode();
+    } catch {
+      return; // Broken image: nothing to show.
+    }
+    img.width = img.naturalWidth;
+    img.height = img.naturalHeight;
+    img.className = "max-w-none";
+    current = { src };
+    raster = !/\.svg(\?|#|$)/i.test(new URL(src, location.href).pathname);
+    const label = source.closest("figure")?.querySelector("figcaption")?.textContent?.trim() || source.alt;
+    show(img, img.naturalWidth, img.naturalHeight, label);
+  }
+
   function download() {
-    if (!currentSvg) return;
-    const xml = new XMLSerializer().serializeToString(currentSvg);
-    const url = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml" }));
-    const a = Object.assign(document.createElement("a"), { href: url, download: "diagram.svg" });
+    if (!current) return;
+    let href: string;
+    let name: string;
+    if ("svg" in current) {
+      const xml = new XMLSerializer().serializeToString(current.svg);
+      href = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml" }));
+      name = "diagram.svg";
+    } else {
+      href = current.src;
+      name = new URL(href, location.href).pathname.split("/").pop() || "image";
+    }
+    // Cross-origin images ignore `download`; they open in a new tab instead.
+    const a = Object.assign(document.createElement("a"), { href, download: name, target: "_blank", rel: "noopener" });
     a.click();
-    URL.revokeObjectURL(url);
+    if (href.startsWith("blob:")) URL.revokeObjectURL(href);
   }
 
   function bindViewer() {
-    dialog = document.querySelector<HTMLDialogElement>("#diagram-viewer")!;
+    dialog = document.querySelector<HTMLDialogElement>("#media-viewer")!;
     if (!dialog || dialog.dataset.bound) return;
     dialog.dataset.bound = "true";
     viewport = dialog.querySelector("[data-viewport]")!;
     stage = dialog.querySelector("[data-stage]")!;
     level = dialog.querySelector("[data-zoom-level]")!;
+    caption = dialog.querySelector("[data-caption]")!;
 
     const actions: Record<string, () => void> = {
       "zoom-in": () => zoomTo(view.scale * STEP),
@@ -155,31 +216,55 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     });
     dialog.addEventListener("close", () => {
       stage.replaceChildren();
-      currentSvg = null;
+      current = null;
+    });
+    window.addEventListener("resize", () => dialog.open && fit());
+
+    // Clicks outside the panel land on the dialog itself (its padding or ::backdrop): close.
+    // Both press and release must be outside, so a drag that ends there does not close.
+    let pressedOutside = false;
+    dialog.addEventListener("pointerdown", (e) => (pressedOutside = e.target === dialog));
+    dialog.addEventListener("click", (e) => {
+      if (pressedOutside && e.target === dialog) dialog.close();
+      pressedOutside = false;
     });
 
+    const local = (e: { clientX: number; clientY: number }) => {
+      const rect = viewport.getBoundingClientRect();
+      return [e.clientX - rect.left, e.clientY - rect.top] as const;
+    };
+
+    // Mouse wheel zooms; trackpad pinch arrives as a wheel event with ctrlKey and small deltas.
     viewport.addEventListener(
       "wheel",
       (e) => {
         e.preventDefault();
-        const rect = viewport.getBoundingClientRect();
-        zoomTo(view.scale * Math.exp(-e.deltaY * 0.0015), e.clientX - rect.left, e.clientY - rect.top);
+        const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+        zoomTo(view.scale * Math.exp(-delta * (e.ctrlKey ? 0.01 : 0.0015)), ...local(e));
       },
       { passive: false },
     );
 
-    // Drag to pan, two fingers to pinch-zoom.
+    // Drag to pan, two fingers to pinch-zoom (and pan), tap outside the media to close.
     const pointers = new Map<number, { x: number; y: number }>();
     let pinch = 0;
+    let mid: { x: number; y: number } | null = null;
+    let moved = 0;
+    let downTarget: EventTarget | null = null;
     viewport.addEventListener("pointerdown", (e) => {
       viewport.setPointerCapture(e.pointerId);
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size === 1) {
+        moved = 0;
+        downTarget = e.target;
+      }
     });
     viewport.addEventListener("pointermove", (e) => {
       const prev = pointers.get(e.pointerId);
       if (!prev) return;
       const pos = { x: e.clientX, y: e.clientY };
       pointers.set(e.pointerId, pos);
+      moved += Math.hypot(pos.x - prev.x, pos.y - prev.y);
       if (pointers.size === 1) {
         view.x += pos.x - prev.x;
         view.y += pos.y - prev.y;
@@ -187,38 +272,61 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
       } else if (pointers.size === 2) {
         const [a, b] = [...pointers.values()];
         const dist = Math.hypot(a.x - b.x, a.y - b.y);
-        const rect = viewport.getBoundingClientRect();
-        if (pinch) zoomTo((view.scale * dist) / pinch, (a.x + b.x) / 2 - rect.left, (a.y + b.y) / 2 - rect.top);
+        const m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+        if (mid) {
+          view.x += m.x - mid.x;
+          view.y += m.y - mid.y;
+        }
+        if (pinch) zoomTo((view.scale * dist) / pinch, ...local({ clientX: m.x, clientY: m.y }));
+        else paint();
         pinch = dist;
+        mid = m;
       }
     });
     const release = (e: PointerEvent) => {
+      const wasTap = pointers.size === 1 && moved < TAP && e.type === "pointerup";
       pointers.delete(e.pointerId);
-      if (pointers.size < 2) pinch = 0;
+      if (pointers.size < 2) {
+        pinch = 0;
+        mid = null;
+      }
+      // Tapping the dark area around the media closes the viewer, like most lightboxes.
+      if (wasTap && downTarget === viewport) closeSoon();
     };
     viewport.addEventListener("pointerup", release);
     viewport.addEventListener("pointercancel", release);
+
+    // Delay closing so a double-tap/double-click on the backdrop can still cancel it.
+    let closeTimer = 0;
+    function closeSoon() {
+      clearTimeout(closeTimer);
+      closeTimer = window.setTimeout(() => dialog.close(), 250);
+    }
     viewport.addEventListener("dblclick", (e) => {
-      const rect = viewport.getBoundingClientRect();
-      zoomTo(view.scale * 2, e.clientX - rect.left, e.clientY - rect.top);
+      clearTimeout(closeTimer);
+      toggleZoom(...local(e));
     });
   }
 
+  /* ---------- Triggers ---------- */
+
+  const expandIcon =
+    '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>';
+
   /** Adds an expand button to each diagram; clicking the diagram itself also opens the viewer. */
-  function makeExpandable(figure: HTMLElement) {
+  function makeDiagramExpandable(figure: HTMLElement) {
     if (figure.dataset.expandable) return;
     figure.dataset.expandable = "true";
     const openThis = () => {
       const svg = figure.querySelector("svg");
-      if (svg) open(svg);
+      if (svg) openSvg(svg);
     };
     const button = Object.assign(document.createElement("button"), {
       type: "button",
-      className: "mermaid-expand",
-      innerHTML:
-        '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>',
+      className: "media-expand",
+      innerHTML: expandIcon,
     });
-    button.setAttribute("aria-label", dialog.dataset.openLabel ?? "");
+    button.setAttribute("aria-label", dialog.dataset.openDiagram ?? "");
     button.addEventListener("click", (e) => {
       e.stopPropagation();
       openThis();
@@ -227,9 +335,22 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     figure.addEventListener("click", openThis);
   }
 
+  /** Wraps a post image in a button that opens it in the viewer. Linked images keep their link. */
+  function makeImageExpandable(img: HTMLImageElement) {
+    if (img.closest("a, button, figure.mermaid, [data-no-zoom]")) return;
+    const button = Object.assign(document.createElement("button"), { type: "button", className: "media-zoomable" });
+    const label = dialog.dataset.openImage ?? "";
+    button.setAttribute("aria-label", img.alt ? `${label}: ${img.alt}` : label);
+    img.replaceWith(button);
+    button.append(img);
+    button.addEventListener("click", () => openImage(img));
+  }
+
   document.addEventListener("astro:page-load", () => {
     bindViewer();
-    document.querySelectorAll<HTMLElement>("figure.mermaid").forEach(makeExpandable);
+    if (!dialog) return;
+    document.querySelectorAll<HTMLElement>("figure.mermaid").forEach(makeDiagramExpandable);
+    document.querySelectorAll<HTMLImageElement>("article .prose img").forEach(makeImageExpandable);
   });
 </script>
 
@@ -247,11 +368,28 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
 
   figure.mermaid[data-expandable] {
     cursor: zoom-in;
-    transition: border-color 250ms;
+    transition:
+      border-color 250ms,
+      box-shadow 250ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  figure.mermaid[data-expandable]:hover {
-    border-color: var(--color-rice);
+  /* Same rice-gold glow as `glow-hover` buttons (global.css). */
+  @media (hover: hover) {
+    figure.mermaid[data-expandable]:hover {
+      border-color: var(--color-rice);
+      box-shadow:
+      0 0 0 1px rgb(217 181 74 / 0.2),
+      0 0 18px rgb(217 181 74 / 0.3),
+      0 8px 24px rgb(43 29 18 / 0.35);
+    }
+
+    .media-zoomable:hover img {
+      outline-color: var(--color-rice);
+      box-shadow:
+      0 0 0 1px rgb(217 181 74 / 0.2),
+      0 0 18px rgb(217 181 74 / 0.3),
+      0 8px 24px rgb(43 29 18 / 0.35);
+    }
   }
 
   figure.mermaid svg {
@@ -260,7 +398,7 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     height: auto;
   }
 
-  .mermaid-expand {
+  .media-expand {
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
@@ -275,18 +413,57 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     transition: color 250ms, background-color 250ms;
   }
 
-  .mermaid-expand:hover {
+  .media-expand:hover {
     color: var(--color-rice);
     background: rgb(246 236 217 / 0.1);
   }
 
-  .mermaid-expand:focus-visible {
+  .media-expand:focus-visible {
     outline: 2px solid var(--color-rice);
     outline-offset: 2px;
   }
 
-  .mermaid-expand svg {
+  .media-expand svg {
     width: 1rem;
     height: 1rem;
+  }
+
+  .media-zoomable {
+    display: block;
+    max-width: 100%;
+    padding: 0;
+    border-radius: 0.75rem;
+    cursor: zoom-in;
+  }
+
+  .media-zoomable img {
+    margin-block: 0;
+    border-radius: inherit;
+    outline: 1px solid transparent;
+    outline-offset: 0;
+    transition:
+      outline-color 250ms,
+      box-shadow 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .media-zoomable:focus-visible {
+    outline: 2px solid var(--color-rice);
+    outline-offset: 3px;
+  }
+
+  #media-viewer[open] {
+    animation: media-viewer-in 180ms ease-out;
+  }
+
+  @keyframes media-viewer-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #media-viewer[open] {
+      animation: none;
+    }
   }
 </style>

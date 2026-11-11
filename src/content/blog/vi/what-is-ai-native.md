@@ -1,7 +1,7 @@
 ---
 title: "AI-Native là gì? Khác gì với “có thêm AI”"
 description: "AI-Native nghĩa là sản phẩm, quy trình hay đội ngũ được thiết kế quanh AI ngay từ đầu, không phải gắn thêm một nút chatbot vào hệ thống cũ. Bài này giải thích khái niệm, cách phân biệt với AI-enabled và dấu hiệu nhận biết một sản phẩm thật sự AI-Native."
-pubDate: 2026-11-09
+pubDate: 2026-11-09T00:49:00+07:00
 category: ai
 tags: [ai, product, engineering]
 ---
