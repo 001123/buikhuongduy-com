@@ -18,8 +18,10 @@ export default function rehypePostImages() {
     let first = true;
     visit(tree, "element", (node) => {
       if (node.tagName !== "img" || typeof node.properties?.src !== "string") return;
-      // Only local/remote images collected by Astro get optimized; skip data URIs and inline SVGs.
-      if (node.properties.src.startsWith("data:")) return;
+      // Only relative imports (e.g. `../../../assets/...`) go through Astro's image pipeline. `public/` paths,
+      // remote URLs (no `image.domains` configured) and data URIs are left untouched, otherwise `widths`
+      // would leak into the HTML as an unknown attribute.
+      if (/^(\/|[a-z][a-z0-9+.-]*:)/i.test(node.properties.src)) return;
       node.properties.widths = WIDTHS;
       node.properties.sizes = SIZES;
       if (first) {
