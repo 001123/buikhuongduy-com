@@ -20,11 +20,11 @@ const t = useTranslations(lang);
         class="group flex h-full flex-col rounded-2xl border border-paper/15 bg-ink/40 p-5 glow-frame-hover hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:p-6"
       >
         <h2 class="line-clamp-3 font-serif text-lg font-semibold text-paper group-hover:text-rice">{post.data.title}</h2>
-        <p class="mt-2 line-clamp-3 text-[0.8125rem] leading-relaxed text-pretty text-paper/75">{post.data.description}</p>
+        <p class="mt-2 line-clamp-3 text-[0.796875rem] leading-relaxed text-pretty text-paper/75">{post.data.description}</p>
         <div class="mt-auto flex items-center gap-x-2 pt-4 text-xs whitespace-nowrap text-paper/60">
           <time class="shrink-0 text-paper/50" datetime={post.data.pubDate.toISOString()}>{formatDateTime(post.data.pubDate, lang)}</time>
-          {post.data.draft && <span class="ms-auto shrink-0 rounded-full border border-lotus/60 px-2 py-0.5 text-lotus">{t("blog.draft")}</span>}
-          {post.data.category && <span class={`${post.data.draft ? "" : "ms-auto "}min-w-0 truncate font-medium text-rice/90`}>{categories[post.data.category][lang].name}</span>}
+          {post.data.category && <><span aria-hidden="true" class="text-paper/30">·</span><span class="min-w-0 truncate font-medium text-rice/90">{categories[post.data.category][lang].name}</span></>}
+          {post.data.draft && <span class="shrink-0 rounded-full border border-lotus/60 px-2 py-0.5 text-lotus">{t("blog.draft")}</span>}
         </div>
       </a>
     </li>
