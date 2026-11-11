@@ -10,28 +10,20 @@ const modes = [
 ---
 
 <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-  <div role="radiogroup" aria-label={t("blog.mode.label")} class="reading-modes inline-flex rounded-lg border border-paper/25 bg-ink/40 p-1 text-sm">
+  <div role="radiogroup" aria-label={t("blog.mode.label")} class="reading-modes relative isolate inline-flex rounded-lg border border-paper/25 bg-ink/40 p-1 text-[0.8125rem]">
+    <span class="mode-pill" aria-hidden="true"></span>
     {
       modes.map((m) => (
-        <span class="group relative inline-flex">
-          <button
-            type="button"
-            role="radio"
-            data-mode-option={m.id}
-            aria-checked={m.id === "normal" ? "true" : "false"}
-            aria-describedby={`mode-hint-${m.id}`}
-            class="rounded-md border border-transparent px-3.5 py-1.5 cursor-pointer font-medium text-paper/70 transition-[color,background-color] duration-200 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
-          >
-            {m.label}
-          </button>
-          <span
-            id={`mode-hint-${m.id}`}
-            role="tooltip"
-            class="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-md border border-paper/15 bg-ink px-2.5 py-1 text-xs text-paper/85 opacity-0 shadow-lg transition duration-150 group-hover:translate-y-0 group-hover:opacity-100 group-has-focus-visible:translate-y-0 group-has-focus-visible:opacity-100"
-          >
-            {m.hint}
-          </span>
-        </span>
+        <button
+          type="button"
+          role="radio"
+          data-mode-option={m.id}
+          aria-checked={m.id === "normal" ? "true" : "false"}
+          title={m.hint}
+          class="rounded-md border border-transparent px-2.5 py-1.5 cursor-pointer font-medium text-paper/70 transition-[color,background-color] duration-200 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+        >
+          {m.label}
+        </button>
       ))
     }
   </div>
@@ -42,11 +34,45 @@ const modes = [
   const MODES = ["tldr", "normal", "advanced"];
   const isMode = (m: string | null): m is string => m !== null && MODES.includes(m);
 
+  const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Slides the highlight pill under the selected option.
+  function placePill() {
+    const group = document.querySelector<HTMLElement>(".reading-modes");
+    const selected = group?.querySelector<HTMLElement>('[data-mode-option][aria-checked="true"]');
+    if (!group || !selected) return;
+    // Sub-pixel exact, relative to the group's padding box (where the pill is positioned).
+    const g = group.getBoundingClientRect();
+    const b = selected.getBoundingClientRect();
+    group.style.setProperty("--pill-x", `${b.left - g.left - group.clientLeft}px`);
+    group.style.setProperty("--pill-w", `${b.width}px`);
+    if (!group.dataset.pill) {
+      group.dataset.pill = "";
+      // Enable the slide only after the first placement, so it does not animate in on load.
+      requestAnimationFrame(() => requestAnimationFrame(() => (group.dataset.pill = "ready")));
+    }
+  }
+
+  // Fades the post body in after its sections are swapped.
+  function fadeContent() {
+    if (reduceMotion()) return;
+    document.querySelectorAll<HTMLElement>(".reading-content").forEach((el) => {
+      el.animate(
+        [
+          { opacity: 0, transform: "translateY(6px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration: 280, easing: "cubic-bezier(0.2, 0, 0, 1)" },
+      );
+    });
+  }
+
   function apply(mode: string) {
     document.documentElement.dataset.readingMode = mode;
     document.querySelectorAll<HTMLButtonElement>("[data-mode-option]").forEach((b) => {
       b.setAttribute("aria-checked", String(b.dataset.modeOption === mode));
     });
+    placePill();
     // Keep the address bar shareable: `?mode=` reflects the current mode ("normal" is the default, so no param).
     const url = new URL(location.href);
     if (mode === "normal") url.searchParams.delete("mode");
@@ -66,9 +92,15 @@ const modes = [
     options.forEach((b) => {
       b.addEventListener("click", () => {
         const mode = b.dataset.modeOption!;
+        if (mode === document.documentElement.dataset.readingMode) return;
         localStorage.setItem(KEY, mode);
         apply(mode);
+        fadeContent();
       });
     });
+    // Button widths change once web fonts load or the viewport resizes.
+    const group = document.querySelector<HTMLElement>(".reading-modes");
+    if (group) new ResizeObserver(placePill).observe(group);
+    document.fonts?.ready.then(placePill);
   });
 </script>

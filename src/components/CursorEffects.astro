@@ -6,13 +6,13 @@
   .click-ripple {
     position: fixed;
     z-index: 100;
-    width: 48px;
-    height: 48px;
-    margin: -24px 0 0 -24px;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
     border: 1.5px solid var(--color-rice);
     box-shadow:
-      0 0 12px color-mix(in oklab, var(--color-rice) 60%, transparent),
-      inset 0 0 8px color-mix(in oklab, var(--color-rice) 40%, transparent);
+      0 0 8px color-mix(in oklab, var(--color-rice) 60%, transparent),
+      inset 0 0 6px color-mix(in oklab, var(--color-rice) 40%, transparent);
     border-radius: 9999px;
     pointer-events: none;
     animation: click-ripple 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -24,7 +24,7 @@
       opacity: 1;
     }
     to {
-      transform: scale(1.8);
+      transform: scale(1.5);
       opacity: 0;
     }
   }

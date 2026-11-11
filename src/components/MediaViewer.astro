@@ -42,11 +42,11 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
         <button type="button" data-action="fit" class={btn} aria-label={t("viewer.fit")} title={t("viewer.fit")}>
           <svg {...icon}><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
         </button>
-        <button type="button" data-action="actual" class={btn} aria-label={t("viewer.actual")} title={`${t("viewer.actual")} (1)`}>
-          <span aria-hidden="true" class="text-xs font-semibold">1:1</span>
-        </button>
         <button type="button" data-action="download" class={btn} aria-label={t("viewer.download")} title={t("viewer.download")}>
           <svg {...icon}><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
+        </button>
+        <button type="button" data-action="actual" class={btn} aria-label={t("viewer.actual")} title={`${t("viewer.actual")} (1)`}>
+          <span aria-hidden="true" class="text-xs font-semibold">1:1</span>
         </button>
         <span aria-hidden="true" class="mx-1 h-5 w-px bg-paper/20"></span>
         <button type="button" data-action="close" class={btn} aria-label={t("viewer.close")} title={`${t("viewer.close")} (Esc)`}>

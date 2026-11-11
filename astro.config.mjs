@@ -69,6 +69,9 @@ for (const lang of /** @type {const} */ (['vi', 'en'])) {
     lastmodByPath.set(path, /** @type {Date} */ (newest(inCategory)));
   }
 }
+// Internal search results pages are `noindex, follow`.
+for (const path of Object.values(sectionPaths.search)) noindexPaths.add(path);
+
 /** @param {string} path */
 function lastmodFor(path) {
   const exact = lastmodByPath.get(path);

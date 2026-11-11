@@ -3,6 +3,7 @@ import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import { Font } from "astro:assets";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
+import SearchBox from "../components/SearchBox.astro";
 import CursorEffects from "../components/CursorEffects.astro";
 import Analytics from "../components/Analytics.astro";
 import { defaultLang, getLang, homePath, languages, locales, useTranslations, type Lang } from "../i18n/ui";
@@ -143,6 +144,7 @@ const jsonLd = structuredData({
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="search" type="application/opensearchdescription+xml" href={`${homePath[lang]}opensearch.xml`} title={t("site.name")} />
     {!noindex && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
@@ -173,7 +175,14 @@ const jsonLd = structuredData({
     </script>
   </head>
   <body class="bg-ink font-sans text-paper antialiased">
-    {floatingLangSwitcher && <LanguageSwitcher lang={lang} links={links} />}
+    {
+      floatingLangSwitcher && (
+        <div class="fixed top-4 right-4 z-50 flex items-center gap-2 sm:top-6 sm:right-6">
+          <SearchBox lang={lang} />
+          <LanguageSwitcher lang={lang} links={links} class="" />
+        </div>
+      )
+    }
     <slot />
     <CursorEffects />
     <script>

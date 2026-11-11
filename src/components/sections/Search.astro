@@ -1,0 +1,335 @@
+---
+// Site search page. The page is `noindex, follow` (internal results pages should not be indexed),
+// but a plain GET form keeps every query a real, shareable URL and the form works without JavaScript.
+// Results come from a small build-time JSON index, fetched only on this page.
+import SectionPage from "../../layouts/SectionPage.astro";
+import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
+import { searchIndexPath } from "../../lib/search";
+
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+const action = sectionPaths.search[lang];
+---
+
+<SectionPage section="search" title={t("search.title")} lead={t("search.lead")} noindex>
+  <div
+    class="not-prose"
+    data-search-page
+    data-index={searchIndexPath(lang)}
+    data-lang={lang}
+    data-text-loading={t("search.loading")}
+    data-text-idle={t("search.idle")}
+    data-text-none={t("search.none")}
+    data-text-found={t("search.found")}
+    data-text-error={t("search.error")}
+  >
+    <search>
+      <form action={action} method="get" class="group flex items-center gap-2 rounded-full border border-paper/30 bg-ink/40 p-1.5 pl-4 focus-within:border-rice glow-hover">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5 shrink-0 text-rice">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input
+          type="search"
+          name="q"
+          required
+          enterkeyhint="search"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label={t("search.label")}
+          aria-keyshortcuts="/"
+          placeholder={t("search.placeholder")}
+          data-search-input
+          class="min-w-0 flex-1 bg-transparent py-2 text-base text-paper outline-none placeholder:text-paper/50"
+        />
+        <button
+          type="submit"
+          class="shrink-0 cursor-pointer rounded-full bg-paper px-4 py-2 text-sm font-medium text-ink hover:bg-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice active:scale-95"
+        >
+          {t("search.submit")}
+        </button>
+      </form>
+    </search>
+
+    <p data-search-status role="status" aria-live="polite" class="mt-5 mb-6 min-h-6 text-sm text-paper/70">{t("search.idle")}</p>
+
+    <noscript>
+      <p class="mb-6 text-sm text-paper/70">
+        {t("search.noscript")} <a href={sectionPaths.blog[lang]} class="text-rice underline underline-offset-4">{t("nav.blog")} →</a>
+      </p>
+    </noscript>
+
+    <ul data-search-results class="grid gap-6"></ul>
+
+    <template data-search-card>
+      <li>
+        <a class="group flex h-full flex-col rounded-2xl border border-paper/15 bg-ink/40 p-5 glow-frame-hover hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:p-6">
+          <h2 data-title class="line-clamp-3 font-serif text-lg font-semibold text-paper group-hover:text-rice"></h2>
+          <p data-snippet class="mt-2 line-clamp-3 text-[0.8125rem] leading-relaxed text-pretty text-paper/75"></p>
+          <div class="mt-auto flex items-center gap-x-2 pt-4 text-xs whitespace-nowrap text-paper/60">
+            <time data-date class="shrink-0 text-paper/50"></time>
+            <span data-category class="ms-auto min-w-0 truncate font-medium text-rice/90"></span>
+          </div>
+        </a>
+      </li>
+    </template>
+  </div>
+</SectionPage>
+
+<style>
+  [data-search-results] :global(mark) {
+    border-radius: 0.2em;
+    background: rgb(217 181 74 / 0.25);
+    color: inherit;
+    padding: 0 0.1em;
+  }
+</style>
+
+<script>
+  interface SearchDoc {
+    url: string;
+    title: string;
+    description: string;
+    category?: string;
+    tags: string[];
+    date: string;
+    dateLabel: string;
+    body: string;
+  }
+
+  /** Text in one matching form: accents kept (lowercase only) or folded away. */
+  interface Forms {
+    title: string;
+    description: string;
+    meta: string;
+    body: string;
+  }
+
+  interface Indexed {
+    doc: SearchDoc;
+    exact: Forms;
+    folded: Forms;
+  }
+
+  /**
+   * Lowercase; with `keepAccents` false also drop diacritics and đ → d, so "hieu nang" finds "Hiệu năng".
+   * A query typed with diacritics is matched accent-sensitively, so "nặng" does not hit "năng".
+   */
+  function normalize(text: string, keepAccents: boolean): string {
+    const lower = text.normalize("NFC").toLowerCase();
+    return keepAccents ? lower : lower.normalize("NFD").replace(/\p{M}/gu, "").replace(/đ/g, "d");
+  }
+
+  const hasAccents = (text: string) => /[\p{M}đĐ]/u.test(text.normalize("NFD"));
+
+  /** Normalized text plus, for each of its chars, the index of the original char it came from. */
+  function normalizeWithMap(text: string, keepAccents: boolean): { folded: string; map: number[] } {
+    let folded = "";
+    const map: number[] = [];
+    for (let i = 0; i < text.length; i++) {
+      const f = normalize(text[i], keepAccents);
+      folded += f;
+      for (let k = 0; k < f.length; k++) map.push(i);
+    }
+    return { folded, map };
+  }
+
+  interface Query {
+    keepAccents: boolean;
+    /** One regex per term, matching at the start of a word. */
+    terms: RegExp[];
+    /** Whole query as a phrase, when it has several terms. */
+    phrase?: RegExp;
+  }
+
+  const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const wordStart = (s: string) => new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegExp(s)}`, "gu");
+
+  function parseQuery(raw: string): Query | undefined {
+    const keepAccents = hasAccents(raw);
+    const words = normalize(raw, keepAccents).split(/\s+/).filter(Boolean);
+    if (words.length === 0) return undefined;
+    return {
+      keepAccents,
+      terms: [...new Set(words)].map(wordStart),
+      phrase: words.length > 1 ? wordStart(words.join(" ")) : undefined,
+    };
+  }
+
+  function count(re: RegExp, haystack: string, cap = Infinity): number {
+    re.lastIndex = 0;
+    let n = 0;
+    while (n < cap && re.exec(haystack)) n++;
+    return n;
+  }
+
+  /** Original-text ranges `[start, end)` matched by any term, merged and sorted. */
+  function matchRanges(text: string, query: Query): [number, number][] {
+    const { folded, map } = normalizeWithMap(text, query.keepAccents);
+    const ranges: [number, number][] = [];
+    for (const re of query.terms) {
+      re.lastIndex = 0;
+      for (let m = re.exec(folded); m; m = re.exec(folded)) {
+        ranges.push([map[m.index], map[m.index + m[0].length - 1] + 1]);
+      }
+    }
+    ranges.sort((a, b) => a[0] - b[0]);
+    const merged: [number, number][] = [];
+    for (const r of ranges) {
+      const last = merged.at(-1);
+      if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]);
+      else merged.push([...r]);
+    }
+    return merged;
+  }
+
+  /** Text with matches wrapped in <mark>, built from text nodes (no HTML parsing). */
+  function highlight(el: HTMLElement, raw: string, query: Query) {
+    const text = raw.normalize("NFC");
+    el.replaceChildren();
+    let pos = 0;
+    for (const [start, end] of matchRanges(text, query)) {
+      el.append(text.slice(pos, start));
+      const mark = document.createElement("mark");
+      mark.textContent = text.slice(start, end);
+      el.append(mark);
+      pos = end;
+    }
+    el.append(text.slice(pos));
+  }
+
+  /** About 180 characters of the body around the first match, trimmed to word boundaries. */
+  function snippet(raw: string, query: Query): string | undefined {
+    const body = raw.normalize("NFC");
+    const first = matchRanges(body, query)[0];
+    if (!first) return undefined;
+    let start = Math.max(0, first[0] - 60);
+    if (start > 0) start = body.indexOf(" ", start) + 1 || start;
+    let end = Math.min(body.length, start + 180);
+    if (end < body.length) end = body.lastIndexOf(" ", end) > first[1] ? body.lastIndexOf(" ", end) : end;
+    return `${start > 0 ? "… " : ""}${body.slice(start, end).trim()}${end < body.length ? " …" : ""}`;
+  }
+
+  /** Every term must appear somewhere; title hits weigh most, then topic/tags, description, body. */
+  function score(item: Indexed, query: Query): number {
+    const f = query.keepAccents ? item.exact : item.folded;
+    let total = 0;
+    for (const re of query.terms) {
+      const s = 10 * count(re, f.title, 1) + 6 * count(re, f.meta, 1) + 4 * count(re, f.description, 1) + count(re, f.body, 5);
+      if (s === 0) return 0;
+      total += s;
+    }
+    if (query.phrase) total += 20 * count(query.phrase, f.title, 1) + 8 * count(query.phrase, f.description, 1) + 2 * count(query.phrase, f.body, 5);
+    return total;
+  }
+
+  const forms = (doc: SearchDoc, keepAccents: boolean): Forms => ({
+    title: normalize(doc.title, keepAccents),
+    description: normalize(doc.description, keepAccents),
+    meta: normalize([doc.category ?? "", ...doc.tags].join(" "), keepAccents),
+    body: normalize(doc.body, keepAccents),
+  });
+
+  const indexes = new Map<string, Promise<Indexed[]>>();
+
+  function loadIndex(url: string): Promise<Indexed[]> {
+    let pending = indexes.get(url);
+    if (!pending) {
+      pending = fetch(url)
+        .then((r) => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json() as Promise<SearchDoc[]>;
+        })
+        .then((docs) => docs.map((doc) => ({ doc, exact: forms(doc, true), folded: forms(doc, false) })));
+      pending.catch(() => indexes.delete(url));
+      indexes.set(url, pending);
+    }
+    return pending;
+  }
+
+  function init() {
+    const root = document.querySelector<HTMLElement>("[data-search-page]");
+    if (!root) return;
+    const form = root.querySelector("form")!;
+    const input = root.querySelector<HTMLInputElement>("[data-search-input]")!;
+    const status = root.querySelector<HTMLElement>("[data-search-status]")!;
+    const list = root.querySelector<HTMLUListElement>("[data-search-results]")!;
+    const card = root.querySelector<HTMLTemplateElement>("[data-search-card]")!;
+    const text = root.dataset as Record<string, string>;
+    const baseTitle = document.title;
+    let run = 0;
+
+    async function search(raw: string, push: boolean) {
+      const current = ++run;
+      const q = raw.trim();
+      const url = new URL(location.href);
+      if (q) url.searchParams.set("q", q);
+      else url.searchParams.delete("q");
+      if (push && url.href !== location.href) history.replaceState(history.state, "", url);
+      document.title = q ? `${q} · ${baseTitle}` : baseTitle;
+
+      const query = parseQuery(q);
+      if (!query) {
+        list.replaceChildren();
+        status.textContent = text.textIdle;
+        return;
+      }
+
+      status.textContent = text.textLoading;
+      let index: Indexed[];
+      try {
+        index = await loadIndex(text.index);
+      } catch {
+        if (current === run) status.textContent = text.textError;
+        return;
+      }
+      if (current !== run) return;
+
+      const hits = index
+        .map((item) => ({ item, s: score(item, query) }))
+        .filter(({ s }) => s > 0)
+        .sort((a, b) => b.s - a.s || b.item.doc.date.localeCompare(a.item.doc.date));
+
+      status.textContent = hits.length ? `${hits.length} ${text.textFound} “${q}”` : `${text.textNone} “${q}”`;
+      list.replaceChildren(
+        ...hits.map(({ item }) => {
+          const { doc } = item;
+          const li = card.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
+          li.querySelector("a")!.href = doc.url;
+          highlight(li.querySelector("[data-title]")!, doc.title, query);
+          const description = (query.keepAccents ? item.exact : item.folded).description;
+          const inDescription = query.terms.some((re) => count(re, description, 1) > 0);
+          highlight(li.querySelector("[data-snippet]")!, inDescription ? doc.description : (snippet(doc.body, query) ?? doc.description), query);
+          const category = li.querySelector<HTMLElement>("[data-category]")!;
+          if (doc.category) category.textContent = doc.category;
+          else category.remove();
+          const time = li.querySelector("time")!;
+          time.dateTime = doc.date;
+          time.textContent = doc.dateLabel;
+          return li;
+        }),
+      );
+    }
+
+    let timer = 0;
+    input.addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = window.setTimeout(() => search(input.value, true), 150);
+    });
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      clearTimeout(timer);
+      search(input.value, true);
+      input.blur();
+    });
+
+    const initial = new URLSearchParams(location.search).get("q") ?? "";
+    input.value = initial;
+    if (initial) search(initial, false);
+    else input.focus();
+    // Warm the index while the reader types.
+    input.addEventListener("focus", () => loadIndex(text.index).catch(() => {}), { once: true });
+  }
+
+  document.addEventListener("astro:page-load", init);
+</script>

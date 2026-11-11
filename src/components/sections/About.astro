@@ -3,6 +3,7 @@ import SectionPage from "../../layouts/SectionPage.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { Image } from "astro:assets";
 import avatar from "../../assets/avatar_cv.webp";
+import cvPdfUrl from "../../assets/cv/Bui-Khuong-Duy-(Timi)-Resume-11-2026.pdf?url";
 import { cvUrl, socials } from "../../data/profile";
 import { gitDates } from "../../lib/git-dates";
 
@@ -212,12 +213,25 @@ const buildMonth = {
   <h2>{t("about.languages")}</h2>
   <p>{content.languages}</p>
 
-  <p class="not-prose mt-12">
+  <p class="not-prose mt-12 flex flex-wrap gap-3">
     <a
       href={cvUrl}
       target="_blank"
       rel="noopener"
       class="inline-flex items-center gap-2 rounded-full border border-rice/80 bg-rice/15 px-5 py-2.5 font-medium text-rice glow-hover hover:bg-rice hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+    >
+      {t("cv.view")}
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
+        <path d="M14 4h6v6"></path>
+        <path d="M20 4 10 14"></path>
+        <path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"></path>
+      </svg>
+    </a>
+    <a
+      href={cvPdfUrl}
+      download="Bui-Khuong-Duy-(Timi)-Resume-11-2026.pdf"
+      type="application/pdf"
+      class="inline-flex items-center gap-2 rounded-full border border-paper/40 bg-ink/40 px-5 py-2.5 font-medium text-paper glow-hover hover:border-rice hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
     >
       {t("cv.download")}
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">

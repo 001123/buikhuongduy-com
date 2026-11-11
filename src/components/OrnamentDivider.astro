@@ -1,0 +1,13 @@
+---
+// Decorative divider: a gold hairline fading out toward both edges.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div
+  class:list={["not-prose h-px bg-linear-to-r from-transparent via-rice/40 to-transparent", className]}
+  aria-hidden="true"
+></div>

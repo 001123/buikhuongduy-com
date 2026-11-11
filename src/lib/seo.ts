@@ -3,7 +3,7 @@ import { homePath, languages, locales, sectionPaths, ui, type Lang } from "../i1
 import type { PageDates } from "./git-dates";
 
 /** schema.org type of the page itself. */
-export type PageType = "WebPage" | "ProfilePage" | "ContactPage" | "CollectionPage";
+export type PageType = "WebPage" | "ProfilePage" | "ContactPage" | "CollectionPage" | "SearchResultsPage";
 
 export interface ArticleMeta {
   headline: string;
@@ -96,6 +96,12 @@ export function structuredData(input: StructuredDataInput) {
     description: t["site.description"],
     inLanguage: (Object.keys(languages) as Lang[]).map((l) => locales[l].bcp47),
     publisher: { "@id": personId },
+    // Sitelinks search box / site search for engines that read it; the search page itself is noindex.
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${abs(sectionPaths.search[lang])}?q={search_term_string}` },
+      "query-input": "required name=search_term_string",
+    },
   };
 
   const page: Record<string, unknown> = {

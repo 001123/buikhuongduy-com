@@ -25,6 +25,7 @@ export const ui = {
     "nav.contact": "Kết Nối",
     "nav.cv": "CV",
     "nav.home": "Trang chủ",
+    "nav.search": "Tìm kiếm",
     "lang.switch": "Chuyển ngôn ngữ",
     "nav.back": "Trở lại",
     "scroll.top": "Lên đầu trang",
@@ -44,7 +45,8 @@ export const ui = {
     "about.blogLink": "blog",
 
     "projects.title": "Dự án cá nhân",
-    "cv.download": "Xem CV đầy đủ",
+    "cv.view": "Xem CV đầy đủ",
+    "cv.download": "Tải CV (PDF)",
     "projects.skills": "Kỹ năng",
 
     "blog.title": "Blog",
@@ -86,8 +88,8 @@ export const ui = {
     "feedback.mailComment": "Góp ý",
     "blog.mode.label": "Chế độ đọc",
     "blog.mode.tldr": "TL;DR",
-    "blog.mode.normal": "Bình thường",
-    "blog.mode.advanced": "Nâng cao",
+    "blog.mode.normal": "Tiêu chuẩn",
+    "blog.mode.advanced": "Mở rộng",
     "blog.mode.tldrHint": "Chỉ đọc tóm tắt ý chính",
     "blog.mode.normalHint": "Đọc toàn bài, bỏ qua phần chuyên sâu",
     "blog.mode.advancedHint": "Đọc toàn bài kèm phần chuyên sâu",
@@ -102,6 +104,20 @@ export const ui = {
     "viewer.download": "Tải xuống",
     "viewer.close": "Đóng",
     "viewer.hint": "Kéo để di chuyển · Cuộn hoặc chụm 2 ngón để phóng to · Nhấp đúp để phóng to/thu về",
+
+    "search.title": "Tìm kiếm",
+    "search.lead": "Tìm bài viết theo tiêu đề, chủ đề, thẻ hoặc nội dung.",
+    "search.label": "Tìm kiếm bài viết",
+    "search.placeholder": "Tìm bài viết…",
+    "search.submit": "Tìm",
+    "search.shortcut": "Nhấn / để tìm kiếm",
+    "search.loading": "Đang tải chỉ mục…",
+    "search.idle": "Gõ từ khóa để bắt đầu, có dấu hay không dấu đều được.",
+    "search.none": "Không tìm thấy bài viết nào cho",
+    "search.found": "bài viết khớp với",
+    "search.error": "Không tải được chỉ mục tìm kiếm. Hãy thử lại sau.",
+    "search.noscript": "Tìm kiếm cần JavaScript. Bạn có thể xem toàn bộ bài viết ở trang Blog.",
+    "seo.search": "Tìm kiếm bài viết trên blog của Bùi Khương Duy về frontend, AI agents, hiệu năng web và DevOps.",
 
     "contact.title": "Kết Nối",
     "contact.lead": "Duy đang sẵn sàng cho công việc mới, đặc biệt là vai trò Frontend Lead hoặc AI\u2060-\u2060native engineering. Nếu đội của bạn đang tìm người, hãy kết nối với Duy nhé!",
@@ -135,6 +151,7 @@ export const ui = {
     "nav.contact": "Contact",
     "nav.cv": "Résumé",
     "nav.home": "Home",
+    "nav.search": "Search",
     "lang.switch": "Change language",
     "nav.back": "Back",
     "scroll.top": "Back to top",
@@ -154,7 +171,8 @@ export const ui = {
     "about.blogLink": "blog",
 
     "projects.title": "Personal Projects",
-    "cv.download": "View full résumé",
+    "cv.view": "View full résumé",
+    "cv.download": "Download résumé (PDF)",
     "projects.skills": "Skills",
 
     "blog.title": "Blog",
@@ -213,6 +231,20 @@ export const ui = {
     "viewer.close": "Close",
     "viewer.hint": "Drag to pan · Scroll or pinch to zoom · Double-click to toggle zoom",
 
+    "search.title": "Search",
+    "search.lead": "Find posts by title, topic, tag or content.",
+    "search.label": "Search posts",
+    "search.placeholder": "Search posts…",
+    "search.submit": "Search",
+    "search.shortcut": "Press / to search",
+    "search.loading": "Loading the index…",
+    "search.idle": "Type a keyword to get started.",
+    "search.none": "No posts found for",
+    "search.found": "posts match",
+    "search.error": "Could not load the search index. Please try again later.",
+    "search.noscript": "Search needs JavaScript. You can browse every post on the Blog page.",
+    "seo.search": "Search Bui Khuong Duy's blog on front-end engineering, AI agents, web performance and DevOps.",
+
     "contact.title": "Contact",
     "contact.lead": "I'm open to new roles, especially Frontend Lead or AI\u2060-\u2060native engineering positions. If your team is hiring, let's connect!",
     "contact.email": "Email",
@@ -253,11 +285,12 @@ export const homePath: Record<Lang, string> = {
   en: "/en/",
 };
 
-export type Section = "about" | "blog" | "contact";
+export type Section = "about" | "blog" | "contact" | "search";
 
 /** Path of each section in each language. */
 export const sectionPaths: Record<Section, Record<Lang, string>> = {
   about: { vi: "/about/", en: "/en/about/" },
   blog: { vi: "/blog/", en: "/en/blog/" },
   contact: { vi: "/contact/", en: "/en/contact/" },
+  search: { vi: "/search/", en: "/en/search/" },
 };

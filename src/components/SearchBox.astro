@@ -1,0 +1,64 @@
+---
+// Header search: a plain GET form to the search page, so it works without JavaScript and every
+// query has a shareable URL (`/search/?q=…`). Small screens get an icon link to the search page.
+import { sectionPaths, useTranslations, type Lang } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const action = sectionPaths.search[lang];
+const shell =
+  "rounded-full border border-paper/40 bg-ink text-paper shadow-lg shadow-ink/30 glow-hover hover:border-rice focus-within:border-rice";
+---
+
+<search class="contents">
+  <a
+    href={action}
+    aria-label={t("nav.search")}
+    title={t("nav.search")}
+    class:list={[shell, "inline-flex size-[2.375rem] items-center justify-center hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:hidden"]}
+  >
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+  </a>
+  <form action={action} method="get" class:list={[shell, "group relative hidden h-[2.375rem] items-center sm:flex"]}>
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none absolute left-3 size-4 text-rice">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+    <input
+      type="search"
+      name="q"
+      required
+      enterkeyhint="search"
+      autocomplete="off"
+      spellcheck="false"
+      aria-label={t("search.label")}
+      aria-keyshortcuts="/"
+      placeholder={t("search.placeholder")}
+      title={t("search.shortcut")}
+      data-search-input
+      class="h-full w-44 rounded-full bg-transparent pr-11 pl-9 text-sm text-paper outline-none transition-[width] duration-300 ease-out placeholder:text-paper/60 focus:w-56 [&::-webkit-search-cancel-button]:hidden"
+    />
+    <kbd aria-hidden="true" class="pointer-events-none absolute right-3 rounded border border-paper/30 px-1.5 font-sans text-[0.6875rem] leading-4 text-paper/60 group-focus-within:hidden">/</kbd>
+  </form>
+</search>
+
+<script>
+  // "/" focuses the visible search field (the search page's own field first), like most docs sites.
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
+    const target = e.target as HTMLElement | null;
+    if (target?.closest("input, textarea, select, [contenteditable]:not([contenteditable='false'])")) return;
+    const input = [...document.querySelectorAll<HTMLInputElement>("[data-search-input]")].find((el) => el.offsetParent !== null);
+    if (!input) return;
+    e.preventDefault();
+    input.focus();
+    input.select();
+  });
+</script>

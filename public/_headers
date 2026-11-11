@@ -11,3 +11,9 @@
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
   Cross-Origin-Opener-Policy: same-origin
+
+# The search index feeds the search page; keep the raw JSON out of search results.
+/search/index.json
+  X-Robots-Tag: noindex
+/en/search/index.json
+  X-Robots-Tag: noindex

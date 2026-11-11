@@ -4,6 +4,7 @@ import SectionPage from "../../layouts/SectionPage.astro";
 import ReadingModes from "../ReadingModes.astro";
 import MediaViewer from "../MediaViewer.astro";
 import PostActions from "../PostActions.astro";
+import OrnamentDivider from "../OrnamentDivider.astro";
 import PostFeedback from "../PostFeedback.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { categories } from "../../data/categories";
@@ -63,12 +64,13 @@ const related = await relatedPosts(post);
   {hasModes && <div slot="meta" class="mt-2"><ReadingModes /></div>}
   {hasModes ? <div class="reading-content"><Content /></div> : <Content />}
   {related.length > 0 && (
-    <section class="not-prose mt-12 border-t border-paper/15 pt-8" aria-labelledby="related-heading">
+    <section class="not-prose mt-14" aria-labelledby="related-heading">
+      <OrnamentDivider class="mb-8" />
       <h2 id="related-heading" class="font-serif text-xl font-semibold text-paper sm:text-2xl">{t("blog.related")}</h2>
       <ul class="mt-4 grid gap-3">
         {related.map((p) => (
           <li>
-            <a href={postUrl(p)} class="group block rounded-xl border border-paper/15 bg-ink/40 px-4 py-3 glow-hover hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
+            <a href={postUrl(p)} class="group block rounded-xl border border-paper/15 bg-ink/40 px-4 py-3 glow-frame-hover hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
               <span class="block font-medium text-paper group-hover:text-rice">{p.data.title}</span>
               <span class="mt-1 block line-clamp-2 text-sm text-paper/65">{p.data.description}</span>
             </a>
@@ -77,6 +79,7 @@ const related = await relatedPosts(post);
       </ul>
     </section>
   )}
+  <OrnamentDivider class="mt-14" />
   <PostActions slug={post.id} />
   <PostFeedback slug={post.id} title={title} />
   {(hasMermaid || hasImages) && <MediaViewer />}

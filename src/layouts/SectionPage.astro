@@ -2,6 +2,7 @@
 import Layout from "./Layout.astro";
 import Background from "../components/Background.astro";
 import LanguageSwitcher from "../components/LanguageSwitcher.astro";
+import SearchBox from "../components/SearchBox.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
 import { contentAnim } from "../components/transitions";
 import { getLang, homePath, sectionPaths, useTranslations, type Lang, type Section } from "../i18n/ui";
@@ -63,6 +64,7 @@ const pageTypes: Record<Section, PageType> = {
   about: "ProfilePage",
   blog: "CollectionPage",
   contact: "ContactPage",
+  search: "SearchResultsPage",
 };
 ---
 
@@ -96,7 +98,10 @@ const pageTypes: Record<Section, PageType> = {
           </svg>
           {backLabel}
         </a>
-        <LanguageSwitcher lang={lang} links={alternates} class="" />
+        <div class="flex items-center gap-2">
+          {section !== "search" && <SearchBox lang={lang} />}
+          <LanguageSwitcher lang={lang} links={alternates} class="" />
+        </div>
       </div>
       <header class="mb-8 flex flex-col items-start gap-3 sm:mb-10 sm:gap-4">
         <h1 class:list={["font-serif leading-tight font-semibold tracking-wide text-pretty text-paper", article ? "text-[clamp(1.375rem,4.5vw,2.25rem)]" : "text-[clamp(1.75rem,7vw,3.5rem)]"]}>{title}</h1>
