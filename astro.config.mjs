@@ -9,6 +9,8 @@ import { sectionPaths } from './src/i18n/ui.ts';
 import { categoryIndexMinPosts } from './src/data/categories.ts';
 
 const SITE = 'https://buikhuongduy.com';
+/** Remote hosts whose images are downloaded and optimized at build time (Markdown `![](https://...)`). */
+const IMAGE_DOMAINS = ['developer.chrome.com'];
 import { unified } from '@astrojs/markdown-remark';
 import remarkDirective from 'remark-directive';
 import remarkReadingModes from './src/lib/remark-reading-modes.mjs';
@@ -109,6 +111,9 @@ export default defineConfig({
   build: {
     inlineStylesheets: 'always',
   },
+  image: {
+    domains: IMAGE_DOMAINS,
+  },
   i18n: {
     locales: ['vi', 'en'],
     defaultLocale: 'vi',
@@ -144,7 +149,7 @@ export default defineConfig({
   markdown: {
     processor: unified({
       remarkPlugins: [remarkDirective, remarkReadingModes, remarkMermaid],
-      rehypePlugins: [rehypePostImages],
+      rehypePlugins: [[rehypePostImages, { domains: IMAGE_DOMAINS }]],
     }),
   },
   vite: {
