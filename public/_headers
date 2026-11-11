@@ -1,16 +1,8 @@
 # Security headers for every response (Cloudflare Pages).
 # X-Content-Type-Options and Referrer-Policy are already added by the Cloudflare zone, so they are not repeated here.
-# Inline scripts/styles come from Astro (view transitions, hoisted scripts) and build-time Mermaid SVGs.
-# Cloudflare Web Analytics: the zone injects beacon.min.js from static.cloudflareinsights.com, which posts to cloudflareinsights.com.
-# `data:` in script-src: Astro's view-transition router injects an empty `data:` module script to await inline modules.
-# GA4 via Partytown: the worker is a `blob:` URL, fetches gtag.js from googletagmanager.com and runs it with `new Function`
-# ('unsafe-eval'); hits go to *.google-analytics.com / *.analytics.google.com.
+# No Content-Security-Policy and no X-Frame-Options: static site with no user input or logins, and pages may be embedded in iframes.
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' data: https://static.cloudflareinsights.com https://www.googletagmanager.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; font-src 'self'; connect-src 'self' https://cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
-  X-Frame-Options: DENY
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
-  Cross-Origin-Opener-Policy: same-origin
 
 # The search index feeds the search page; keep the raw JSON out of search results.
 /search/index.json
