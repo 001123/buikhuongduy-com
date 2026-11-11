@@ -15,29 +15,68 @@ import remarkReadingModes from './src/lib/remark-reading-modes.mjs';
 import remarkMermaid from './src/lib/remark-mermaid.mjs';
 
 /**
- * Category pages that are `noindex` (fewer than `categoryIndexMinPosts` published posts in that language).
- * The sitemap filter runs before content collections are available, so this reads frontmatter directly;
- * it must match the `noindex` rule in `getCategoryPaths` (src/lib/blog.ts).
+ * Published posts read straight from frontmatter: the sitemap hooks run before content collections are available.
+ * @typedef {{ lang: 'vi' | 'en', slug: string, category?: string, lastmod: Date }} PostMeta
+ * @returns {PostMeta[]}
  */
-function noindexCategoryPaths() {
-  const paths = new Set();
+function readPublishedPosts() {
+  /** @type {PostMeta[]} */
+  const posts = [];
   for (const lang of /** @type {const} */ (['vi', 'en'])) {
     const dir = new URL(`./src/content/blog/${lang}/`, import.meta.url);
-    /** @type {Record<string, number>} */
-    const counts = {};
     for (const file of readdirSync(dir).filter((f) => /\.mdx?$/.test(f))) {
       const fm = readFileSync(new URL(file, dir), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
       if (/^draft:\s*true\s*$/m.test(fm)) continue;
-      const category = fm.match(/^category:\s*["']?([a-z0-9-]+)/m)?.[1];
-      if (category) counts[category] = (counts[category] ?? 0) + 1;
-    }
-    for (const [category, n] of Object.entries(counts)) {
-      if (n < categoryIndexMinPosts) paths.add(`${sectionPaths.blog[lang]}category/${category}/`);
+      const date = (/** @type {string} */ key) => fm.match(new RegExp(`^${key}:\\s*["']?([^"'\\n]+)`, 'm'))?.[1];
+      const lastmod = new Date(date('updatedDate') ?? date('pubDate') ?? NaN);
+      if (Number.isNaN(lastmod.getTime())) throw new Error(`Missing or invalid pubDate in blog/${lang}/${file}`);
+      posts.push({
+        lang,
+        slug: file.replace(/\.mdx?$/, ''),
+        category: fm.match(/^category:\s*["']?([a-z0-9-]+)/m)?.[1],
+        lastmod,
+      });
     }
   }
-  return paths;
+  return posts;
 }
-const noindexPaths = noindexCategoryPaths();
+const posts = readPublishedPosts();
+
+/** @param {PostMeta[]} list */
+const newest = (list) => (list.length ? new Date(Math.max(...list.map((p) => p.lastmod.getTime()))) : undefined);
+
+/**
+ * Category pages that are `noindex` (fewer than `categoryIndexMinPosts` published posts in that language).
+ * Must match the `noindex` rule in `getCategoryPaths` (src/lib/blog.ts).
+ */
+const noindexPaths = new Set();
+/**
+ * `<lastmod>` per path: a post's `updatedDate ?? pubDate`; blog listings (index, pages, categories) take their newest post.
+ * Home, about and contact get none: there is no reliable date for them, and a wrong lastmod is worse than none.
+ * @type {Map<string, Date>}
+ */
+const lastmodByPath = new Map();
+for (const lang of /** @type {const} */ (['vi', 'en'])) {
+  const blogPath = sectionPaths.blog[lang];
+  const langPosts = posts.filter((p) => p.lang === lang);
+  for (const p of langPosts) lastmodByPath.set(`${blogPath}${p.slug}/`, p.lastmod);
+  const latest = newest(langPosts);
+  if (latest) lastmodByPath.set(blogPath, latest);
+  for (const category of new Set(langPosts.map((p) => p.category).filter(Boolean))) {
+    const inCategory = langPosts.filter((p) => p.category === category);
+    const path = `${blogPath}category/${category}/`;
+    if (inCategory.length < categoryIndexMinPosts) noindexPaths.add(path);
+    lastmodByPath.set(path, /** @type {Date} */ (newest(inCategory)));
+  }
+}
+/** @param {string} path */
+function lastmodFor(path) {
+  const exact = lastmodByPath.get(path);
+  if (exact) return exact;
+  // Paginated listings (`/blog/page/2/`, `/blog/category/x/page/2/`) shift whenever their parent listing gets a post.
+  const parent = path.replace(/page\/\d+\/$/, '');
+  return parent !== path ? lastmodByPath.get(parent) : undefined;
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -85,6 +124,8 @@ export default defineConfig({
       // Pair sections whose slugs differ between languages.
       serialize(item) {
         const path = new URL(item.url).pathname;
+        const lastmod = lastmodFor(path);
+        if (lastmod) item.lastmod = lastmod.toISOString();
         const pair = Object.values(sectionPaths).find((p) => p.vi === path || p.en === path);
         if (pair) {
           item.links = [
