@@ -10,7 +10,7 @@ export const defaultLang: Lang = "vi";
 export const ui = {
   vi: {
     "site.name": "Bùi Khương Duy",
-    "site.description": "Bùi Khương Duy – Front-End Lead (AI-Native) với hơn 9 năm kinh nghiệm React, Next.js, TypeScript, DevOps và Kubernetes. Kinh nghiệm, dự án và blog.",
+    "site.description": "Bùi Khương Duy – Front-End Lead (AI-Native) với hơn 9 năm kinh nghiệm React, Next.js, TypeScript, DevOps và Kubernetes. Khám phá kinh nghiệm, dự án và các bài viết trên blog của tôi.",
     "seo.homeTitle": "Bùi Khương Duy – Front-End Lead (AI-Native) | React, Next.js",
     "seo.jobTitle": "Front-End Lead (AI-Native)",
     "seo.ogImageAlt": "Bùi Khương Duy — Front-End Lead (AI-Native), hơn 9 năm kinh nghiệm React, Next.js, TypeScript, DevOps & K8s",
@@ -137,7 +137,7 @@ export const ui = {
   },
   en: {
     "site.name": "Bui Khuong Duy",
-    "site.description": "Bui Khuong Duy – Front-End Lead (AI-Native) with 9+ years of experience in React, Next.js, TypeScript, DevOps and Kubernetes. Experience, projects and blog.",
+    "site.description": "Bui Khuong Duy – Front-End Lead (AI-Native) with 9+ years of experience in React, Next.js, TypeScript, DevOps and Kubernetes. Explore my experience, projects and blog posts.",
     "seo.homeTitle": "Bui Khuong Duy – Front-End Lead (AI-Native) | React, Next.js",
     "seo.jobTitle": "Front-End Lead (AI-Native)",
     "seo.ogImageAlt": "Bui Khuong Duy — Front-End Lead (AI-Native) with 9+ years in React, Next.js, TypeScript, DevOps & K8s",
