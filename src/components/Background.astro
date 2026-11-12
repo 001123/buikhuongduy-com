@@ -20,7 +20,8 @@ const placeholder =
   "data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAACQBQCdASoYABIAPu1sq1EppaOiqAqpMB2JZACdG1/tv8Ax73Bex/CZyzb9eS0rVQRUGXrFAAD+z+upRi3hOJtVGCBI4H9mh9HICE+41IBiNImXdWefz17r+RauDsDgOxcFyxGLd5ZyqJyUJCEzcYJROkFyW2GSKFE43N7RxtFxaBFQ//WAAyaBtcbEbwkXZ901o91mc56q1GjDAAA=";
 ---
 
-<div class="fixed inset-0 -z-20 overflow-hidden bg-[#87694a]" transition:name="home-bg" transition:animate="none">
+<!-- Decorative: the alt text satisfies crawlers (Bing flags empty alt), aria-hidden keeps it out of screen readers. -->
+<div aria-hidden="true" class="fixed inset-0 -z-20 overflow-hidden bg-[#87694a]" transition:name="home-bg" transition:animate="none">
   <div
     aria-hidden="true"
     class="absolute inset-0 scale-110 bg-cover bg-[55%_center] blur-xl"
@@ -28,7 +29,7 @@ const placeholder =
   ></div>
   <Picture
     src={bgHome}
-    alt=""
+    alt="background home"
     formats={["avif", "webp"]}
     fallbackFormat="webp"
     widths={dim ? [640] : [640, 960, 1280, bgHome.width]}
