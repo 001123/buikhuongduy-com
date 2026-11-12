@@ -49,6 +49,11 @@ jobs:
         env:
           PUBLIC_GA4_ID: ${{ github.ref == 'refs/heads/main' && vars.PUBLIC_GA4_ID || '' }}
 
+      # Live sitemap before this deploy, so IndexNow only gets URLs that are new, removed or have a new lastmod.
+      - name: Snapshot live sitemap
+        if: github.ref == 'refs/heads/main'
+        run: node scripts/indexnow.mjs snapshot "$RUNNER_TEMP/sitemap-before.json"
+
       # Production deploy on main (served at buikhuongduy.com); preview deploy for PRs.
       - name: Deploy
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
@@ -62,6 +67,12 @@ jobs:
             --project-name=buikhuongduy-com
             --branch=${{ github.head_ref || github.ref_name }}
             --commit-hash=${{ github.sha }}
+
+      # Notify Bing and other IndexNow engines (not Google) about changed URLs. Never fails the deploy.
+      - name: Submit changed URLs to IndexNow
+        if: github.ref == 'refs/heads/main'
+        continue-on-error: true
+        run: node scripts/indexnow.mjs submit "$RUNNER_TEMP/sitemap-before.json"
 
   # Every audited page must score 100 in all Lighthouse categories (see lighthouserc.cjs).
   # Runs in parallel with deploy; mark it as a required check to block merging regressions.

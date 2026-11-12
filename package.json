@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "lighthouse": "lhci autorun"
+    "lighthouse": "lhci autorun",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.6",
