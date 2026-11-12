@@ -50,9 +50,10 @@ export const ui = {
     "projects.skills": "Kỹ năng",
 
     "blog.title": "Blog",
-    "blog.lead": "Ghi chép, suy nghĩ và những điều mình học được.",
+    "blog.lead": "Tổng hợp công nghệ mới và kinh nghiệm thực tế.",
     "blog.empty": "Bài viết đầu tiên đang được chuẩn bị.",
     "blog.back": "Tất cả bài viết",
+    "blog.latest": "Bài viết mới",
     "blog.published": "Đăng ngày",
     "blog.updated": "Cập nhật",
     "blog.draft": "Bản nháp",
@@ -176,9 +177,10 @@ export const ui = {
     "projects.skills": "Skills",
 
     "blog.title": "Blog",
-    "blog.lead": "Notes, thoughts and things I have learned.",
+    "blog.lead": "New technology roundups and hands-on experience.",
     "blog.empty": "The first post is on its way.",
     "blog.back": "All posts",
+    "blog.latest": "Latest posts",
     "blog.published": "Published",
     "blog.updated": "Updated",
     "blog.draft": "Draft",

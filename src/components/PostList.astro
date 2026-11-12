@@ -5,22 +5,27 @@ import { formatDateTime, postUrl, type Post } from "../lib/blog";
 
 interface Props {
   posts: Post[];
+  /** Extra classes for the list, e.g. grid columns. */
+  class?: string;
+  /** Heading level for post titles; use h3 when the list sits under a section h2. */
+  headingLevel?: "h2" | "h3";
 }
 
-const { posts } = Astro.props;
+const { posts, class: className, headingLevel = "h2" } = Astro.props;
+const Heading = headingLevel;
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 ---
 
-<ul class="not-prose grid gap-6">
+<ul class:list={["not-prose grid gap-6", className]}>
   {posts.map((post) => (
     <li>
       <a
         href={postUrl(post)}
         class="group flex h-full flex-col rounded-2xl border border-paper/15 bg-ink/40 p-5 glow-frame-hover hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:p-6"
       >
-        <h2 class="line-clamp-3 font-serif text-lg font-semibold text-paper group-hover:text-rice">{post.data.title}</h2>
-        <p class="mt-2 line-clamp-3 text-[0.796875rem] leading-relaxed text-pretty text-paper/75">{post.data.description}</p>
+        <Heading class="line-clamp-3 font-serif text-lg font-semibold lg:text-xl text-paper group-hover:text-rice">{post.data.title}</Heading>
+        <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-pretty text-paper/75">{post.data.description}</p>
         <div class="mt-auto flex items-center gap-x-2 pt-4 text-xs whitespace-nowrap text-paper/60">
           <time class="shrink-0 text-paper/50" datetime={post.data.pubDate.toISOString()}>{formatDateTime(post.data.pubDate, lang)}</time>
           {post.data.category && <><span aria-hidden="true" class="text-paper/30">·</span><span class="min-w-0 truncate font-medium text-rice/90">{categories[post.data.category][lang].name}</span></>}

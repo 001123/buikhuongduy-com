@@ -1,10 +1,13 @@
 ---
 import Background from "./Background.astro";
+import PostList from "./PostList.astro";
 import { getLang, sectionPaths, useTranslations, type Section } from "../i18n/ui";
+import { getPosts } from "../lib/blog";
 import { contentAnim } from "./transitions";
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
+const latest = (await getPosts(lang)).slice(0, 3);
 
 const primary: Section[] = ["about", "contact", "blog"];
 const links = primary.map((s) => ({ label: t(`nav.${s}`), href: sectionPaths[s][lang] }));
@@ -16,7 +19,7 @@ const pill =
   "rounded-full border backdrop-blur-md shadow-lg shadow-ink/30 text-center font-medium tracking-wide glow-hover active:scale-[0.97] active:duration-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
 ---
 
-<main class="relative isolate flex min-h-dvh flex-col items-center justify-start overflow-hidden px-6 pt-[16dvh] pb-16 sm:pt-[12dvh] [@media(max-height:36rem)]:pt-[8dvh]">
+<main class="relative isolate flex min-h-dvh flex-col items-center justify-start overflow-hidden px-6 pt-[16dvh] pb-24 sm:pt-[12dvh] sm:pb-10 [@media(max-height:36rem)]:pt-[8dvh]">
   <Background />
 
   {
@@ -76,6 +79,37 @@ const pill =
       }
     </nav>
   </div>
+
+  {
+    latest.length > 0 && (
+      <section
+        aria-labelledby="latest-posts"
+        class="mt-16 w-full max-w-5xl sm:mt-auto sm:pt-16"
+        transition:name="home-latest"
+        transition:animate={contentAnim}
+      >
+        <div class="mb-4 flex items-center justify-between gap-4">
+          <h2
+            id="latest-posts"
+            class="rounded-full border border-paper/20 bg-ink/80 px-4 py-2 text-sm font-semibold tracking-wide text-paper shadow-lg shadow-ink/30 backdrop-blur-md sm:px-5 sm:text-base"
+          >
+            {t("blog.latest")}
+          </h2>
+          <a
+            href={sectionPaths.blog[lang]}
+            class="glow-hover shrink-0 rounded-full border border-paper/20 bg-ink/80 px-4 py-2 text-sm font-medium text-paper shadow-lg shadow-ink/30 backdrop-blur-md hover:border-rice hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+          >
+            {t("blog.back")} →
+          </a>
+        </div>
+        <PostList
+          posts={latest}
+          headingLevel="h3"
+          class="grid-cols-1 gap-4 md:grid-cols-3 [&_a]:bg-ink/85 [&_a]:shadow-lg [&_a]:shadow-ink/30 [&_a]:backdrop-blur-md"
+        />
+      </section>
+    )
+  }
 </main>
 
 <style>
