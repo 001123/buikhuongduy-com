@@ -16,6 +16,8 @@ tags: [frontend, system-design, micro-frontends, architecture, web-components, i
 
 Trong [checklist Front-end System Design 9 bước](/blog/frontend-system-design-cheatsheet/), mục kiến trúc có một dòng: "frontend monolith hay micro-frontends". Bài này mở rộng dòng đó, dựa chủ yếu trên [micro-frontends.org](https://micro-frontends.org/) của Michael Geers và bài [Micro Frontends](https://martinfowler.com/articles/micro-frontends.html) của Cam Jackson trên blog Martin Fowler, cộng thêm những gì nền tảng web đã thay đổi từ đó.
 
+> **Bản tiếng Việt của micro-frontends.org:** mình đã dịch toàn bộ trang sang tiếng Việt và gửi [pull request #108](https://github.com/neuland/micro-frontends/pull/108) lên repo gốc, hiện đang chờ merge. Trong lúc chờ, bạn có thể đọc trước bản dịch tại [001123.github.io/micro-frontends](https://001123.github.io/micro-frontends/).
+
 ## Micro-frontends là gì?
 
 Backend đã tách thành nhiều microservice, nhưng phía trên vẫn là một SPA khổng lồ do một team frontend riêng làm. SPA đó phình dần, khó bảo trì, và mọi team đều phải xếp hàng chờ nó. Đó là **frontend monolith**.
@@ -457,7 +459,7 @@ Micro-frontends là **định luật Conway áp dụng có chủ đích**: thi�
 
 ### Tham khảo
 
-- [Micro Frontends, Michael Geers](https://micro-frontends.org/)
+- [Micro Frontends, Michael Geers](https://micro-frontends.org/) ([bản tiếng Việt](https://001123.github.io/micro-frontends/), [PR #108](https://github.com/neuland/micro-frontends/pull/108) đang chờ merge)
 - [Tractor Store 2.0, neuland](https://micro-frontends.org/tractor-store/)
 - [Micro Frontends, Cam Jackson trên martinfowler.com](https://martinfowler.com/articles/micro-frontends.html)
 - [Micro frontends, ThoughtWorks Technology Radar](https://www.thoughtworks.com/radar/techniques/micro-frontends)
