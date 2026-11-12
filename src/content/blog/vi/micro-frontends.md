@@ -14,19 +14,13 @@ tags: [frontend, system-design, micro-frontends, architecture, web-components, i
 - Cái giá có thật: payload lớn hơn, nhiều thứ cần vận hành, dễ lạc nhau về UI. Nếu chỉ có một hai team, **modular monolith** gần như luôn là lựa chọn tốt hơn.
 :::
 
-Trong [checklist Front-end System Design 9 bước](/blog/frontend-system-design-cheatsheet/), mục kiến trúc có một dòng ngắn: "frontend monolith hay micro-frontends". Bài này mở rộng dòng đó. Ghi chú dựa chủ yếu trên [micro-frontends.org](https://micro-frontends.org/) của Michael Geers (tác giả cuốn *Micro Frontends in Action*) và bài [Micro Frontends](https://martinfowler.com/articles/micro-frontends.html) của Cam Jackson trên blog Martin Fowler, cộng thêm những gì đã thay đổi từ khi hai bài đó ra đời.
+Trong [checklist Front-end System Design 9 bước](/blog/frontend-system-design-cheatsheet/), mục kiến trúc có một dòng: "frontend monolith hay micro-frontends". Bài này mở rộng dòng đó, dựa chủ yếu trên [micro-frontends.org](https://micro-frontends.org/) của Michael Geers và bài [Micro Frontends](https://martinfowler.com/articles/micro-frontends.html) của Cam Jackson trên blog Martin Fowler, cộng thêm những gì nền tảng web đã thay đổi từ đó.
 
 ## Micro-frontends là gì?
 
-Thuật ngữ này xuất hiện lần đầu trên [ThoughtWorks Technology Radar](https://www.thoughtworks.com/radar/techniques/micro-frontends) cuối năm 2016, mang ý tưởng microservices sang frontend.
+Backend đã tách thành nhiều microservice, nhưng phía trên vẫn là một SPA khổng lồ do một team frontend riêng làm. SPA đó phình dần, khó bảo trì, và mọi team đều phải xếp hàng chờ nó. Đó là **frontend monolith**.
 
-Bối cảnh quen thuộc: backend đã tách thành nhiều microservice, nhưng phía trên vẫn là một SPA khổng lồ do một team frontend riêng làm. Theo thời gian SPA đó phình ra, khó bảo trì, và mọi team backend đều phải xếp hàng chờ team frontend. Đó là **frontend monolith**.
-
-Micro-frontends nhìn một website như **tập hợp các tính năng**, mỗi tính năng thuộc về một **team độc lập**. Mỗi team:
-
-- có một **mảng nghiệp vụ** hoặc **sứ mệnh** rõ ràng (ví dụ: "giúp người dùng chọn sản phẩm", "dẫn người dùng qua bước thanh toán"),
-- là team **cross-functional**, làm tính năng **từ đầu đến cuối**, từ database đến giao diện,
-- **build, test và deploy độc lập**, không cần hỏi team khác.
+Micro-frontends (xuất hiện trên [ThoughtWorks Technology Radar](https://www.thoughtworks.com/radar/techniques/micro-frontends) cuối 2016) nhìn website như **tập hợp tính năng**, mỗi tính năng thuộc về một **team độc lập**: có sứ mệnh nghiệp vụ rõ ràng, làm **từ database đến giao diện**, và **deploy không cần hỏi ai**.
 
 ```mermaid
 flowchart TB
@@ -51,51 +45,52 @@ flowchart TB
   end
 ```
 
+Chữ quan trọng là **độc lập**: về codebase, về release và về team.
+
+:::advanced
+### Nguồn gốc và định nghĩa
+
 Ý tưởng này không mới. Nó gần với [Self-contained Systems](https://scs-architecture.org/), và trước đó OTTO gọi là "Frontend Integration for Verticalised Systems". "Micro-frontends" chỉ là cái tên dễ nhớ hơn.
 
-Định nghĩa của Cam Jackson gọn nhất: *"Một kiểu kiến trúc trong đó các ứng dụng frontend có thể deliver độc lập được ghép lại thành một tổng thể lớn hơn."* Chữ quan trọng là **độc lập**: độc lập về codebase, về release, và về team.
+Định nghĩa của Cam Jackson: *"Một kiểu kiến trúc trong đó các ứng dụng frontend có thể deliver độc lập được ghép lại thành một tổng thể lớn hơn."* Ông liệt kê bốn lợi ích: nâng cấp từng phần (strangler thay vì viết lại), codebase nhỏ và tách bạch theo bounded context, deploy độc lập với pipeline riêng, và team tự chủ. Team phải được tổ chức theo **lát cắt nghiệp vụ dọc**, không theo mối quan tâm kỹ thuật ngang như "team styling" hay "team form".
+
+Ví dụ trong suốt bài là cửa hàng máy kéo mô hình của micro-frontends.org, với ba team: **Team Product** (đỏ) sở hữu trang sản phẩm, **Team Checkout** (xanh dương) sở hữu nút mua và giỏ hàng mini, **Team Inspire** (xanh lá) sở hữu phần gợi ý. Phiên bản [Tractor Store 2.0](https://micro-frontends.org/tractor-store/) là một shop đầy đủ, được viết lại bằng nhiều stack khác nhau, giống TodoMVC cho micro-frontends.
+:::
 
 ## Khi nào nên (và không nên) dùng?
 
-Micro-frontends giải quyết **vấn đề của tổ chức**, không phải vấn đề kỹ thuật. Nó đáng giá khi:
+Micro-frontends giải quyết **vấn đề tổ chức**, không phải vấn đề kỹ thuật.
 
-- Có **nhiều team** (thường từ ba bốn team trở lên) cùng làm trên một sản phẩm và đang giẫm chân nhau: xung đột merge, hàng đợi release, một team làm hỏng build của cả công ty.
-- Muốn **migrate dần** khỏi một stack cũ (AngularJS, jQuery, một framework nội bộ) theo kiểu [strangler fig](https://martinfowler.com/bliki/StranglerFigApplication.html), không phải đập đi viết lại.
-- Các mảng của sản phẩm có **nhịp release khác nhau**: trang thanh toán cần ổn định, trang khuyến mãi đổi hằng ngày.
+**Nên** khi có từ ba bốn team trở lên trên cùng một sản phẩm và đang giẫm chân nhau (xung đột merge, hàng đợi release), khi cần **migrate dần** khỏi stack cũ theo kiểu [strangler fig](https://martinfowler.com/bliki/StranglerFigApplication.html), hoặc khi các mảng có nhịp release rất khác nhau.
 
-Không nên dùng khi:
-
-- Chỉ có **một hoặc hai team**. Chi phí vận hành lớn hơn lợi ích. Một monorepo có ranh giới module rõ ràng (modular monolith) cho bạn phần lớn lợi ích với rất ít chi phí.
-- Lý do chính là "muốn mỗi team dùng framework riêng". Đó là triệu chứng, không phải mục tiêu (xem phần "Tránh micro-frontend anarchy" bên dưới).
-- Sản phẩm là một ứng dụng có tương tác dày đặc giữa mọi phần (ví dụ trình soạn thảo đồ họa). Ranh giới team sẽ cắt ngang qua state dùng chung, và bạn sẽ dành phần lớn thời gian để đồng bộ.
-
-Ngay cả tài liệu micro-frontends của Vercel cũng khuyên thử monorepo, feature flag và build nhanh hơn trước khi tách.
+**Không nên** khi chỉ có một hai team (một **modular monolith** trong monorepo cho phần lớn lợi ích với rất ít chi phí), khi lý do chính là "mỗi team muốn dùng framework riêng", hoặc khi mọi phần của ứng dụng tương tác dày đặc với nhau (như trình chỉnh sửa đồ họa).
 
 ## Năm nguyên tắc cốt lõi
 
-micro-frontends.org nêu năm ý, mình thấy vẫn đúng đến giờ:
+Theo micro-frontends.org, và vẫn đúng đến giờ:
 
-1. **Không phụ thuộc công nghệ.** Mỗi team chọn và nâng cấp stack của mình mà không cần phối hợp với team khác. Custom Elements giúp giấu chi tiết bên trong sau một interface trung lập.
-2. **Cô lập code của team.** Không chia sẻ runtime, kể cả khi mọi team cùng dùng một framework. Không dựa vào state chung hay biến toàn cục.
-3. **Đặt tiền tố theo team.** Ở những chỗ chưa cô lập được, thống nhất quy ước đặt tên: CSS, event, localStorage, cookie. Vừa tránh xung đột vừa nhìn vào là biết của ai.
-4. **Ưu tiên tính năng sẵn có của trình duyệt.** Dùng browser event để giao tiếp thay vì tự xây một hệ thống PubSub toàn cục. Nếu buộc phải có API giữa các team, giữ nó đơn giản nhất có thể.
-5. **Xây site có khả năng chống chịu.** Tính năng vẫn phải dùng được khi JavaScript lỗi hoặc chưa chạy xong. Dùng server rendering và progressive enhancement.
+1. **Không phụ thuộc công nghệ**: mỗi team tự chọn và nâng cấp stack, không cần phối hợp.
+2. **Cô lập code của team**: không chia sẻ runtime, state chung hay biến toàn cục.
+3. **Đặt tiền tố theo team** cho những gì chưa cô lập được: CSS, event, localStorage, cookie.
+4. **Ưu tiên tính năng của trình duyệt**: dùng DOM event thay vì tự xây PubSub toàn cục.
+5. **Chống chịu**: tính năng vẫn dùng được khi JavaScript lỗi hoặc chưa chạy, nhờ server rendering và progressive enhancement.
 
-## Chọn vị trí trên dải "document ↔ application"
+## Các cách ghép
 
-Trước khi chọn kỹ thuật ghép, xác định sản phẩm nằm đâu trên [dải Documents-to-Applications](https://ar.al/notes/the-documents-to-applications-continuum/) của Aral Balkan:
+Trước khi chọn, xác định sản phẩm nằm đâu trên [dải document ↔ application](https://ar.al/notes/the-documents-to-applications-continuum/): site nhiều nội dung thì ghép ở **server** là đủ; thương mại điện tử hay PWA cần ghép ở **cả server lẫn trình duyệt**; ứng dụng thuần tương tác thì ghép ở **client**.
 
-- **Bên trái** (website nhiều nội dung, chủ yếu là document nối với nhau bằng link): ghép ở **server** là đủ. Server nối các mẩu HTML lại, cập nhật bằng cách tải lại trang hoặc thay một phần qua AJAX.
-- **Ở giữa** (thương mại điện tử, PWA, cần phản hồi tức thì như optimistic UI hay skeleton screen): cần ghép ở **cả server lẫn trình duyệt**.
-- **Bên phải** (ứng dụng thuần hành vi, ít nội dung, như trình chỉnh ảnh online): ghép chủ yếu ở **client**.
+| Cách ghép | Ưu | Nhược |
+| --- | --- | --- |
+| **Server (SSI, ESI, edge)** | Nhanh lần đầu, chạy khi tắt JS, SEO tốt, đơn giản | Mảnh chậm nhất quyết định tốc độ cả trang |
+| **Build-time (npm package)** | Một bundle, dedupe dễ | Release lockstep: không phải micro-frontends thật |
+| **iframe** | Cô lập mạnh nhất, hợp với nội dung bên thứ ba | Routing, deep link, responsive, a11y đều khó |
+| **JavaScript runtime** (import map, Module Federation) | Linh hoạt nhất, chia sẻ dependency được | Chủ yếu chạy ở client; shared dependency là hợp đồng version ngầm |
+| **Web Components** | Chuẩn web, framework nào cũng dùng được, kết hợp tốt với SSR | Phải tự lo SSR và hydrate |
 
-Quyết định này ảnh hưởng mọi thứ phía sau: kỹ thuật ghép, cách lấy dữ liệu, cách xử lý loading.
+:::advanced
+### Ghép ở server: SSI, ESI
 
-## Các cách ghép micro-frontends
-
-### 1. Ghép ở server: SSI, ESI
-
-Cách "cổ" nhất và cũng ổn định nhất. Server của team sở hữu trang render khung HTML, chèn các mảnh (fragment) của team khác bằng [Server Side Includes](https://en.wikipedia.org/wiki/Server_Side_Includes):
+Server của team sở hữu trang render khung HTML và chèn fragment của team khác bằng [Server Side Includes](https://en.wikipedia.org/wiki/Server_Side_Includes):
 
 ```html
 <blue-buy sku="t_porsche">
@@ -103,15 +98,7 @@ Cách "cổ" nhất và cũng ổn định nhất. Server của team sở hữu 
 </blue-buy>
 ```
 
-Web server (nginx), CDN (qua [ESI](https://en.wikipedia.org/wiki/Edge_Side_Includes)) hoặc edge worker thay comment `#include` bằng HTML do server của team sở hữu fragment trả về, rồi mới gửi trang cho trình duyệt.
-
-**Ưu**: nhanh lần đầu, chạy được khi tắt JavaScript, SEO tốt, đơn giản đến nhàm chán (theo nghĩa tốt).
-**Nhược**: **mảnh chậm nhất quyết định thời gian phản hồi của cả trang**, nên phải cache fragment cẩn thận.
-
-:::advanced
-### Cấu hình nginx và các biến thể
-
-Mỗi team có server riêng, nginx bật `ssi` và định tuyến theo tiền tố URL. Response của `/blue-buy?sku=t_porsche` được chèn vào chỗ comment `#include`:
+Mỗi team có server riêng, nginx bật `ssi` và định tuyến theo tiền tố URL. Response của `/blue-buy?sku=t_porsche` được chèn vào chỗ comment `#include` trước khi gửi trang cho trình duyệt:
 
 ```nginx
 upstream team_blue  { server team_blue:3001; }
@@ -129,12 +116,13 @@ server {
 }
 ```
 
-Biến thể: ESI (ghép ở CDN/edge, Varnish, Akamai, Fastly hỗ trợ), hoặc thư viện như Tailor của Zalando. Ngày nay bạn cũng có thể làm việc này trong một edge worker (Cloudflare Workers với `HTMLRewriter`) hoặc dùng routing của nền tảng như Vercel Microfrontends để chia URL cho từng app.
+Biến thể: [ESI](https://en.wikipedia.org/wiki/Edge_Side_Includes) (ghép ở CDN/edge, Varnish, Akamai, Fastly hỗ trợ), hoặc thư viện như Tailor của Zalando. Ngày nay bạn cũng có thể làm việc này trong một edge worker (Cloudflare Workers với `HTMLRewriter`) hoặc dùng routing của nền tảng như Vercel Microfrontends để chia URL cho từng app.
 :::
 
-### 2. Ghép lúc build: npm package
+:::advanced
+### Build-time và iframe
 
-Mỗi micro-frontend là một package, ứng dụng container khai báo chúng trong `package.json`:
+Build-time: mỗi micro-frontend là một package, container khai báo trong `package.json`:
 
 ```json
 {
@@ -146,9 +134,9 @@ Mỗi micro-frontend là một package, ứng dụng container khai báo chúng 
 }
 ```
 
-Trông hợp lý (một bundle, dedupe dependency dễ), nhưng muốn sửa một phần thì phải build và release lại **cả app**. Đó là **lockstep release**, đúng thứ micro-frontends muốn bỏ. Cam Jackson khuyên mạnh mẽ là không nên làm vậy. Nó vẫn hữu ích để **chia code** trong một monolith, chỉ đừng gọi đó là micro-frontends.
+Sửa một phần thì phải build và release lại cả app, đúng thứ micro-frontends muốn bỏ. Cam Jackson khuyên mạnh mẽ là không nên làm vậy. Nó vẫn hữu ích để chia code trong một monolith, chỉ đừng gọi đó là micro-frontends.
 
-### 3. iframe
+iframe: container đổi `src` theo route.
 
 ```html
 <iframe id="micro-frontend-container"></iframe>
@@ -161,30 +149,22 @@ Trông hợp lý (một bundle, dedupe dependency dễ), nhưng muốn sửa m�
 </script>
 ```
 
-**Ưu**: cô lập mạnh nhất (CSS, JS, global, cả lỗi), không cần thỏa thuận gì về framework. Phù hợp khi nhúng thứ **không tin tưởng hoàn toàn** hoặc từ bên thứ ba (widget thanh toán, ứng dụng nội bộ cũ).
-**Nhược**: routing, history, deep link phức tạp; khó làm responsive vì iframe không tự co theo nội dung; giao tiếp phải qua `postMessage`; accessibility và SEO kém hơn; mỗi iframe tải lại framework riêng.
+Cô lập CSS, JS, global và cả lỗi; phù hợp để nhúng widget thanh toán hay công cụ nội bộ cũ (thêm `sandbox` nếu không tin tưởng). Đổi lại: giao tiếp phải qua `postMessage`, iframe không tự co theo nội dung, history và deep link phức tạp, mỗi iframe tải lại framework riêng.
+:::
 
-### 4. JavaScript runtime: container gọi hàm mount
+:::advanced
+### JavaScript runtime, import map và Module Federation 2.0
 
-Đây là cách Cam Jackson gọi là "mặc định" và cũng là cách phổ biến nhất. Mỗi micro-frontend tải qua `<script>` và đăng ký một hàm mount; container quyết định mount cái nào, ở đâu, khi nào:
+Cam Jackson coi đây là cách "mặc định". Mỗi micro-frontend đăng ký hàm mount; container quyết định mount cái nào, ở đâu, khi nào. Hợp đồng càng nhỏ càng tốt:
 
 ```ts
-// Hợp đồng giữa container và micro-frontend: càng nhỏ càng tốt.
 type MicroFrontend = {
   mount(el: HTMLElement, ctx: { basePath: string; navigate(to: string): void }): void;
   unmount(el: HTMLElement): void;
 };
 ```
 
-Ngày nay mỗi team thường xuất bản một ES module, container tải bằng `import()` dynamic, URL thật được map qua import map hoặc manifest. **Module Federation** là phiên bản "có tổ chức" của cách này: mỗi app là một **remote** expose module, app **host** tiêu thụ lúc runtime, hai bên khai báo **dependency dùng chung** (`react`, `react-dom`) để không tải trùng.
-
-**Ưu**: linh hoạt nhất, deploy độc lập, chia sẻ dependency được.
-**Nhược**: chỉ chạy ở client nếu không đầu tư thêm cho SSR; "shared dependency" là một **hợp đồng phiên bản** ngầm giữa các team (React 19 ở host, React 18 ở remote thì sao?), và lỗi chỉ lộ ra lúc runtime.
-
-:::advanced
-### Import map và Module Federation 2.0
-
-Thay vì gắn hàm lên `window` như ví dụ năm 2019, container map tên module sang URL đã hash qua một [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap):
+Thay vì gắn hàm lên `window` như ví dụ năm 2019, ngày nay mỗi team xuất bản một ES module, container map tên module sang URL đã hash qua một [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap):
 
 ```html
 <script type="importmap">
@@ -204,40 +184,28 @@ mfe.mount(document.getElementById("checkout-root")!, { basePath: "/checkout", na
 
 Deploy một team chỉ là đổi một dòng trong import map (hoặc manifest), không ai khác phải build lại.
 
-Module Federation 2.0 đã có bản stable, chạy được trên Webpack, Rspack, Rollup/Rolldown, Vite, Rsbuild, cả Next.js và React Native, thêm type hint động cho remote, preload, DevTools và tree shaking cho shared dependency. Các framework như [single-spa](https://single-spa.js.org/), Piral hay Native Federation (dựa trên import map) cũng nằm trong nhóm này.
+**Module Federation** là phiên bản "có tổ chức": mỗi app là một **remote** expose module, app **host** tiêu thụ lúc runtime, hai bên khai báo **dependency dùng chung** (`react`, `react-dom`) để không tải trùng. Module Federation 2.0 đã có bản stable, chạy trên Webpack, Rspack, Rollup/Rolldown, Vite, Rsbuild, cả Next.js và React Native, thêm type hint động cho remote, preload, DevTools và tree shaking cho shared dependency. [single-spa](https://single-spa.js.org/), Piral và Native Federation (dựa trên import map) cũng thuộc nhóm này.
+
+Rủi ro chính: shared dependency là một **hợp đồng version** ngầm. Host dùng React 19, remote dùng React 18 thì sao? Lỗi kiểu này chỉ lộ ra lúc runtime.
 :::
 
-### 5. Web Components: DOM là API
+## DOM là API
 
-micro-frontends.org chọn cách này làm trọng tâm. Mỗi team bọc tính năng (viết bằng bất cứ framework gì) trong một [Custom Element](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements). **Tag name, attribute và event** của element đó chính là public API cho team khác. Team khác không cần biết bên trong dùng React hay Svelte, chỉ cần biết thao tác DOM.
-
-Ví dụ trên micro-frontends.org là một cửa hàng máy kéo mô hình với ba team: **Team Product** (đỏ) sở hữu trang sản phẩm, **Team Checkout** (xanh dương) sở hữu nút mua và giỏ hàng mini, **Team Inspire** (xanh lá) sở hữu phần gợi ý sản phẩm. Team Product đặt nút mua vào trang chỉ bằng:
+micro-frontends.org chọn **Custom Elements** làm trọng tâm. Mỗi team bọc tính năng (viết bằng framework gì cũng được) trong một custom element; **tag name, attribute và event** là public API cho team khác. Team Product đặt nút mua của Team Checkout vào trang chỉ bằng:
 
 ```html
 <blue-buy sku="t_porsche"></blue-buy>
 ```
 
-Quy ước `[màu-team]-[tính-năng]` vừa tránh trùng tên, vừa giúp nhìn DOM là biết tính năng của team nào. Spec chỉ yêu cầu tên có dấu gạch ngang (`-`). Lưu ý custom element **không tự đóng được**: `<green-recos sku="t_porsche" />` sẽ không hoạt động đúng.
+Quy ước `[team]-[tính-năng]` vừa tránh trùng tên, vừa giúp nhìn DOM là biết của ai.
 
-Web Components là chuẩn web nên mọi framework lớn đều dùng được (xem [Custom Elements Everywhere](https://custom-elements-everywhere.com/); React 19 đã hỗ trợ đầy đủ property và custom event cho custom element). Custom Elements và Shadow DOM chạy trên mọi trình duyệt hiện đại, không cần polyfill.
-
-## Giao tiếp giữa các micro-frontend
-
-Nguyên tắc chung từ cả hai nguồn: **giao tiếp càng ít càng tốt**. Mỗi kênh giao tiếp là một hợp đồng phải giữ ổn định qua nhiều lần release của nhiều team.
-
-### Cha → con: attribute
-
-Khi người dùng chọn mẫu máy kéo khác, nút mua phải cập nhật giá. Team Product chỉ cần đổi attribute:
+**Cha → con: attribute.** Người dùng chọn mẫu khác, Team Product chỉ đổi attribute; element khai báo `observedAttributes` và tự render lại:
 
 ```js
 document.querySelector("blue-buy").setAttribute("sku", "t_fendt");
 ```
 
-Nếu Team Product dùng React hay framework có DOM diffing, việc này xảy ra tự động. Phía Team Checkout, element khai báo `observedAttributes` và render lại trong `attributeChangedCallback`. Thay đổi attribute (khai báo) nên được ưu tiên hơn việc gọi method trên element (mệnh lệnh).
-
-### Con → cha, anh em: DOM event
-
-Khi bấm nút mua, giỏ hàng mini phải làm mới. Cả hai đều của Team Checkout, nhưng để hai instance biết nhau trực tiếp là vi phạm sự cô lập. Trình duyệt đã có sẵn PubSub: **event**. Nút mua bắn một `CustomEvent` có tiền tố team, giỏ hàng lắng nghe:
+**Con → cha, anh em: DOM event.** Bấm mua thì giỏ hàng mini phải làm mới. Thay vì để hai component biết nhau, dùng PubSub sẵn có của trình duyệt:
 
 ```js
 // trong <blue-buy>
@@ -246,6 +214,8 @@ this.dispatchEvent(new CustomEvent("blue:basket:changed", { bubbles: true }));
 // trong <blue-basket> (nhớ gỡ listener trong disconnectedCallback)
 window.addEventListener("blue:basket:changed", () => this.refresh());
 ```
+
+Các kênh khác: **URL** để chuyển trạng thái giữa các trang, **server/BFF** cho dữ liệu cần nhất quán như giỏ hàng. Tránh **store toàn cục dùng chung**: nó giống chia sẻ database giữa các microservice. Nếu dùng Redux, mỗi micro-frontend một store riêng.
 
 :::advanced
 ### Viết custom element cho đúng
@@ -278,7 +248,7 @@ customElements.define("blue-buy", BlueBuy);
 
 (Ví dụ đầu tiên trên micro-frontends.org viết `this.shadowRoot = \`...\``; `shadowRoot` là thuộc tính chỉ đọc, phải gán vào `this.shadowRoot.innerHTML` như các ví dụ sau trong bài.)
 
-`render()` là nơi khởi tạo framework riêng của team nếu có.
+`render()` là nơi khởi tạo framework riêng của team nếu có. Thay đổi attribute (khai báo) nên được ưu tiên hơn việc gọi method trên element (mệnh lệnh). Spec chỉ yêu cầu tên có dấu gạch ngang, và custom element **không tự đóng được**: `<green-recos sku="t_porsche" />` sẽ không hoạt động đúng.
 
 Phần event, với listener được gỡ đúng cách:
 
@@ -322,10 +292,13 @@ Hai chi tiết hay bị sai:
 - **Giữ cùng một tham chiếu hàm** khi add và remove listener. `this.refresh` trong method của class bị mất `this` khi truyền làm callback; dùng arrow function làm class field như trên.
 - Event bắn từ bên trong shadow root cần `composed: true` để vượt qua ranh giới shadow DOM; ở đây event bắn từ chính host element nên `bubbles: true` là đủ, nhưng thêm `composed` giúp an toàn khi sau này đổi chỗ dispatch.
 
-Nếu không muốn giỏ hàng nghe trên `window` (ngoài phạm vi của nó), trang chủ quản (Team Product) có thể nghe event và gọi `refresh()` trên element giỏ hàng. Đây là kiểu "page điều phối", rõ ràng hơn nhưng làm team chủ quản biết nhiều hơn.
+Nếu không muốn giỏ hàng nghe trên `window` (ngoài phạm vi của nó), trang chủ quản (Team Product) có thể nghe event và gọi `refresh()` trên element giỏ hàng. Kiểu "page điều phối" này rõ ràng hơn nhưng làm team chủ quản biết nhiều hơn.
+
+Web Components là chuẩn web nên mọi framework lớn đều dùng được (xem [Custom Elements Everywhere](https://custom-elements-everywhere.com/); React 19 hỗ trợ đầy đủ property và custom event cho custom element). Custom Elements và Shadow DOM chạy trên mọi trình duyệt hiện đại, không cần polyfill.
 :::
 
-### Các kênh khác
+:::advanced
+### Bảng các kênh giao tiếp
 
 | Kênh | Khi nào dùng | Lưu ý |
 | --- | --- | --- |
@@ -334,15 +307,16 @@ Nếu không muốn giỏ hàng nghe trên `window` (ngoài phạm vi của nó)
 | URL (path, query) | Chuyển trạng thái giữa các trang/app | Deep link miễn phí; ví dụ của Cam Jackson chỉ giao tiếp qua route |
 | Server / BFF | Dữ liệu cần nhất quán (giỏ hàng, phiên đăng nhập) | Mỗi team tự đọc từ nguồn thật, không đồng bộ state ở client |
 | `BroadcastChannel` | Đồng bộ giữa nhiều tab | Dễ bị lạm dụng thành event bus toàn cục |
-| Store toàn cục dùng chung | Gần như không bao giờ | Giống chia sẻ database giữa microservices: coupling khổng lồ |
+| Store toàn cục dùng chung | Gần như không bao giờ | Coupling khổng lồ |
 
-Nếu dùng Redux hay một store tương tự, **mỗi micro-frontend một store riêng**. Chính tài liệu Redux coi việc "cô lập một Redux app như một component trong ứng dụng lớn hơn" là lý do hợp lệ để có nhiều store.
+Chính tài liệu Redux coi việc "cô lập một Redux app như một component trong ứng dụng lớn hơn" là lý do hợp lệ để có nhiều store.
+:::
 
-## Server rendering và Web Components
+## Server rendering và trạng thái loading
 
-Năm 2017–2019, bài trên micro-frontends.org than rằng "spec Web Components không nói gì về server rendering: không JavaScript, không Custom Elements". Giải pháp lúc đó là mỗi team expose `render()` qua URL (tag name thành path, attribute thành query) và ghép bằng SSI như ở trên. Kết quả là gần như một **Universal Web Component**: có HTML từ server, sau đó JavaScript tiếp quản.
+Bài gốc trên micro-frontends.org than rằng Web Components không có server rendering, và giải bằng cách cho mỗi team expose `render()` qua URL rồi ghép bằng SSI. Từ 2024, [Declarative Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/template#shadowrootmode) đã chạy trên mọi trình duyệt lớn: fragment server render mang theo cả shadow root và style đóng gói, không cần JavaScript.
 
-Từ năm 2024, [Declarative Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/template#shadowrootmode) đã chạy trên mọi trình duyệt lớn, nên fragment server render có thể mang theo cả shadow root và style đóng gói, không cần JavaScript. Nếu SEO và tốc độ tải lần đầu quan trọng, ghép ở server vẫn là điểm khởi đầu đơn giản nhất.
+Vì **mảnh chậm nhất quyết định tốc độ cả trang**, fragment vừa đắt vừa khó cache (như gợi ý cá nhân hóa) có thể chuyển sang render ở client. Nhưng khi nội dung về, nó đẩy layout xuống (xấu cho CLS). Đừng bắt team sở hữu trang cố định chiều cao vùng đó, vì như vậy hai team phải release cùng nhau mỗi khi đổi giao diện. Thay vào đó, team sở hữu fragment cho server render một **skeleton** đúng kích thước, nội dung thật lấp vào sau.
 
 :::advanced
 ### Declarative Shadow DOM và SSR với Module Federation
@@ -360,16 +334,8 @@ Fragment do server của Team Checkout trả về:
 
 Khi JavaScript của Team Checkout tải xong, `connectedCallback` thấy `this.shadowRoot` đã tồn tại và chỉ cần gắn listener (đây là lý do dùng `this.shadowRoot ?? this.attachShadow(...)` trong `render()`).
 
-Với Module Federation, SSR cũng khả thi (MF 2.0 chạy trên Node.js, có tích hợp cho Next.js và Modern.js), nhưng phức tạp hơn nhiều so với "server trả HTML, nginx ghép lại".
+Với Module Federation, SSR cũng khả thi (MF 2.0 chạy trên Node.js, có tích hợp cho Next.js và Modern.js), nhưng phức tạp hơn nhiều so với "server trả HTML, nginx ghép lại". Nếu SEO và tốc độ tải lần đầu quan trọng, ghép ở server vẫn là điểm khởi đầu đơn giản nhất.
 :::
-
-## Lấy dữ liệu và trạng thái loading
-
-Nhược điểm lớn của SSI/ESI: **mảnh chậm nhất quyết định thời gian phản hồi của cả trang**. Với mảnh vừa đắt vừa khó cache (gợi ý cá nhân hóa của Team Inspire), có thể bỏ include và để nó render ở client. Nhưng như vậy gây **layout shift** lớn: vùng gợi ý ban đầu trống, JavaScript tải, gọi API, render, ảnh tải, rồi đẩy phần dưới trang xuống. Xấu cho người dùng và cho CLS.
-
-Cách sửa "dễ" là Team Product cố định chiều cao vùng gợi ý. Nhưng đó là **coupling giữa hai team**: Team Inspire muốn thêm một dòng tiêu đề phụ thì phải hẹn Team Product đổi chiều cao, rồi release cùng lúc.
-
-Cách tốt hơn: giữ include, nhưng Team Inspire cho server render một **skeleton**, tái dùng style layout của nội dung thật để giữ đúng chỗ. Dữ liệu thật về sau sẽ lấp vào mà không đẩy layout. Quyền quyết định kích thước vẫn nằm trong tay team sở hữu fragment.
 
 :::advanced
 ### Bỏ include và skeleton ở client
@@ -386,46 +352,42 @@ Chuyển một fragment từ server render sang client render chỉ là bỏ dò
 <green-recos sku="t_porsche"></green-recos>
 ```
 
+Vùng gợi ý ban đầu trống, JavaScript tải, gọi API, render, ảnh tải, rồi đẩy phần dưới trang xuống. Skeleton do server render tái dùng style layout của nội dung thật để giữ đúng chỗ.
+
 Skeleton cũng hữu ích khi render ở client: element mới chèn vào DOM thì vẽ skeleton ngay trong lúc chờ dữ liệu. Khi attribute đổi, có thể quay về skeleton, nhưng nếu API trả nhanh thì skeleton nháy qua lại còn khó chịu hơn; giữ dữ liệu cũ hoặc chỉ hiện skeleton sau một khoảng chờ ngắn.
 :::
 
-## CSS: cô lập style
+## CSS và design system
 
-CSS vốn toàn cục và kế thừa. Team A viết `h2 { color: black }`, team B viết `h2 { color: blue }`, ở hai repo khác nhau, và ai đó sẽ thất vọng. Các lựa chọn, từ yếu đến mạnh:
+CSS vốn toàn cục: hai team cùng viết `h2 { … }` ở hai repo là xung đột. Từ yếu đến mạnh có: tiền tố team trong tên class, CSS Modules, `@scope` + `@layer`, và Shadow DOM. Cách nào cũng được, miễn mọi team chắc chắn style của mình không ảnh hưởng ai. Dùng **CSS custom properties** làm design token, vì chúng xuyên qua được shadow DOM.
+
+Người dùng phải thấy **một** sản phẩm. Thư viện component dùng chung nên **chỉ chứa logic UI** (`Button`, `Combobox`), không chứa logic nghiệp vụ (`ProductTable`). Đừng làm quá nhiều component quá sớm, và phải có một người hoặc team chịu trách nhiệm.
+
+Cũng đừng trộn React, Angular, Vue trên cùng một trang. ThoughtWorks gọi đó là [micro frontend anarchy](https://www.thoughtworks.com/radar/techniques/micro-frontend-anarchy) và xếp vào mục **Hold**. Trộn framework chỉ hợp lý trong giai đoạn migrate.
+
+:::advanced
+### Chi tiết về CSS và design system
+
+Các lựa chọn cô lập CSS:
 
 1. **Quy ước đặt tên có tiền tố team** (`.blue-buy__button`, BEM): dựa vào kỷ luật.
 2. **CSS Modules / CSS-in-JS**: build tool sinh tên class duy nhất.
 3. **`@scope`** và **cascade layers** (`@layer`): chuẩn CSS, giới hạn phạm vi selector và kiểm soát thứ tự ưu tiên giữa style của shell, design system và từng team.
 4. **Shadow DOM**: cô lập thật ở trình duyệt. Style ngoài không lọt vào (trừ thuộc tính kế thừa như `font`, `color` và CSS custom properties), style trong không lọt ra.
 
-Chọn cách nào không quan trọng bằng việc **mọi team biết style của mình sẽ không ảnh hưởng ai** khi ghép lại. Một mẹo hay: dùng **CSS custom properties** (`--color-primary`, `--space-2`) làm cầu nối design token, vì chúng xuyên qua được shadow DOM.
+Design system:
 
-## Design system dùng chung
+- **Thu hoạch thay vì đoán trước.** Cam Jackson khuyên để các team tự viết trước, chấp nhận trùng lặp ban đầu, đợi API của component lộ rõ qua thực tế rồi mới "harvest" vào thư viện chung.
+- **Custodian.** "Ai cũng sở hữu" nghĩa là không ai sở hữu; tập trung hoàn toàn thì người làm xa người dùng. Mô hình tốt nhất: ai cũng đóng góp được, một người hoặc team chịu trách nhiệm chất lượng.
+- **Có version**, và chấp nhận các team ở các version khác nhau trong một thời điểm. Token qua CSS custom properties giúp đổi giao diện đồng loạt mà không cần mọi team release.
+- Tractor Store 2.0 gợi ý bắt đầu thống nhất từ component đơn giản nhất: nút bấm.
 
-Người dùng phải thấy **một** sản phẩm, không phải ba. Thư viện component dùng chung là cách phổ biến, nhưng dễ làm sai:
+Về anarchy: kỹ thuật thì trộn framework được, nhưng người dùng tải nhiều framework, các team khó chia sẻ kiến thức và gần như không thể có thư viện component chung. Ngoài giai đoạn migrate (app AngularJS cũ chạy song song phần React mới, chuyển dần từng route), giữ một framework chính, một design system, một bộ công cụ build, kiểm thử và giám sát chung.
+:::
 
-- **Đừng làm quá nhiều component quá sớm.** Cam Jackson khuyên để các team tự viết trước, chấp nhận trùng lặp ban đầu, đợi API của component lộ rõ qua thực tế rồi mới "thu hoạch" (harvest) vào thư viện chung.
-- **Chỉ chia sẻ logic UI, không chia sẻ logic nghiệp vụ.** `Button`, `Icon`, `Combobox`, `DataTable` thì được. `ProductTable` thì không: nó mang theo giả định về "sản phẩm" là gì và tạo coupling giữa các team.
-- **Có người giữ (custodian).** "Ai cũng sở hữu" nghĩa là không ai sở hữu. Tập trung hoàn toàn thì người làm xa người dùng. Mô hình tốt nhất: ai cũng đóng góp được, một người hoặc một team chịu trách nhiệm chất lượng và tính nhất quán.
-- **Phát hành design system có version**, và chấp nhận rằng trong một thời điểm các team có thể ở các version khác nhau. Token (màu, spacing, typography) qua CSS custom properties giúp đổi giao diện đồng loạt mà không cần mọi team release.
+## App shell, routing và auth
 
-Tractor Store 2.0 gợi ý bắt đầu thống nhất từ component đơn giản nhất: nút bấm.
-
-## Tránh "micro-frontend anarchy"
-
-Năm 2020, ThoughtWorks đưa [micro frontend anarchy](https://www.thoughtworks.com/radar/techniques/micro-frontend-anarchy) vào mục **Hold**: dùng micro-frontends làm cớ để trộn React, Angular, Vue trên cùng một trang. Kỹ thuật thì làm được, nhưng người dùng tải nhiều framework, các team khó chia sẻ kiến thức và gần như không thể có thư viện component chung.
-
-Khả năng trộn công nghệ hữu ích nhất **trong giai đoạn migrate**: app AngularJS cũ chạy song song với phần React mới, từng route được chuyển dần. Ngoài trường hợp đó, giữ một mức thống nhất hợp lý: một framework chính, một design system, một bộ công cụ build, kiểm thử và giám sát chung.
-
-## Routing, auth và các mối quan tâm xuyên suốt
-
-Hầu hết kiến trúc đều có một **container / app shell**, chịu trách nhiệm:
-
-- render phần chung (header, footer, điều hướng),
-- **xác thực**: shell lấy token, truyền vào micro-frontend khi mount (hoặc dùng cookie `HttpOnly` cùng domain để không ai phải đụng vào token),
-- **routing cấp cao**: `/checkout/*` thuộc team Checkout, phần còn lại của URL do team đó tự định tuyến bên trong.
-
-Shell không phải bắt buộc. Tractor Store 2.0 cho thấy một tập self-contained system tuân theo vài quy tắc chung cũng hợp lệ như một meta-framework có shell.
+Phần lớn kiến trúc có một **app shell** lo header/footer, **xác thực** (lấy token rồi truyền vào khi mount, hoặc dùng cookie `HttpOnly` cùng domain) và **routing cấp cao** (`/checkout/*` thuộc Team Checkout, phần còn lại team đó tự định tuyến). Shell không bắt buộc: Tractor Store 2.0 cho thấy một tập self-contained system theo vài quy tắc chung cũng hợp lệ.
 
 :::advanced
 ### Điều hướng và backend
@@ -447,45 +409,51 @@ Không khác monolith nhiều: mỗi micro-frontend có bộ test riêng đầy 
 
 ## Cái giá phải trả
 
-| Chi phí | Vì sao | Giảm nhẹ |
-| --- | --- | --- |
-| Payload lớn hơn | Mỗi team bundle dependency riêng, có thể tải React hai lần | Shared dependency (Module Federation, import map), thống nhất framework, ngân sách bundle cho từng team |
-| Môi trường dev khác production | Dev chạy một app, production ghép nhiều app | Chế độ standalone, môi trường preview ghép đủ các app, proxy các team khác từ staging |
-| Vận hành và quản trị | Nhiều repo, pipeline, hạ tầng, version | Template dự án, pipeline chuẩn, giám sát và error tracking gắn nhãn theo team |
-| UI không nhất quán | Mỗi team tự diễn giải design | Design system có custodian, token dùng chung, review UX xuyên team |
-| Lỗi chỉ lộ ra lúc runtime | Hợp đồng nằm ở DOM hoặc remote module, không phải trong type system | Contract test, type sinh từ remote (MF 2.0), error boundary cho từng fragment |
-| Hiệu năng khó kiểm soát | Không ai sở hữu "cả trang" | Ngân sách hiệu năng theo trang, team sở hữu trang chịu trách nhiệm Core Web Vitals |
+| Chi phí | Giảm nhẹ |
+| --- | --- |
+| Payload lớn hơn (có thể tải React hai lần) | Shared dependency, một framework chính, ngân sách bundle theo team |
+| Dev khác production | Chế độ standalone, môi trường preview ghép đủ các app |
+| Nhiều repo, pipeline, hạ tầng phải vận hành | Template dự án, pipeline chuẩn, giám sát gắn nhãn theo team |
+| UI lệch nhau | Design system có custodian, token dùng chung |
+| Lỗi hợp đồng chỉ lộ ra lúc runtime | Contract test, error boundary cho từng fragment |
 
-Một điểm thường bị quên: khi một micro-frontend lỗi, phần còn lại của trang phải **sống sót**. Bọc mỗi fragment trong error boundary (hoặc `try/catch` quanh `mount`), có fallback (skeleton, liên kết đến trang riêng), và đặt timeout cho việc tải remote.
+Khi một fragment lỗi, phần còn lại của trang phải **sống sót**: bọc mỗi fragment trong error boundary, có fallback và đặt timeout khi tải remote.
+
+:::advanced
+### Thêm về chi phí
+
+- **Hiệu năng khó sở hữu**: không ai sở hữu "cả trang". Đặt ngân sách hiệu năng theo trang, và để team sở hữu trang chịu trách nhiệm Core Web Vitals.
+- **Lỗi runtime**: hợp đồng nằm ở DOM hoặc remote module, không nằm trong type system. MF 2.0 sinh type từ remote, giúp bắt một phần lỗi sớm hơn.
+- **Dev khác production**: ngoài chế độ standalone, có thể proxy các team khác từ staging để chạy cả trang ở local.
+- **Fallback** cho fragment lỗi: skeleton, hoặc một liên kết đến trang riêng của tính năng đó; với remote, `try/catch` quanh `import()` và `mount`.
+:::
 
 ## Chọn cách ghép nào?
 
 | Tình huống | Gợi ý |
 | --- | --- |
-| Website nhiều nội dung, SEO quan trọng, cần chạy cả khi JS lỗi | Ghép ở server/edge (SSI, ESI, edge worker), mỗi trang một team, Web Components + Declarative Shadow DOM cho phần tương tác |
-| Thương mại điện tử, nhiều team trên cùng một trang | Server render từng fragment + Custom Elements làm hợp đồng ở client, DOM event để giao tiếp |
-| Dashboard / SPA nội bộ, không cần SEO, cùng một framework | App shell + Module Federation hoặc import map, mỗi route một micro-frontend |
-| Migrate dần từ stack cũ | Strangler theo route: route mới sang app mới, route cũ giữ nguyên; iframe hoặc Web Components để nhúng phần cũ vào phần mới (hoặc ngược lại) |
-| Nhúng ứng dụng bên thứ ba hoặc không tin tưởng | iframe (có `sandbox`) |
-| Một đến hai team | Không tách. Modular monolith trong monorepo, ranh giới module rõ ràng |
+| Site nhiều nội dung, SEO quan trọng | Ghép ở server/edge, Web Components + Declarative Shadow DOM cho phần tương tác |
+| Thương mại điện tử, nhiều team trên một trang | Fragment server render + Custom Elements + DOM event |
+| Dashboard nội bộ, một framework | App shell + Module Federation hoặc import map, mỗi route một app |
+| Migrate từ stack cũ | Strangler theo route; iframe hoặc Web Components để nhúng phần cũ |
+| Nhúng bên thứ ba | iframe có `sandbox` |
+| Một đến hai team | Không tách: modular monolith |
 
 ## Trong phỏng vấn system design
 
-Nếu người phỏng vấn hỏi "có nên dùng micro-frontends không?", câu trả lời tốt bắt đầu bằng câu hỏi ngược về **tổ chức**: có bao nhiêu team, họ có cần release độc lập không, có đang migrate không. Sau đó mới đến kỹ thuật:
+Gặp câu "có nên dùng micro-frontends không?", hãy hỏi lại về **tổ chức** trước: bao nhiêu team, có cần release độc lập không, có đang migrate không. Sau đó trình bày:
 
-1. **Ranh giới**: chia theo mảng nghiệp vụ (theo chiều dọc), không chia theo lớp kỹ thuật ("team CSS", "team form").
-2. **Cách ghép**: server, client hay cả hai, dựa trên vị trí trên dải document ↔ application.
-3. **Hợp đồng**: tag name, attribute, event, chữ ký `mount`. Nhỏ, có version, có contract test.
-4. **Dùng chung**: design system và token, auth ở shell, không chia sẻ state nghiệp vụ.
-5. **Chi phí**: payload, nhất quán UI, khả năng chống lỗi khi một fragment hỏng.
+1. **Ranh giới** theo mảng nghiệp vụ, không theo lớp kỹ thuật.
+2. **Cách ghép**: server, client hay cả hai.
+3. **Hợp đồng**: tag name, attribute, event, chữ ký `mount`; nhỏ, có version, có contract test.
+4. **Dùng chung**: design system, token, auth ở shell; không chia sẻ state nghiệp vụ.
+5. **Chi phí**: payload, UI nhất quán, chống lỗi khi một fragment hỏng.
 
-Nói được phần 5 là thứ phân biệt người đã thực sự làm micro-frontends với người chỉ đọc về nó.
+Nói được mục 5 là thứ phân biệt người đã thực sự làm micro-frontends với người chỉ đọc về nó.
 
 ## Kết
 
-Micro-frontends về bản chất là **định luật Conway áp dụng có chủ đích**: kiến trúc phản ánh cách tổ chức, nên hãy thiết kế tổ chức trước. Về kỹ thuật, những thứ mà micro-frontends.org đề xuất từ 2017 đến giờ vẫn rất vững vì chúng dựa trên nền tảng của trình duyệt: Custom Elements làm hợp đồng, DOM event để giao tiếp, server rendering để chống chịu, và tiền tố team cho những gì chưa cô lập được. Nền tảng web còn tốt hơn: Declarative Shadow DOM giải quyết bài toán SSR, import map và Module Federation 2.0 làm việc chia sẻ dependency gọn hơn, View Transitions làm MPA mượt như SPA.
-
-Nhưng đừng quên lời khuyên quan trọng nhất: nếu bạn chưa có vấn đề về nhiều team giẫm chân nhau, bạn chưa cần micro-frontends.
+Micro-frontends là **định luật Conway áp dụng có chủ đích**: thiết kế tổ chức trước, kiến trúc sẽ đi theo. Những gì micro-frontends.org đề xuất từ 2017 vẫn vững vì dựa trên nền tảng trình duyệt: Custom Elements làm hợp đồng, DOM event để giao tiếp, server rendering để chống chịu, tiền tố team cho phần chưa cô lập được. Còn nếu chưa có nhiều team giẫm chân nhau, bạn chưa cần micro-frontends.
 
 ### Tham khảo
 
