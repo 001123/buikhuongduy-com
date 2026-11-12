@@ -9,3 +9,7 @@
   X-Robots-Tag: noindex
 /en/search/index.json
   X-Robots-Tag: noindex
+
+# Page versions read by the next deploy to find changed URLs (scripts/indexnow.mjs).
+/indexnow.json
+  X-Robots-Tag: noindex
