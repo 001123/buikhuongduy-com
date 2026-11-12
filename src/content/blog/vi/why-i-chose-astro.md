@@ -73,3 +73,5 @@ Nhờ vậy chi phí JavaScript tỷ lệ với số chỗ tương tác, không 
 ## Kết
 
 Với trang cá nhân, Astro cho mình đúng thứ cần: nhanh mặc định, viết bằng Markdown, và chỉ thêm độ phức tạp khi có lý do.
+
+Muốn biết Astro có gì mới gần đây, xem [Astro tháng 10/2026](/blog/astro-october-2026/). Còn vì sao một site tĩnh như thế này chạy với chi phí hosting 0đ, xem [bài về hosting 0đ chịu hàng triệu request](/blog/zero-cost-hosting-millions-of-requests/).

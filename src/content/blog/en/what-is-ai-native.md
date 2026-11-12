@@ -70,11 +70,13 @@ Every time a user edits a result, that is a signal. An AI-Native system collects
 
 An AI-Native application usually has a few layers that repeat:
 
-- **Model**: an LLM or a specialized model, called through an API or self-hosted.
+- **Model**: an LLM or a specialized model (for example [Claude Fable 5.2](/en/blog/claude-fable-5-2/)), called through an API or self-hosted.
 - **Context**: data put into the prompt at the right time, often through RAG (finding related documents and adding them to the context) or through connections such as MCP.
 - **Tools**: functions the model is allowed to call to take real actions: read files, call APIs, run commands.
 - **Agent loop**: the cycle of *plan → call a tool → read the result → decide the next step*, until the goal is done.
 - **Evals and guardrails**: test suites that measure output quality, plus limits on permissions and cost.
+
+[The 5 layers of AI agent infrastructure](/en/blog/agent-infrastructure-stack/) goes into the infrastructure underneath in more detail: memory, retrieval, tools, sandboxes and runtime.
 
 ```mermaid
 sequenceDiagram
@@ -100,8 +102,8 @@ The word is not only for products. A **developer** or a **team** can also work i
 In the past, most of the time went into typing code. When you work AI-Native, the time goes to other things:
 
 - **Describe the requirements clearly**: write specs, constraints, and examples, because how well an agent works depends on how clearly you state the task.
-- **Prepare context**: project docs, code conventions, and instruction files for agents (such as `AGENTS.md` in this repo).
-- **Delegate in parallel**: many agents run at once on many branches, and I move into the role of coordinator.
+- **Prepare context**: project docs, code conventions, and instruction files for agents (such as `AGENTS.md` in this repo), or skill packs such as [Modern Web Guidance](/en/blog/modern-web-guidance/).
+- **Delegate in parallel**: many agents run at once on many branches, and I move into the role of coordinator (the reason I [built KD Code](/en/blog/why-i-built-kd-code/)).
 - **Review and verify**: read the diff, run tests, and check in the browser. Final responsibility still belongs to the person.
 
 In other words, the skill shifts from "writing code fast" to "**making the right decisions and checking carefully**."

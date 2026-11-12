@@ -160,7 +160,7 @@ Một extension cho agent chạy lệnh trên máy là thứ dễ bị lợi d�
 - **Link từ agent** chỉ mở sau khi hỏi, và chỉ qua https hoặc http tới localhost và các host mình liệt kê.
 - **Mục trong registry có đường dẫn không an toàn** bị từ chối khi cài.
 
-README cũng nói thẳng: permission rule chỉ để đỡ phải bấm, **không phải ranh giới bảo mật**, và worktree **không phải sandbox**. Agent tự mô tả tool của nó, nên đừng coi rule là lớp bảo vệ.
+README cũng nói thẳng: permission rule chỉ để đỡ phải bấm, **không phải ranh giới bảo mật**, và worktree **không phải sandbox**. Agent tự mô tả tool của nó, nên đừng coi rule là lớp bảo vệ. Cần cô lập thật thì xem lớp Sandboxes trong [bức tranh hạ tầng cho AI agent](/blog/agent-infrastructure-stack/).
 :::
 
 ## Vì sao không chờ ai đó làm

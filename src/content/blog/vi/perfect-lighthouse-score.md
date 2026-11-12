@@ -102,7 +102,7 @@ Trình xem sơ đồ phóng to chỉ được nhúng vào bài có sơ đồ, nh
 
 ### Phục vụ từ edge
 
-Site được build và deploy lên Cloudflare Pages qua GitHub Actions. HTML tĩnh nằm sẵn ở edge, gần người đọc, TTFB thấp mà không cần tối ưu server.
+Site được build và deploy lên Cloudflare Pages qua GitHub Actions. HTML tĩnh nằm sẵn ở edge, gần người đọc, TTFB thấp mà không cần tối ưu server. Cách này cũng là lý do [trang không tốn đồng nào cho hosting](/blog/zero-cost-hosting-millions-of-requests/).
 
 ## 2. Accessibility: thứ dễ mất điểm nhất
 

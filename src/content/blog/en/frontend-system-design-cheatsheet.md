@@ -245,6 +245,8 @@ const debouncedSearch = debounce(search, 300);
 Jitter matters more than it looks: if a server goes down and comes back, thousands of clients retrying **in lockstep** will knock it over again.
 
 Only auto-retry **idempotent** requests (GET, or POST with an idempotency key). Retrying a "pay" request without a key can charge someone twice.
+
+[Designing an Autocomplete component](/en/blog/autocomplete-system-design/) goes deeper into this exact example: caching, race conditions, UX and accessibility.
 :::
 
 ## 7. Performance checklist

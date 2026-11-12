@@ -245,6 +245,8 @@ const debouncedSearch = debounce(search, 300);
 Jitter quan trọng hơn vẻ ngoài của nó: nếu server sập rồi sống lại, hàng nghìn client retry **cùng một nhịp** sẽ đánh sập nó lần nữa.
 
 Chỉ tự động retry những request **idempotent** (GET, hoặc POST có idempotency key). Retry một request "thanh toán" không có key có thể trừ tiền hai lần.
+
+Bài [thiết kế component Autocomplete](/blog/autocomplete-system-design/) đi sâu hơn vào chính ví dụ này: cache, xử lý race condition, UX và accessibility.
 :::
 
 ## 7. Checklist hiệu năng

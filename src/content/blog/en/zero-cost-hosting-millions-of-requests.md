@@ -141,7 +141,7 @@ There are things this setup does not solve:
 
 The zero cost is not Cloudflare being generous. It comes from the site **not asking a server to do anything per request**. Add any of these and code starts running per request, with a quota to watch:
 
-1. **SSR or Pages Functions**: every request to that route counts as a Workers request. The Free plan has a daily allowance, and past it requests are refused instead of served.
+1. **SSR or Pages Functions**: every request to that route counts as a Workers request. The Free plan has a daily allowance, and past it requests are refused instead of served. Running your own Node server, say [Next.js on Kubernetes](/en/blog/kubernetes-for-frontend-developers/), costs more still: machines run 24/7 even when nobody visits.
 2. **A self-handled contact form**: needs an endpoint to receive data, then send an email or store it somewhere.
 3. **Server-side search, comments, view counters**: all need a database or an API, and databases are rarely free without limits.
 4. **On-the-fly image resizing**: edge image services usually bill per transformation. This site optimizes images **at build time**, so they are already AVIF/WebP at the right sizes before deploy.

@@ -141,7 +141,7 @@ Nhưng cũng có những thứ kiến trúc này không giải quyết:
 
 Mức 0đ không đến từ việc Cloudflare hào phóng. Nó đến từ việc trang **không yêu cầu máy chủ làm gì cho từng request**. Thêm một trong những thứ sau là bắt đầu có code chạy theo request, và có quota phải theo dõi:
 
-1. **SSR hoặc Pages Functions**: mỗi request vào route đó được tính như một request Workers. Gói Free có hạn mức theo ngày, vượt là request bị từ chối thay vì trả trang.
+1. **SSR hoặc Pages Functions**: mỗi request vào route đó được tính như một request Workers. Gói Free có hạn mức theo ngày, vượt là request bị từ chối thay vì trả trang. Tự chạy server Node, ví dụ [Next.js trên Kubernetes](/blog/kubernetes-for-frontend-developers/), còn tốn hơn: máy phải chạy 24/7 dù không ai truy cập.
 2. **Form liên hệ tự xử lý**: cần một endpoint để nhận dữ liệu, rồi gửi email hoặc lưu vào đâu đó.
 3. **Tìm kiếm phía server, bình luận, đếm lượt xem**: đều cần database hoặc API, và database thì hiếm khi miễn phí vô hạn.
 4. **Resize ảnh theo yêu cầu**: dịch vụ tối ưu ảnh ở edge thường tính tiền theo số lần biến đổi. Trang này tối ưu ảnh **lúc build**, nên ảnh đã là AVIF/WebP đúng kích thước từ trước khi deploy.

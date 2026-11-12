@@ -92,7 +92,7 @@ The first release uses **static analysis** on a limited set of patterns. Chrome 
 
 ### Keeping Up With the Platform
 
-Every browser release ships new features, and features you could not use before keep [becoming Baseline](https://web.dev/baseline#the-baseline-monthly-digest). Because MWG is built on Baseline data and maintained by browser engineers, web standards experts, and accessibility specialists, its advice evolves with the platform.
+Every browser release ships new features, and features you could not use before keep [becoming Baseline](https://web.dev/baseline#the-baseline-monthly-digest). Because MWG is built on Baseline data and maintained by browser engineers, web standards experts, and accessibility specialists, its advice evolves with the platform. New APIs such as [HTML-in-Canvas](/en/blog/html-in-canvas/) or [Device Bound Session Credentials](/en/blog/device-bound-session-credentials/) are exactly the kind of knowledge a model has not caught up on yet.
 
 ### A Learning Resource
 

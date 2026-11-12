@@ -130,7 +130,7 @@ Với pull request, đặt `lighthouse` làm required check thì PR làm tụt �
 
 Tất cả những điều trên chỉ hiệu quả vì site là **HTML tĩnh**. Không có server phải khởi động lại, không có migration database, không có bước health check chờ instance mới sẵn sàng.
 
-Deploy chỉ là tải thư mục `dist/` lên Cloudflare Pages. Wrangler chỉ gửi những file thay đổi, nên một commit sửa CSS chỉ upload vài file. Khi lệnh deploy xong, bản mới đã phục vụ từ edge.
+Deploy chỉ là tải thư mục `dist/` lên Cloudflare Pages. Wrangler chỉ gửi những file thay đổi, nên một commit sửa CSS chỉ upload vài file. Khi lệnh deploy xong, bản mới đã phục vụ từ edge. Cũng nhờ là file tĩnh mà [chi phí hosting vẫn là 0đ](/blog/zero-cost-hosting-millions-of-requests/) dù lượng truy cập tăng.
 
 Pull request cũng đi qua cùng workflow và nhận một bản preview riêng, nên mình xem được thay đổi trên môi trường thật trước khi merge.
 

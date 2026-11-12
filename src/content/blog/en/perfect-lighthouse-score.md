@@ -102,7 +102,7 @@ The zoomable diagram viewer is included only on posts with diagrams, thanks to a
 
 ### Served from the edge
 
-The site is built and deployed to Cloudflare Pages by GitHub Actions. Static HTML sits at the edge, close to readers, giving a low TTFB with no server tuning.
+The site is built and deployed to Cloudflare Pages by GitHub Actions. Static HTML sits at the edge, close to readers, giving a low TTFB with no server tuning. The same setup is why [the site costs nothing to host](/en/blog/zero-cost-hosting-millions-of-requests/).
 
 ## 2. Accessibility: the easiest place to lose points
 

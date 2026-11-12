@@ -73,3 +73,5 @@ This way, JavaScript cost grows with the number of interactive parts, not with t
 ## Conclusion
 
 For a personal site, Astro gives me exactly what I need: fast by default, writing in Markdown, and added complexity only when there is a reason.
+
+For what changed in Astro recently, see [Astro in October 2026](/en/blog/astro-october-2026/). For why a static site like this one costs nothing to host, see [zero-cost hosting for millions of requests](/en/blog/zero-cost-hosting-millions-of-requests/).

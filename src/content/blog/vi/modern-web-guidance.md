@@ -92,7 +92,7 @@ Bản đầu tiên dùng **phân tích tĩnh** với một tập mẫu (pattern)
 
 ### Cập nhật theo web platform
 
-Mỗi bản trình duyệt mới lại có tính năng mới, và những tính năng trước đây chưa dùng được dần [trở thành Baseline](https://web.dev/baseline#the-baseline-monthly-digest). Vì MWG dựa trên dữ liệu Baseline và được kỹ sư trình duyệt, chuyên gia chuẩn web và chuyên gia accessibility duy trì, lời khuyên sẽ thay đổi theo platform.
+Mỗi bản trình duyệt mới lại có tính năng mới, và những tính năng trước đây chưa dùng được dần [trở thành Baseline](https://web.dev/baseline#the-baseline-monthly-digest). Vì MWG dựa trên dữ liệu Baseline và được kỹ sư trình duyệt, chuyên gia chuẩn web và chuyên gia accessibility duy trì, lời khuyên sẽ thay đổi theo platform. Những API mới như [HTML-in-Canvas](/blog/html-in-canvas/) hay [Device Bound Session Credentials](/blog/device-bound-session-credentials/) là loại kiến thức model chưa kịp học.
 
 ### Dùng để tự học
 

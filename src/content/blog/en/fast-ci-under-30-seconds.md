@@ -130,7 +130,7 @@ For pull requests, making `lighthouse` a required check means a PR that lowers t
 
 All of the above works only because the site is **static HTML**. There is no server to restart, no database migration and no health check waiting for a new instance to be ready.
 
-Deploying just uploads the `dist/` folder to Cloudflare Pages. Wrangler sends only the files that changed, so a commit that edits CSS uploads only a few files. When the deploy command finishes, the new version is already served from the edge.
+Deploying just uploads the `dist/` folder to Cloudflare Pages. Wrangler sends only the files that changed, so a commit that edits CSS uploads only a few files. When the deploy command finishes, the new version is already served from the edge. Being static files is also what keeps [hosting free](/en/blog/zero-cost-hosting-millions-of-requests/) as traffic grows.
 
 Pull requests go through the same workflow and get their own preview. That lets me check changes on a real environment before merging.
 

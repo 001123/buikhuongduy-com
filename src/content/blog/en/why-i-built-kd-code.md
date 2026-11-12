@@ -160,7 +160,7 @@ An extension that lets agents run commands on your machine is easy to abuse if y
 - **Links from agents** open only after asking, and only over https, or over http to localhost and hosts you list.
 - **Registry entries with unsafe paths** are refused at install.
 
-The README is also explicit: permission rules save clicks but are **not a security boundary**, and a worktree is **not a sandbox**. Agents describe their own tools, so do not treat rules as a layer of protection.
+The README is also explicit: permission rules save clicks but are **not a security boundary**, and a worktree is **not a sandbox**. Agents describe their own tools, so do not treat rules as a layer of protection. For real isolation, see the Sandboxes layer in [the AI agent infrastructure stack](/en/blog/agent-infrastructure-stack/).
 :::
 
 ## Why not wait for someone else

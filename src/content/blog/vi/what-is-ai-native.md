@@ -70,11 +70,13 @@ Mỗi lần người dùng sửa kết quả là một tín hiệu. Hệ thống
 
 Một ứng dụng AI-Native thường có vài lớp lặp đi lặp lại:
 
-- **Model**: LLM hoặc model chuyên biệt, gọi qua API hoặc tự host.
+- **Model**: LLM hoặc model chuyên biệt (ví dụ [Claude Fable 5.2](/blog/claude-fable-5-2/)), gọi qua API hoặc tự host.
 - **Context**: dữ liệu đưa vào prompt đúng lúc, thường qua RAG (tìm tài liệu liên quan rồi đưa vào ngữ cảnh) hoặc qua các kết nối như MCP.
 - **Tools**: các hàm mà model được phép gọi để hành động thật: đọc file, gọi API, chạy lệnh.
 - **Agent loop**: vòng lặp *lập kế hoạch → gọi tool → đọc kết quả → quyết định bước tiếp*, cho tới khi xong mục tiêu.
 - **Evals và guardrails**: bộ kiểm thử đo chất lượng đầu ra, cộng giới hạn về quyền và chi phí.
+
+Bài [5 lớp hạ tầng cho AI agent](/blog/agent-infrastructure-stack/) đi chi tiết hơn vào phần hạ tầng bên dưới: memory, retrieval, tool, sandbox và runtime.
 
 ```mermaid
 sequenceDiagram
@@ -100,8 +102,8 @@ Chữ này không chỉ dùng cho sản phẩm. Một **lập trình viên** hay
 Trước đây, phần lớn thời gian là gõ code. Làm việc kiểu AI-Native thì thời gian dồn vào những việc khác:
 
 - **Mô tả rõ yêu cầu**: viết spec, ràng buộc, ví dụ, vì agent làm tốt tới đâu phụ thuộc vào việc bạn nói rõ tới đâu.
-- **Chuẩn bị ngữ cảnh**: tài liệu dự án, quy ước code, file hướng dẫn cho agent (như `AGENTS.md` trong repo này).
-- **Giao việc song song**: nhiều agent chạy cùng lúc trên nhiều nhánh, mình chuyển sang vai người điều phối.
+- **Chuẩn bị ngữ cảnh**: tài liệu dự án, quy ước code, file hướng dẫn cho agent (như `AGENTS.md` trong repo này), hoặc bộ skill như [Modern Web Guidance](/blog/modern-web-guidance/).
+- **Giao việc song song**: nhiều agent chạy cùng lúc trên nhiều nhánh, mình chuyển sang vai người điều phối (đây là lý do mình [làm KD Code](/blog/why-i-built-kd-code/)).
 - **Review và kiểm chứng**: đọc diff, chạy test, kiểm tra trên trình duyệt. Trách nhiệm cuối cùng vẫn là của người.
 
 Nói cách khác, kỹ năng chuyển từ “viết code nhanh” sang “**ra quyết định đúng và kiểm tra kỹ**”.
