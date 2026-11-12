@@ -51,7 +51,7 @@ Những quyết định lớn, khó đổi về sau:
 
 - **Kiến trúc rendering**: CSR, SSR, SSG, ISR hay streaming.
 - **Kiến trúc trang**: SPA hay MPA.
-- **Kiến trúc sản phẩm**: frontend monolith hay micro-frontends.
+- **Kiến trúc sản phẩm**: frontend monolith hay [micro-frontends](/blog/micro-frontends/).
 - **API**: BFF (Backend for Frontend) hay gọi API trực tiếp; REST hay GraphQL.
 - **Dữ liệu real-time**: polling, SSE hay WebSocket.
 - **Vẽ giao diện**: DOM, Canvas hay WebGL.

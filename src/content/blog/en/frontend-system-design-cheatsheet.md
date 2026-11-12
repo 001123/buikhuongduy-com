@@ -51,7 +51,7 @@ The big decisions that are hard to change later:
 
 - **Rendering architecture**: CSR, SSR, SSG, ISR or streaming.
 - **Page architecture**: SPA or MPA.
-- **Product architecture**: monolith front end or micro-frontends.
+- **Product architecture**: monolith front end or [micro-frontends](/en/blog/micro-frontends/).
 - **APIs**: BFF (Backend for Frontend) or direct API calls; REST or GraphQL.
 - **Real-time data**: polling, SSE or WebSocket.
 - **Drawing**: DOM, Canvas or WebGL.
