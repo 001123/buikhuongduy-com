@@ -150,7 +150,7 @@ export const categories: Record<CategorySlug, Record<Lang, CategoryCopy>> = {
     en: {
       name: "Front-end System Design",
       title: "Front-end System Design Articles",
-      description: "Front-end system design articles by Bui Khuong Duy: rendering architecture, state management, networking and real-time, performance, reliability and client-side security.",
+      description: "Front-end system design articles by Bui Khuong Duy: rendering, state management, networking, real-time, performance, reliability and client-side security.",
       intro: "How to design a front-end app from requirements to architecture: rendering, state, networking, performance, reliability and security. Useful for system design interviews and real projects alike.",
     },
   },
