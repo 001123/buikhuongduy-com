@@ -9,7 +9,7 @@ import type { Lang } from "../i18n/ui";
  *
  * Kept free of `astro:content` imports so `content.config.ts` and `astro.config.mjs` can use it.
  */
-export const categorySlugs = ["ai", "react", "nextjs", "typescript", "astro", "performance", "devops", "web-platform"] as const;
+export const categorySlugs = ["ai", "react", "nextjs", "typescript", "astro", "performance", "devops", "web-platform", "frontend-system-design"] as const;
 
 export type CategorySlug = (typeof categorySlugs)[number];
 
@@ -138,6 +138,20 @@ export const categories: Record<CategorySlug, Record<Lang, CategoryCopy>> = {
       title: "Web Platform Articles",
       description: "Web Platform articles by Bui Khuong Duy: new browser APIs, web standards, security features and how to apply them in real apps.",
       intro: "New browser APIs, web standards and security features: what I read, try out and how to bring them into real apps.",
+    },
+  },
+  "frontend-system-design": {
+    vi: {
+      name: "Front-end System Design",
+      title: "Bài viết về Front-end System Design",
+      description: "Bài viết về Front-end System Design của Bùi Khương Duy: kiến trúc rendering, quản lý state, mạng và real-time, hiệu năng, độ tin cậy và bảo mật phía client.",
+      intro: "Cách thiết kế một ứng dụng frontend từ yêu cầu đến kiến trúc: rendering, state, mạng, hiệu năng, độ tin cậy và bảo mật. Hữu ích cho cả phỏng vấn system design lẫn dự án thật.",
+    },
+    en: {
+      name: "Front-end System Design",
+      title: "Front-end System Design Articles",
+      description: "Front-end system design articles by Bui Khuong Duy: rendering architecture, state management, networking and real-time, performance, reliability and client-side security.",
+      intro: "How to design a front-end app from requirements to architecture: rendering, state, networking, performance, reliability and security. Useful for system design interviews and real projects alike.",
     },
   },
 };
