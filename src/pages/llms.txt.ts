@@ -26,6 +26,8 @@ export const GET: APIRoute = async ({ site }) => {
     `- [About](${url(sectionPaths.about.en)}): ${en["about.lead"]}`,
     `- [Blog](${url(sectionPaths.blog.en)}): ${en["blog.lead"]}`,
     `- [Contact](${url(sectionPaths.contact.en)}): Email and social links`,
+    `- [RSS feed](${url(`${homePath.en}rss.xml`)}): English blog posts`,
+    `- [RSS feed (vi)](${url(`${homePath.vi}rss.xml`)}): Vietnamese blog posts`,
     `- [Trang chủ (vi)](${url(homePath.vi)})`,
     `- [Giới thiệu (vi)](${url(sectionPaths.about.vi)})`,
     `- [Blog (vi)](${url(sectionPaths.blog.vi)})`,

@@ -145,6 +145,7 @@ const jsonLd = structuredData({
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="search" type="application/opensearchdescription+xml" href={`${homePath[lang]}opensearch.xml`} title={t("site.name")} />
+    <link rel="alternate" type="application/rss+xml" href={`${homePath[lang]}rss.xml`} title={`${t("blog.title")} – ${t("site.name")}`} />
     {!noindex && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
