@@ -171,4 +171,4 @@ Astryx thú vị không phải vì có nhiều component (nhiều thư viện c�
 
 Hai lưu ý: thư viện đang **beta** nên API vẫn có thể đổi giữa các bản 0.x, và cách tốt nhất để đánh giá là tự dựng một trang thật trong [Playground](https://astryx.atmeta.com/playground) hoặc với một trong các [app mẫu](https://github.com/meta/astryx) (Next.js, Next.js + StyleX, Next.js + Tailwind, Vite + Tailwind).
 
-Nếu bạn quan tâm cách cho agent làm UI tốt hơn, có thể đọc thêm [UI SDK của Vercel](/blog/vercel-ui-sdk/) (đưa agent behavior thay vì component) và [A2UI 1.0](/blog/a2ui-1-0/) (agent trả lời bằng giao diện).
+Muốn hiểu lớp styling bên dưới Astryx, xem bài [StyleX](/blog/stylex/). Nếu bạn quan tâm cách cho agent làm UI tốt hơn, có thể đọc thêm [UI SDK của Vercel](/blog/vercel-ui-sdk/) (đưa agent behavior thay vì component) và [A2UI 1.0](/blog/a2ui-1-0/) (agent trả lời bằng giao diện).

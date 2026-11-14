@@ -171,4 +171,4 @@ What makes Astryx interesting is not the component count (plenty of libraries ha
 
 Two caveats: the library is in **beta**, so APIs can still change across 0.x releases, and the best way to judge it is to build a real page in the [Playground](https://astryx.atmeta.com/playground) or with one of the [example apps](https://github.com/meta/astryx) (Next.js, Next.js + StyleX, Next.js + Tailwind, Vite + Tailwind).
 
-If you care about helping agents build better UI, see also [Vercel's UI SDK](/en/blog/vercel-ui-sdk/) (giving agents behaviors instead of components) and [A2UI 1.0](/en/blog/a2ui-1-0/) (agents answering with UI).
+For the styling layer underneath Astryx, see the [StyleX](/en/blog/stylex/) post. If you care about helping agents build better UI, see also [Vercel's UI SDK](/en/blog/vercel-ui-sdk/) (giving agents behaviors instead of components) and [A2UI 1.0](/en/blog/a2ui-1-0/) (agents answering with UI).
