@@ -1,5 +1,6 @@
 ---
 title: "Chi phí hosting 0đ mà vẫn chịu được hàng triệu request: vì sao?"
+seoTitle: "Hosting 0đ mà vẫn chịu hàng triệu request: vì sao?"
 description: "Trang cá nhân này không tốn đồng nào cho hosting nhưng vẫn chịu được hàng triệu request. Bài này giải thích vì sao: HTML tĩnh, Cloudflare Pages phục vụ từ edge, request tới file tĩnh miễn phí và không giới hạn, CI chạy trên GitHub Actions, cùng những thứ sẽ làm mất mức 0đ."
 pubDate: 2026-11-10T23:20:00+07:00
 category: devops

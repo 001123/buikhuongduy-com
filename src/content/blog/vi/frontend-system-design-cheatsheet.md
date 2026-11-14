@@ -1,5 +1,6 @@
 ---
 title: "Front-end System Design: checklist 9 bước từ yêu cầu đến bảo mật"
+seoTitle: "Front-end System Design: checklist 9 bước"
 description: "Checklist Front-end System Design theo 9 bước: làm rõ yêu cầu, chọn kiến trúc, building blocks, state, UI và rendering, mạng và real-time, hiệu năng, độ tin cậy, bảo mật. Dùng cho phỏng vấn lẫn dự án thật."
 pubDate: 2026-11-11T10:00:00+07:00
 category: frontend-system-design

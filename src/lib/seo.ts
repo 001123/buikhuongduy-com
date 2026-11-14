@@ -1,5 +1,5 @@
 import { cvUrl, email, socials } from "../data/profile";
-import { homePath, languages, locales, sectionPaths, ui, type Lang } from "../i18n/ui";
+import { defaultLang, homePath, languages, locales, sectionPaths, ui, type Lang } from "../i18n/ui";
 import type { PageDates } from "./git-dates";
 
 /** schema.org type of the page itself. */
@@ -77,7 +77,8 @@ export function structuredData(input: StructuredDataInput) {
     alternateName: ui.en["site.name"],
     jobTitle: t["seo.jobTitle"],
     description: t["site.description"],
-    url: abs(homePath[lang]),
+    // One canonical profile URL in every language, so the entity and `author` resolve to the same page.
+    url: abs(sectionPaths.about[defaultLang]),
     image: avatar.href,
     email: `mailto:${email}`,
     nationality: { "@type": "Country", name: "Vietnam" },

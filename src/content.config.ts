@@ -15,6 +15,8 @@ const blog = defineCollection({
   loader: glob({ pattern: "{vi,en}/**/*.{md,mdx}", base: "./src/content/blog" }),
   schema: z.object({
     title: z.string(),
+    /** Shorter `<title>` for search results (aim for ~60 characters); the H1 and social cards keep `title`. */
+    seoTitle: z.string().optional(),
     description: z.string(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),

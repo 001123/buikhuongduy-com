@@ -1,5 +1,6 @@
 ---
 title: "Cloudflare Rocket Loader broke my scripts on Astro page navigation"
+seoTitle: "Cloudflare Rocket Loader broke scripts on Astro navigation"
 description: "After going from the post list to a post, the reading-mode buttons and diagrams stopped responding, and a refresh fixed them. The cause was Cloudflare Rocket Loader: it rewrites the type of every script tag, and Astro's ClientRouter skips scripts with an unknown type. How I found it, why it only happened after navigation, and how to fix it."
 pubDate: 2026-11-12T14:00:00+07:00
 category: performance

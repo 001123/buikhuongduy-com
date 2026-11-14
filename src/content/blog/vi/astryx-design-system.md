@@ -1,5 +1,6 @@
 ---
 title: "Astryx: design system React của Meta, viết cho cả người lẫn AI agent"
+seoTitle: "Astryx: design system React của Meta cho người và AI agent"
 description: "Astryx là design system mã nguồn mở của Meta cho React 19 và StyleX: hơn 170 component accessible, 7 theme, gần 60 page template và một CLI đưa docs thẳng vào context của AI agent. Mình đã cài thử và ghi lại những gì thấy."
 pubDate: 2026-11-15T00:40:00+07:00
 category: react

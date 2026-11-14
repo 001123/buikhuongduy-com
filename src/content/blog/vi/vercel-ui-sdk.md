@@ -1,5 +1,6 @@
 ---
 title: "UI SDK của Vercel: đưa cho AI agent \"behavior\" thay vì component"
+seoTitle: "UI SDK của Vercel: cho AI agent behavior thay vì component"
 description: "UI SDK là thư viện của Vercel Labs gồm hơn 50 behavior như popup, selection, typeahead để AI agent tự ghép thành component trên React, Vue, Svelte, Solid và Web Components, rồi dùng chính các component đó nhanh hơn gấp đôi mà không cần chụp màn hình."
 pubDate: 2026-11-13T10:00:00+07:00
 updatedDate: 2026-11-15T00:09:00+07:00

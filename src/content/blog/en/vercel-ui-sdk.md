@@ -1,5 +1,6 @@
 ---
 title: "Vercel's UI SDK: Giving AI Agents Behaviors Instead of Components"
+seoTitle: "Vercel's UI SDK: Giving AI Agents Behaviors, Not Components"
 description: "UI SDK from Vercel Labs is a library of 50+ behaviors like popup, selection and typeahead that AI agents compose into components for React, Vue, Svelte, Solid and Web Components, then use those components more than twice as fast without screenshots."
 pubDate: 2026-11-13T10:00:00+07:00
 updatedDate: 2026-11-15T00:09:00+07:00

@@ -1,5 +1,6 @@
 ---
 title: "Kubernetes cho Frontend Developer: hiểu đủ để deploy app Next.js"
+seoTitle: "Kubernetes cho Frontend Developer: deploy app Next.js"
 description: "Giải thích Kubernetes theo góc nhìn frontend: container, Pod, Deployment, Service, Ingress, ConfigMap, Secret, probe và autoscaling, kèm ví dụ deploy Next.js và những lỗi frontend hay gặp khi chạy trên cluster."
 pubDate: 2026-11-10T16:24:00+07:00
 category: devops

@@ -1,5 +1,6 @@
 ---
 title: "Device Bound Session Credentials (DBSC): gắn phiên đăng nhập với thiết bị"
+seoTitle: "DBSC là gì: gắn phiên đăng nhập với thiết bị"
 description: "Cookie phiên bị đánh cắp cho phép kẻ tấn công bỏ qua cả mật khẩu lẫn 2FA. Device Bound Session Credentials (DBSC) trên Chrome gắn phiên đăng nhập với một khóa lưu trong phần cứng của thiết bị. Bài này giải thích DBSC hoạt động thế nào, ba thay đổi cần làm phía server và các trường hợp fallback cần tính trước."
 pubDate: 2026-11-11T00:29:00+07:00
 updatedDate: 2026-11-15T00:09:00+07:00

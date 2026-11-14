@@ -1,5 +1,6 @@
 ---
 title: "HTML-in-Canvas: Drawing Live, Accessible DOM into 2D, WebGL and WebGPU"
+seoTitle: "HTML-in-Canvas: Live, Accessible DOM in WebGL and WebGPU"
 description: "Chrome 157 ships the HTML-in-Canvas API: draw live DOM subtrees into 2D, WebGL or WebGPU canvases while keeping interactivity, accessibility, Find-in-Page and translation. This post covers the drawable attribute, the paint event, geometry sync, sizing pitfalls and fallbacks."
 pubDate: 2026-11-11T00:29:00+07:00
 updatedDate: 2026-11-15T00:09:00+07:00

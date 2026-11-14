@@ -1,5 +1,6 @@
 ---
 title: "Front-end System Design: Micro-frontends, When to Split and How"
+seoTitle: "Micro-frontends: When to Split a Frontend and How"
 description: "Micro-frontends from first principles to practice: vertical teams, integration options (SSI/ESI, iframes, JavaScript runtime, Module Federation, Web Components), DOM event communication, server rendering, CSS, shared design systems and the real costs."
 pubDate: 2026-11-12T13:00:00+07:00
 category: frontend-system-design

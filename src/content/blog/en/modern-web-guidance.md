@@ -1,5 +1,6 @@
 ---
 title: "Modern Web Guidance 1.0: Teaching Coding Agents to Build the Web Right"
+seoTitle: "Modern Web Guidance 1.0: Teaching Agents to Build the Web"
 description: "On November 10, 2026, Chrome released Modern Web Guidance 1.0, a set of skills that brings best practices, Baseline data, and browser engineers' expertise into coding agents. This post covers what is new, why to use it, how to install it, the modernization workflow, and how to pair it with Chrome DevTools for agents."
 pubDate: 2026-11-11T02:22:00+07:00
 category: ai

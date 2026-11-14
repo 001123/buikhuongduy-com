@@ -1,5 +1,6 @@
 ---
 title: "A Perfect 100/100/100/100 Lighthouse Score for My Personal Site: What I Did"
+seoTitle: "How I Got a Perfect 100 Lighthouse Score on My Site"
 description: "The techniques behind a perfect Lighthouse score in Performance, Accessibility, Best Practices and SEO: static HTML, inlined CSS, self-hosted fonts with no layout shift, a prioritized LCP image, and Mermaid rendered at build time."
 pubDate: 2026-11-08T22:25:00+07:00
 category: performance

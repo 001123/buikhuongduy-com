@@ -1,5 +1,6 @@
 ---
 title: "Astro in October 2026: Build Timings, Parallel Prerendering and What's Worth Trying"
+seoTitle: "Astro October 2026: Build Timings and Parallel Prerendering"
 description: "A recap of Astro's October 2026 roundup: Astro 7.4 with the --timings flag, separate build and runtime image services, parallel prerendering, custom redirect pages, and what I found running it on this site."
 pubDate: 2026-11-10T16:06:00+07:00
 category: astro

@@ -1,5 +1,6 @@
 ---
 title: "Front-end System Design: A 9-Step Checklist from Requirements to Security"
+seoTitle: "Front-end System Design: A 9-Step Checklist"
 description: "A front-end system design checklist in 9 steps: requirements, architecture, building blocks, state, UI and rendering, networking and real-time, performance, reliability and security. For interviews and real projects."
 pubDate: 2026-11-11T10:00:00+07:00
 category: frontend-system-design

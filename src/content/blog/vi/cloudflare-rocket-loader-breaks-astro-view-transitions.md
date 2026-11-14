@@ -1,5 +1,6 @@
 ---
 title: "Rocket Loader của Cloudflare làm hỏng script khi chuyển trang trong Astro"
+seoTitle: "Rocket Loader làm hỏng script khi chuyển trang Astro"
 description: "Bấm từ danh sách bài viết sang một bài thì các nút chế độ đọc và sơ đồ không bấm được, F5 lại thì chạy. Thủ phạm là Rocket Loader của Cloudflare: nó đổi type của mọi thẻ script, và ClientRouter của Astro bỏ qua các script có type lạ. Bài này kể cách tìm ra lỗi, vì sao nó chỉ xảy ra khi chuyển trang, và cách sửa."
 pubDate: 2026-11-12T14:00:00+07:00
 category: performance

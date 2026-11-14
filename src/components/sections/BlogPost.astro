@@ -25,7 +25,7 @@ const hasMermaid = Boolean(remarkPluginFrontmatter.hasMermaid);
 const hasImages = /!\[[^\]]*\]\(|<img\b/i.test(post.body ?? "");
 const alternates = await postAlternates(post);
 const translations = await postTranslations(post);
-const { title, description, pubDate, updatedDate, tags, draft, category } = post.data;
+const { title, seoTitle, description, pubDate, updatedDate, tags, draft, category } = post.data;
 const cat = category ? { name: categories[category][lang].name, path: categoryPath(lang, category) } : undefined;
 const breadcrumbs = [
   { name: t("nav.blog"), path: sectionPaths.blog[lang] },
@@ -38,6 +38,7 @@ const related = await relatedPosts(post);
 <SectionPage
   section="blog"
   title={title}
+  seoTitle={seoTitle}
   lead={description}
   description={description}
   alternates={alternates}

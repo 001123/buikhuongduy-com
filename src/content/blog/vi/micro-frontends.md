@@ -1,5 +1,6 @@
 ---
 title: "Front-end System Design: Micro-frontends, khi nào nên tách và tách thế nào"
+seoTitle: "Micro-frontends: khi nào nên tách và tách thế nào"
 description: "Micro-frontends từ gốc đến thực tế: chia team theo chiều dọc, các cách ghép (SSI/ESI, iframe, JavaScript runtime, Module Federation, Web Components), giao tiếp bằng DOM event, server rendering, CSS, design system dùng chung và cái giá phải trả."
 pubDate: 2026-11-12T13:00:00+07:00
 category: frontend-system-design

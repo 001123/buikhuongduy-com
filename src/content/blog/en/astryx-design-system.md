@@ -1,5 +1,6 @@
 ---
 title: "Astryx: Meta's React Design System Built for People and AI Agents"
+seoTitle: "Astryx: Meta's React Design System for People and AI Agents"
 description: "Astryx is Meta's open source design system for React 19 and StyleX: 170+ accessible components, 7 themes, about 60 page templates and a CLI that feeds docs straight into an AI agent's context. I installed it and wrote down what I found."
 pubDate: 2026-11-15T00:40:00+07:00
 category: react

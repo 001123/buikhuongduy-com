@@ -12,12 +12,14 @@ import type { PageDates } from "../lib/git-dates";
 
 interface Props {
   title?: string;
+  /** Title for og:title, twitter:title and image alt. Defaults to `title`. */
+  socialTitle?: string;
   description?: string;
   /** Path of this page in each language. Defaults to the home page. */
   alternates?: Partial<Record<Lang, string>>;
   /** Languages that have a real translation of this page (for hreflang). Defaults to `alternates`. */
   translations?: Partial<Record<Lang, string>>;
-  /** schema.org type of this page. */
+  /** schema.org type of this page. Only the About pages are `ProfilePage`. */
   pageType?: PageType;
   /** Set on blog posts to emit article metadata. */
   article?: ArticleMeta;
@@ -38,10 +40,11 @@ const t = useTranslations(lang);
 
 const {
   title = t("seo.homeTitle"),
+  socialTitle = title,
   description: rawDescription = t("site.description"),
   alternates = {},
   translations,
-  pageType = "ProfilePage",
+  pageType = "WebPage",
   article,
   floatingLangSwitcher = true,
   noindex = false,
@@ -57,7 +60,7 @@ const links = Object.fromEntries(
 const site = Astro.site ?? Astro.url;
 const ogImage = new URL(article?.image ?? "/og-image.jpg", site);
 const ogImageType = article?.image ? "image/png" : "image/jpeg";
-const ogImageAlt = article?.image ? title : t("seo.ogImageAlt");
+const ogImageAlt = article?.image ? socialTitle : t("seo.ogImageAlt");
 const pageUrl = new URL(Astro.url.pathname, site);
 
 // hreflang: only languages with a real translation, plus x-default on the Vietnamese (primary) version.
@@ -105,7 +108,7 @@ const jsonLd = structuredData({
     <meta property="og:locale" content={locales[lang].og} />
     {otherLocales.map((l) => <meta property="og:locale:alternate" content={locales[l].og} />)}
     <meta property="og:type" content={ogType} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={socialTitle} />
     <meta property="og:description" content={description} />
     {!noindex && <meta property="og:url" content={pageUrl} />}
     <meta property="og:image" content={ogImage} />
@@ -132,7 +135,7 @@ const jsonLd = structuredData({
     }
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@khuongduy1897" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={socialTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogImageAlt} />

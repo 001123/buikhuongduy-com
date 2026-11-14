@@ -1,5 +1,6 @@
 ---
 title: "HTML-in-Canvas: vẽ DOM sống, vẫn accessible, vào 2D, WebGL và WebGPU"
+seoTitle: "HTML-in-Canvas: vẽ DOM sống vào 2D, WebGL và WebGPU"
 description: "Chrome 157 chính thức có HTML-in-Canvas API: vẽ cây DOM sống vào canvas 2D, WebGL hoặc WebGPU mà vẫn giữ tương tác, accessibility, Find-in-Page và dịch trang. Bài này giải thích thuộc tính drawable, sự kiện paint, đồng bộ geometry, các lỗi về kích thước và cách fallback."
 pubDate: 2026-11-11T00:29:00+07:00
 updatedDate: 2026-11-15T00:09:00+07:00

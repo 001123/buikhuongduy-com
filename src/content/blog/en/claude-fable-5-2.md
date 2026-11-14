@@ -1,5 +1,6 @@
 ---
 title: "Claude Fable 5.2: Stronger, Faster, and Cheaper Than Fable 5.1"
+seoTitle: "Claude Fable 5.2: Stronger, Faster, Cheaper Than Fable 5.1"
 description: "On November 9, 2026, Anthropic released Claude Fable 5.2 and Claude Mythos 5.2. This post sums up what is new: benchmark scores, pricing, speed, notable experiments, when to pick Fable over Opus 5.5, and what to watch for when calling it through the API."
 pubDate: 2026-11-10T23:27:00+07:00
 updatedDate: 2026-11-15T00:09:00+07:00

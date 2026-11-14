@@ -12,6 +12,8 @@ import type { PageDates } from "../lib/git-dates";
 interface Props {
   section: Section;
   title: string;
+  /** Shorter document title for search results. Blog posts only; defaults to `title`. */
+  seoTitle?: string;
   lead: string;
   /** Meta description. Defaults to the section's SEO description. */
   description?: string;
@@ -41,6 +43,7 @@ const t = useTranslations(lang);
 const {
   section,
   title,
+  seoTitle,
   lead,
   description = t(`seo.${section}`),
   translations,
@@ -57,7 +60,8 @@ const {
 
 // Keep titles and descriptions unique across listing pages.
 const pageLabel = page > 1 ? `${t("blog.page")} ${page}` : "";
-const docTitle = [title, pageLabel, t("site.name")].filter(Boolean).join(" · ");
+// Articles drop the site-name suffix: Google shows the site name separately, and the space is better spent on the post title.
+const docTitle = article ? (seoTitle ?? title) : [title, pageLabel, t("site.name")].filter(Boolean).join(" · ");
 const docDescription = pageLabel ? `${description} (${pageLabel})` : description;
 
 const pageTypes: Record<Section, PageType> = {
@@ -77,6 +81,7 @@ const currentPath = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${A
 
 <Layout
   title={docTitle}
+  socialTitle={article ? title : docTitle}
   description={docDescription}
   alternates={alternates}
   translations={translations}
