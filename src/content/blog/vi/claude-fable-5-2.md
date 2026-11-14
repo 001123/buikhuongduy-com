@@ -138,3 +138,5 @@ Họ cũng thừa nhận một điểm khó: Fable 5.2 nghi ngờ mình đang b�
 Với người dùng bình thường, Fable 5.2 là bản nâng cấp dễ chịu: mạnh hơn, nhanh hơn, rẻ hơn và ít bị chặn nhầm hơn. Tuần này các gói trả phí còn được tặng thêm lượt dùng Fable, nên đây là lúc hợp lý để thử.
 
 Với người làm phần mềm, điều mình thấy đáng giá nhất không phải điểm benchmark cao nhất, mà là chuyện **làm được cùng chất lượng với khoảng một nửa chi phí** so với Opus 5.5 ở mức Max. Dù vậy, lời khuyên của chính Anthropic vẫn đúng: dùng Opus 5.5 cho việc hằng ngày, và chỉ gọi Fable khi việc thật sự khó.
+
+Muốn tự so sánh Fable với Opus trên chính codebase của bạn, có thể chạy hai agent song song trên git worktree bằng [KD Code](/blog/why-i-built-kd-code/), extension VS Code mình làm cho đúng việc này.

@@ -51,7 +51,7 @@ In practice, many systems start with a single vector database for both, separate
 
 Agents need to call APIs, drive browsers, and connect to other apps. **MCP** has become the de facto standard in this layer.
 
-- **Browsers**: Playwright, Browser Use, Browserbase, Stagehand, Chrome DevTools for agents, agent-browser, Midscene.js.
+- **Browsers**: Playwright, Browser Use, Browserbase, Stagehand, Chrome DevTools for agents (see how to pair it with [Modern Web Guidance](/en/blog/modern-web-guidance/)), agent-browser, Midscene.js.
 - **MCP and integrations**: FastMCP, Composio, Zapier MCP, Pipedream Connect, Nango, Apify MCP.
 - **Tool gateways**: AgentCore Gateway, Docker MCP Gateway, agentgateway, ToolHive.
 
@@ -117,3 +117,5 @@ This is also the layer for **human approval** points (human-in-the-loop): the wo
 ## Wrap-up
 
 If you're just starting, you don't need all 5 layers. A simple agent usually needs only **Tool Use** (via MCP) and a bit of **Retrieval**. Once your agent starts running code, running for a long time, or serving many users, that's when you add **Sandboxes**, **Memory**, and a **Runtime**.
+
+For the view from someone using agents every day rather than building their infrastructure, see [What is AI-native?](/en/blog/what-is-ai-native/).

@@ -14,7 +14,7 @@ tags: [astro, performance]
 :::
 
 Mỗi tháng, team Astro ra một bài [What's new in Astro](https://astro.build/blog/whats-new-october-2026/) tổng hợp bản phát hành, site hay, bài viết và integration từ cộng đồng.
-Bản tháng 10 khá dài, nên mình lọc lại những phần liên quan tới việc làm site hằng ngày, kèm vài thử nghiệm trên chính trang này.
+Bản tháng 10 khá dài, nên mình lọc lại những phần liên quan tới việc làm site hằng ngày, kèm vài thử nghiệm trên chính trang này (lý do trang dùng Astro nằm ở [bài này](/blog/why-i-chose-astro/)).
 
 ## Astro 7.4: build chậm ở đâu?
 

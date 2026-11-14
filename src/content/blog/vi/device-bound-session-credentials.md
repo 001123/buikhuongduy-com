@@ -157,4 +157,4 @@ DBSC không phải thuốc tiên. Nếu malware **đã có sẵn trên máy ngay
 
 DBSC vá một điểm yếu lâu đời của phiên đăng nhập dựa trên cookie với khá ít thay đổi: thêm một header lúc đăng nhập và hai endpoint mới. Người dùng trên phần cứng được hỗ trợ được bảo vệ mà không nhận ra gì khác, những người còn lại vẫn dùng bình thường. Nếu ứng dụng của bạn giữ dữ liệu nhạy cảm, nhất là khi đã từng gặp chuyện tài khoản bị chiếm qua cookie bị đánh cắp, DBSC rất đáng đưa vào lộ trình.
 
-Đọc thêm: [hướng dẫn trên Chrome for Developers](https://developer.chrome.com/docs/web-platform/device-bound-session-credentials) và [đặc tả DBSC](https://w3c.github.io/webappsec-dbsc/).
+Đọc thêm: [hướng dẫn trên Chrome for Developers](https://developer.chrome.com/docs/web-platform/device-bound-session-credentials) và [đặc tả DBSC](https://w3c.github.io/webappsec-dbsc/). Các vấn đề bảo mật khác phía frontend (token đặt ở đâu, phân quyền trên UI) có trong [cheatsheet frontend system design](/blog/frontend-system-design-cheatsheet/).

@@ -14,7 +14,7 @@ tags: [astro, performance]
 :::
 
 Every month, the Astro team publishes a [What's new in Astro](https://astro.build/blog/whats-new-october-2026/) roundup of releases, notable sites, articles and community integrations.
-The October edition is long, so I picked out the parts that matter for day-to-day site work, plus a few experiments on this very site.
+The October edition is long, so I picked out the parts that matter for day-to-day site work, plus a few experiments on this very site (why it runs on Astro is in [this post](/en/blog/why-i-chose-astro/)).
 
 ## Astro 7.4: where does the build time go?
 

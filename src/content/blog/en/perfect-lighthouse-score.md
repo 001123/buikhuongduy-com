@@ -21,7 +21,7 @@ This post sums up what I did for this site, following Lighthouse's four categori
 
 ![PageSpeed Insights result for buikhuongduy.com on mobile: 100 Performance, 100 Accessibility, 100 Best Practices, 100 SEO](../../../assets/blog/perfect-lighthouse-score-pagespeed.webp)
 
-Measured with PageSpeed Insights in **mobile** mode, emulating a Moto G Power on Slow 4G (Lighthouse 13.6.0): FCP **0.9 s**, LCP **0.9 s**, Total Blocking Time **0 ms**, CLS **0**, Speed Index **2.3 s**. [See the original PageSpeed Insights report](https://pagespeed.web.dev/analysis/https-buikhuongduy-com/x7i018oiwk?form_factor=mobile).
+Measured with PageSpeed Insights in **mobile** mode, emulating a Moto G Power on Slow 4G (Lighthouse 13.6.0): FCP **0.9 s**, LCP **0.9 s**, Total Blocking Time **0 ms**, CLS **0**, Speed Index **2.3 s**. [See the original PageSpeed Insights report](https://pagespeed.web.dev/analysis/https-buikhuongduy-com/x7i018oiwk?form_factor=mobile). What each metric means and how to read the report is covered in [PageSpeed Insights explained](/en/blog/pagespeed-insights-explained/).
 
 ## Why 100 on mobile is a real challenge
 
@@ -48,7 +48,7 @@ flowchart LR
 
 ### Static HTML, JavaScript only when needed
 
-The site is built with Astro and fully rendered to HTML at build time. No framework has to hydrate.
+The site is built with [Astro](/en/blog/why-i-chose-astro/) and fully rendered to HTML at build time. No framework has to hydrate.
 Interactive parts, such as the reading mode switch or the diagram viewer, are small scripts included only on pages that actually use them.
 
 ### Removing render-blocking requests

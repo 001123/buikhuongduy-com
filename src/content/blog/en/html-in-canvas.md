@@ -27,7 +27,7 @@ HTML drawn into a canvas behaves like regular HTML:
 - Text selection, copy and paste, and context menus, even inside a 3D scene.
 - Exposure in the accessibility tree for screen readers.
 - Browser translation, autofill and Find-in-Page, including for text on WebGL/WebGPU textures.
-- DevTools inspection, browser extensions, and indexing by crawlers and AI agents.
+- DevTools inspection, browser extensions, and indexing by crawlers and AI agents. (Models haven't learned APIs this new yet, so coding agents need extra guidance such as [Modern Web Guidance](/en/blog/modern-web-guidance/).)
 - Export of the composite with `toDataURL()`, `toBlob()` or `captureStream()`.
 
 ## Step 1: Prepare the Canvas

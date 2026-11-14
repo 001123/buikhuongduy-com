@@ -21,7 +21,7 @@ Bài này tóm tắt những gì mình đã làm cho trang này, theo đúng b�
 
 ![Kết quả PageSpeed Insights cho buikhuongduy.com trên mobile: 100 Performance, 100 Accessibility, 100 Best Practices, 100 SEO](../../../assets/blog/perfect-lighthouse-score-pagespeed.webp)
 
-Đo bằng PageSpeed Insights ở chế độ **mobile**, mô phỏng Moto G Power với mạng Slow 4G (Lighthouse 13.6.0): FCP **0,9 s**, LCP **0,9 s**, Total Blocking Time **0 ms**, CLS **0**, Speed Index **2,3 s**. [Xem báo cáo gốc trên PageSpeed Insights](https://pagespeed.web.dev/analysis/https-buikhuongduy-com/x7i018oiwk?form_factor=mobile).
+Đo bằng PageSpeed Insights ở chế độ **mobile**, mô phỏng Moto G Power với mạng Slow 4G (Lighthouse 13.6.0): FCP **0,9 s**, LCP **0,9 s**, Total Blocking Time **0 ms**, CLS **0**, Speed Index **2,3 s**. [Xem báo cáo gốc trên PageSpeed Insights](https://pagespeed.web.dev/analysis/https-buikhuongduy-com/x7i018oiwk?form_factor=mobile). Ý nghĩa từng chỉ số và cách đọc báo cáo có trong bài [PageSpeed Insights giải thích](/blog/pagespeed-insights-explained/).
 
 ## Vì sao 100 trên mobile là một thử thách
 
@@ -48,7 +48,7 @@ flowchart LR
 
 ### HTML tĩnh, JavaScript chỉ khi cần
 
-Trang được dựng bằng Astro, render toàn bộ ra HTML lúc build. Không có framework nào phải hydrate.
+Trang được dựng bằng [Astro](/blog/why-i-chose-astro/), render toàn bộ ra HTML lúc build. Không có framework nào phải hydrate.
 Những chỗ tương tác như chuyển chế độ đọc hay trình xem sơ đồ là script nhỏ, và chỉ được nhúng vào trang thật sự dùng tới.
 
 ### Gỡ request chặn render

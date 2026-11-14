@@ -6,6 +6,7 @@ import MediaViewer from "../MediaViewer.astro";
 import PostActions from "../PostActions.astro";
 import OrnamentDivider from "../OrnamentDivider.astro";
 import PostFeedback from "../PostFeedback.astro";
+import AuthorBox from "../AuthorBox.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { categories } from "../../data/categories";
 import { categoryPath, formatDateTime, postAlternates, postTranslations, postUrl, relatedPosts, type Post } from "../../lib/blog";
@@ -63,6 +64,7 @@ const related = await relatedPosts(post);
   </div>
   {hasModes && <div slot="meta" class="mt-2"><ReadingModes /></div>}
   {hasModes ? <div class="reading-content"><Content /></div> : <Content />}
+  <AuthorBox />
   {related.length > 0 && (
     <section class="not-prose mt-14" aria-labelledby="related-heading">
       <OrnamentDivider class="mb-8" />

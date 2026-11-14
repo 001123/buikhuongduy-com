@@ -27,7 +27,7 @@ HTML vẽ vào canvas hoạt động y như HTML bình thường:
 - Bôi đen, copy/paste và menu chuột phải, kể cả trong cảnh 3D.
 - Có mặt trong accessibility tree cho screen reader.
 - Dịch trang, autofill và Find-in-Page của trình duyệt, kể cả với chữ trên texture WebGL/WebGPU.
-- Soi được bằng DevTools, extension trình duyệt hoạt động được, crawler và AI agent index được.
+- Soi được bằng DevTools, extension trình duyệt hoạt động được, crawler và AI agent index được. (API mới thế này model chưa kịp học, nên coding agent cần được "dạy" thêm, như [Modern Web Guidance](/blog/modern-web-guidance/).)
 - Xuất toàn bộ cảnh bằng `toDataURL()`, `toBlob()` hoặc `captureStream()`.
 
 ## Bước 1: chuẩn bị canvas

@@ -51,7 +51,7 @@ Trong thực tế, nhiều hệ thống bắt đầu bằng cách dùng chung m�
 
 Agent cần gọi API, điều khiển trình duyệt và kết nối với ứng dụng khác. **MCP** gần như đã trở thành chuẩn chung ở lớp này.
 
-- **Trình duyệt**: Playwright, Browser Use, Browserbase, Stagehand, Chrome DevTools for agents, agent-browser, Midscene.js.
+- **Trình duyệt**: Playwright, Browser Use, Browserbase, Stagehand, Chrome DevTools for agents (xem cách dùng cùng [Modern Web Guidance](/blog/modern-web-guidance/)), agent-browser, Midscene.js.
 - **MCP và tích hợp**: FastMCP, Composio, Zapier MCP, Pipedream Connect, Nango, Apify MCP.
 - **Gateway quản lý tool**: AgentCore Gateway, Docker MCP Gateway, agentgateway, ToolHive.
 
@@ -117,3 +117,5 @@ Mô hình này kéo theo hai yêu cầu cho code của bạn:
 ## Kết
 
 Nếu mới bắt đầu, không cần dùng đủ cả 5 lớp. Một agent đơn giản thường chỉ cần **Tool Use** (qua MCP) và một ít **Retrieval**. Khi agent bắt đầu chạy code, chạy lâu hoặc phục vụ nhiều người dùng, lúc đó mới cần thêm **Sandbox**, **Memory** và **Runtime**.
+
+Còn ở góc người dùng agent hằng ngày thay vì người xây hạ tầng, xem thêm [AI-native là gì](/blog/what-is-ai-native/).

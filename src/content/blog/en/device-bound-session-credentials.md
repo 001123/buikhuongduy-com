@@ -157,4 +157,4 @@ DBSC is not a silver bullet. If malware is **already on the device at registrati
 
 DBSC fixes a long-standing weakness of cookie-based sessions with fairly few changes: one extra header at login and two new endpoints. Users on supported hardware are protected without noticing anything, and everyone else keeps working as before. If your application holds sensitive data, especially if you have seen account takeovers through stolen cookies, DBSC is worth adding to your roadmap.
 
-Further reading: [the Chrome for Developers guide](https://developer.chrome.com/docs/web-platform/device-bound-session-credentials) and [the DBSC specification](https://w3c.github.io/webappsec-dbsc/).
+Further reading: [the Chrome for Developers guide](https://developer.chrome.com/docs/web-platform/device-bound-session-credentials) and [the DBSC specification](https://w3c.github.io/webappsec-dbsc/). Other front-end security concerns (where to store tokens, permissions in the UI) are covered in the [front-end system design cheatsheet](/en/blog/frontend-system-design-cheatsheet/).
