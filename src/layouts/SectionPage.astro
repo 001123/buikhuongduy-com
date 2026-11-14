@@ -66,6 +66,13 @@ const pageTypes: Record<Section, PageType> = {
   contact: "ContactPage",
   search: "SearchResultsPage",
 };
+
+// Site-wide footer nav so every inner page links to the main sections.
+const footerLinks = [
+  { label: t("nav.home"), href: homePath[lang] },
+  ...(["about", "blog", "contact"] as const).map((s) => ({ label: t(`nav.${s}`), href: sectionPaths[s][lang] })),
+];
+const currentPath = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`;
 ---
 
 <Layout
@@ -114,5 +121,23 @@ const pageTypes: Record<Section, PageType> = {
       </div>
     </article>
     <ScrollToTop />
+    <nav aria-label={t("nav.label")} class="relative mx-auto mt-6 max-w-[54rem] sm:mt-8">
+      <ul class="flex flex-wrap items-center justify-center gap-x-1 gap-y-2 text-sm">
+        {
+          footerLinks.map(({ label, href }, i) => (
+            <li class="flex items-center gap-x-1">
+              {i > 0 && <span aria-hidden="true" class="text-paper/30">·</span>}
+              <a
+                href={href}
+                aria-current={currentPath === href ? "page" : undefined}
+                class="rounded-full px-3 py-1.5 text-paper/70 glow-hover hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice aria-[current=page]:text-rice"
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
   </main>
 </Layout>

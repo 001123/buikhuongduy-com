@@ -54,8 +54,8 @@ const newest = (list) => (list.length ? new Date(Math.max(...list.map((p) => p.l
  */
 const noindexPaths = new Set();
 /**
- * `<lastmod>` per path: a post's `updatedDate ?? pubDate`; blog listings (index, pages, categories) take their newest post.
- * Home, about and contact get none: there is no reliable date for them, and a wrong lastmod is worse than none.
+ * `<lastmod>` per path: a post's `updatedDate ?? pubDate`; home and blog listings (index, pages, categories) take their
+ * newest post. About and contact get none: there is no reliable date for them, and a wrong lastmod is worse than none.
  * @type {Map<string, Date>}
  */
 const lastmodByPath = new Map();
@@ -64,7 +64,11 @@ for (const lang of /** @type {const} */ (['vi', 'en'])) {
   const langPosts = posts.filter((p) => p.lang === lang);
   for (const p of langPosts) lastmodByPath.set(`${blogPath}${p.slug}/`, p.lastmod);
   const latest = newest(langPosts);
-  if (latest) lastmodByPath.set(blogPath, latest);
+  if (latest) {
+    lastmodByPath.set(blogPath, latest);
+    // Home lists the latest posts, so it changes whenever a post is published or updated.
+    lastmodByPath.set(lang === 'vi' ? '/' : '/en/', latest);
+  }
   for (const category of new Set(langPosts.map((p) => p.category).filter(Boolean))) {
     const inCategory = langPosts.filter((p) => p.category === category);
     const path = `${blogPath}category/${category}/`;
@@ -124,24 +128,12 @@ export default defineConfig({
   integrations: [
     // GA4 runs in a web worker; see src/components/Analytics.astro.
     partytown(),
+    // hreflang lives only in the HTML head (Layout.astro), so the sitemap carries no alternates.
     sitemap({
-      i18n: {
-        defaultLocale: 'vi',
-        locales: { vi: 'vi-VN', en: 'en-US' },
-      },
       filter: (page) => !noindexPaths.has(new URL(page).pathname),
-      // Pair sections whose slugs differ between languages.
       serialize(item) {
-        const path = new URL(item.url).pathname;
-        const lastmod = lastmodFor(path);
+        const lastmod = lastmodFor(new URL(item.url).pathname);
         if (lastmod) item.lastmod = lastmod.toISOString();
-        const pair = Object.values(sectionPaths).find((p) => p.vi === path || p.en === path);
-        if (pair) {
-          item.links = [
-            { lang: 'vi-VN', url: new URL(pair.vi, SITE).href },
-            { lang: 'en-US', url: new URL(pair.en, SITE).href },
-          ];
-        }
         return item;
       },
     }),

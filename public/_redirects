@@ -4,6 +4,9 @@
 /lien-he/ /contact/ 301
 /lien-he /contact/ 301
 
+# The CV PDF used to be a hashed Vite asset; it now lives at a stable path.
+/_astro/Bui-Khuong-Duy-(Timi)-FE-EN-2026.BYwW4HC9.pdf /cv/bui-khuong-duy-cv.pdf 301
+
 # Listing page 1 lives at the listing root.
 /blog/page/1/ /blog/ 301
 /en/blog/page/1/ /en/blog/ 301

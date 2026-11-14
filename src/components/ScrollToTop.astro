@@ -1,5 +1,5 @@
 ---
-// End-of-page outro: thank-you + go back (home as fallback) / back to top / home.
+// End-of-page outro: thank-you + go back (home as fallback) / back to top.
 // Shown only when the page is taller than the viewport (the reader actually scrolled to the end).
 import { getLang, homePath, useTranslations } from "../i18n/ui";
 
@@ -12,7 +12,6 @@ const button =
 const icons = {
   back: ["M19 12H5", "M12 19l-7-7 7-7"],
   top: ["M12 19V5", "M5 12l7-7 7 7"],
-  home: ["M3 10.5 12 3l9 7.5", "M5 9v11a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9"],
 };
 const svg = {
   "aria-hidden": "true",
@@ -38,10 +37,6 @@ const svg = {
       <svg {...svg}>{icons.top.map((d) => <path d={d} />)}</svg>
       <span class="inline-block first-letter:uppercase">{t("end.top")}</span>
     </button>
-    <a href={homePath[lang]} class={button}>
-      <svg {...svg}>{icons.home.map((d) => <path d={d} />)}</svg>
-      <span class="inline-block first-letter:uppercase">{t("end.home")}</span>
-    </a>
   </div>
 </footer>
 

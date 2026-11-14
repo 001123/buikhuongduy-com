@@ -10,6 +10,10 @@
 /en/search/index.json
   X-Robots-Tag: noindex
 
+# The CV PDF lives at a stable URL for sharing, but stays out of search results.
+/cv/*
+  X-Robots-Tag: noindex
+
 # Page versions read by the next deploy to find changed URLs (scripts/indexnow.mjs).
 /indexnow.json
   X-Robots-Tag: noindex

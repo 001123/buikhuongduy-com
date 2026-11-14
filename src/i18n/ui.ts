@@ -32,7 +32,6 @@ export const ui = {
     "end.thanks": "Cảm ơn bạn đã đọc đến cuối.",
     "end.back": "trở lại trang trước",
     "end.top": "đọc lại từ đầu",
-    "end.home": "về trang chủ",
     "hero.status": "Sẵn sàng cho cơ hội mới",
 
     "about.title": "Giới Thiệu",
@@ -162,7 +161,6 @@ export const ui = {
     "end.thanks": "Thanks for reading to the end.",
     "end.back": "go back",
     "end.top": "start again from the top",
-    "end.home": "go to the homepage",
     "hero.status": "Open to new opportunities",
 
     "about.title": "About",
