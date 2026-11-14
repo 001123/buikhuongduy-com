@@ -2,6 +2,7 @@
 title: "Vercel's UI SDK: Giving AI Agents Behaviors Instead of Components"
 description: "UI SDK from Vercel Labs is a library of 50+ behaviors like popup, selection and typeahead that AI agents compose into components for React, Vue, Svelte, Solid and Web Components, then use those components more than twice as fast without screenshots."
 pubDate: 2026-11-13T10:00:00+07:00
+updatedDate: 2026-11-15T00:09:00+07:00
 category: ai
 tags: [ai, agents, ui-sdk, vercel, components, accessibility]
 ---
@@ -183,6 +184,30 @@ when there's text. Clear empties the input and puts focus back in it. Use our ex
 ```
 
 To go deeper, read the [Introduction](https://ui-sdk.dev/docs), the [Build a Component](https://ui-sdk.dev/docs/guides) guide and [Built for Agents](https://ui-sdk.dev/docs/agents).
+
+## What I Found Trying It
+
+I asked Opus 5.5 (via the API) to build an accessible Combobox two ways, two runs each (tested November 14, 2026, `@ui-sdk/core` and `@ui-sdk/react` 0.1.0-beta.1, React 19). Way **A** was plain React with no docs. Way **B** composed it from UI SDK behaviors, with about 123 KB of docs and types in the prompt. Then I ran all four results through 22 automated keyboard and ARIA checks (Playwright + Chrome 157) and axe.
+
+| | Plain React (A) | UI SDK behaviors (B) |
+|---|---|---|
+| Built as-is, no fixes | 2/2 | 2/2 |
+| Passed 22 keyboard/ARIA checks | 2/2 | 2/2 |
+| axe violations | 0 | 1 critical in one run |
+| Input / output tokens | ~580 / ~3,900 | ~46,000 / ~7,300 |
+| Generation time | ~30 s | ~69 s |
+| JS added to the bundle (gzip) | ~1.5 KB | ~16.5 KB |
+
+This wasn't what I expected: **for a well-known component like a Combobox, Opus 5.5 writing plain React is already good enough**, so UI SDK gave no accessibility edge here while costing more tokens and bundle. The axe violation in run B was in the "no results" state: `aria-controls` pointed to a list that was no longer on the page.
+
+Other beta rough edges:
+
+- `npm install` gets beta.1 because the `latest` tag doesn't point to beta.2 yet.
+- `llms.txt` is 385 KB, a full copy of the docs rather than an index. I had to pick the relevant sections for the prompt by hand.
+- The docs point agents to `createListbox` for a combobox, not `createPopup` + `createSelection` + `createTypeahead` as I described above. In both runs the model chose `createListbox`.
+- The ready-made Combobox has a bug: passing `items` together with custom-rendered options **turns filtering off**, contrary to the docs. Removing `items` fixes it.
+
+My take: this was a small test (two runs per way, one component, and the model couldn't run tests and fix its own code), so it says nothing about unusual or more complex components. That may be where UI SDK shines. For common components it isn't worth the tokens and bundle size yet. The part I find more promising is the agent bridge and WebMCP for agents *using* the UI, but I haven't measured that.
 
 ## Wrapping Up
 

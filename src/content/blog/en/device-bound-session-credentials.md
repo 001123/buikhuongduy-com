@@ -2,6 +2,7 @@
 title: "Device Bound Session Credentials (DBSC): Binding Login Sessions to the Device"
 description: "Stolen session cookies let attackers skip passwords and 2FA entirely. Device Bound Session Credentials (DBSC) in Chrome bind a session to a hardware-backed key on the user's device. This post explains how DBSC works, the three changes your server needs, and the fallback cases to plan for."
 pubDate: 2026-11-11T00:29:00+07:00
+updatedDate: 2026-11-15T00:09:00+07:00
 category: web-platform
 tags: [web-platform, security, chrome, authentication, cookies]
 ---
@@ -47,11 +48,11 @@ After the user signs in, return the usual long-lived cookie together with the `S
 
 ```http
 HTTP/1.1 200 OK
-Secure-Session-Registration: (ES256 RS256); path="/StartSession"
+Secure-Session-Registration: (ES256 RS256);path="/StartSession";challenge="random_challenge"
 Set-Cookie: auth_cookie=session_id; max-age=2592000; Domain=example.com; Secure; SameSite=Lax
 ```
 
-`(ES256 RS256)` lists the signing algorithms the server accepts. If the device supports secure key storage, Chrome calls `/StartSession` and sends the public key inside a JWT.
+`(ES256 RS256)` lists the signing algorithms the server accepts. If the device supports secure key storage, Chrome calls `/StartSession` and sends the public key inside a JWT signed over the `challenge`. The example in Chrome's guide omits `challenge`. When I tried it without one, Chrome still called `/StartSession` but sent no JWT and no public key.
 
 The cookie name (`auth_cookie` here) is up to you. It only has to match the `name` field in the session configuration in the next step.
 
@@ -108,7 +109,7 @@ When the short-lived cookie expires, Chrome and the server run a short exchange:
 
    ```http
    HTTP/1.1 403 Forbidden
-   Secure-Session-Challenge: "challenge_value"
+   Secure-Session-Challenge: "challenge_value";id="session_id"
    ```
 
 3. Chrome signs the challenge with the private key and retries:
@@ -152,6 +153,28 @@ In these cases Chrome falls back to the long-lived cookie **if one still exists*
 ## Limitations
 
 DBSC is not a silver bullet. If malware is **already on the device at registration time**, it may be able to extract the private key and hijack the session like any other cookie theft. Attacks that require malware at the moment of login, or modified TPM drivers, are much more complex and easier to detect than simply copying a cookie file, though. DBSC significantly raises the cost of session theft rather than eliminating it.
+
+## What I Found Trying It
+
+I built a minimal Node server with `/login`, `/StartSession`, `/refresh` and one authenticated endpoint, then ran it against Chrome 157 on a MacBook M4 Pro (November 14, 2026, fresh profile, no flags). The short-lived cookie lasted 60 seconds so the behavior was easy to watch.
+
+**HTTPS only, even on localhost.** On `http://localhost`, Chrome silently ignored the registration header: no request, no console warning. On `https://localhost` with a self-signed certificate, `/StartSession` was called right away, always with ES256. The Mac has no TPM, but DBSC was still on by default. Each signature took about 8–16 ms, which suggests a hardware-backed key, though I couldn't verify that directly.
+
+**Refresh is nearly invisible.** When the short-lived cookie expired, Chrome held the request for about **93 ms** while it refreshed. The server never received a request without the cookie. If the server sends the next challenge ahead of time in the success response, Chrome skips the 403 round trip and the hold drops to about **16 ms**. One caveat: Chrome still signed a challenge that was 70 seconds old, so the server must enforce challenge freshness itself. With a 60-second cookie, Chrome refreshed on almost every request even with about 54 seconds left. With 600 seconds it didn't. A very short lifetime means a signature on nearly every request.
+
+**Simulated cookie theft.** Cookies copied into curl or another Chrome profile worked immediately. After 65 seconds the stolen short-lived cookie expired and couldn't be refreshed, since the thief has no key. A proof signed with a different key was rejected. Meanwhile the victim's session kept refreshing normally. But **the 30-day long-lived cookie still opened everything that only required it**. DBSC protects only the endpoints where the server insists on the short-lived cookie. If you use the two-cookie pattern, don't let the long cookie unlock sensitive data on its own.
+
+**When the server fails.** With the refresh endpoint returning 500, Chrome didn't block the user: the request went out without the short cookie, plus a `Secure-Session-Skipped: server_error` header. After 4 failures in a row Chrome paused calls to `/refresh`, and resumed within 15 seconds of the server recovering.
+
+The most time-consuming parts were all formatting details, and I've fixed the examples above accordingly:
+
+- The registration header needs `challenge="…"`.
+- The challenge header needs `;id="<session>"`. Without it, Chrome abandons the refresh and doesn't retry.
+- Chrome sends `Sec-Secure-Session-Id` and `Secure-Session-Response` **unquoted**, unlike the spec, so the server should accept both forms.
+- The JWT contains only `jti` (the challenge) and `authorization`, with no `aud`/`iat`/`exp`. The public key sits in the JWT header and only at registration. The ES256 signature is raw 64 bytes, so Node needs `dsaEncoding: "ieee-p1363"`.
+- The best debugging tool is the DevTools Protocol event `Network.deviceBoundSessionEventOccurred`. It tells you exactly why registration or refresh failed.
+
+My take: DBSC already works on desktop Chrome with no flags, and the server side isn't much work. The hard part is getting every quote and parameter in the headers right while the docs and the browser still disagree.
 
 ## Wrapping Up
 

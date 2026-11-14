@@ -2,6 +2,7 @@
 title: "HTML-in-Canvas: Drawing Live, Accessible DOM into 2D, WebGL and WebGPU"
 description: "Chrome 157 ships the HTML-in-Canvas API: draw live DOM subtrees into 2D, WebGL or WebGPU canvases while keeping interactivity, accessibility, Find-in-Page and translation. This post covers the drawable attribute, the paint event, geometry sync, sizing pitfalls and fallbacks."
 pubDate: 2026-11-11T00:29:00+07:00
+updatedDate: 2026-11-15T00:09:00+07:00
 category: web-platform
 tags: [web-platform, canvas, webgl, webgpu, accessibility, chrome]
 ---
@@ -171,6 +172,34 @@ export function supportsHtmlInCanvas() {
 ```
 
 When it's missing, fall back to an alternative UI, floating HTML overlays, or libraries such as `three-html-render`, `html2canvas` or `dom-to-image`.
+
+## What I Found Trying It
+
+I built two small demos, one on a 2D canvas and one in WebGL. Each draws a slightly rotated HTML card with a heading, a paragraph, a text input and a button. Then I tested them with Playwright on Chrome 157 (November 14, 2026, MacBook M4 Pro).
+
+| Check | 2D | WebGL |
+|---|---|---|
+| Content in the accessibility tree | ✅ | ✅ |
+| Text selection (double-click, drag) | ✅ | ✅ |
+| Clicking the button, typing in the input on the rotated card | ✅ | ✅ with `updateElementGeometry()` |
+| Without `updateElementGeometry()` | (not needed) | ❌ clicks fall through to the canvas |
+| Stale geometry after moving the card 150px | (not needed) | ❌ clicks still land at the old spot |
+| `requestPaint()` loop | 60 fps (headless), 120 fps (120 Hz display) | same as 2D |
+
+The geometry part works exactly as documented: in WebGL, forget to report positions and the element is completely dead. The fps numbers are just the display's refresh cap; a single simple card can't show the real limit.
+
+**Blur is the easiest mistake to make.** At `devicePixelRatio` 2, a canvas whose grid matches its CSS size renders visibly blurry text. On a simple sharpness metric (edge variance) it scored about **13%** of plain DOM. Sizing the grid in device pixels brought it to about **99%**:
+
+![The same HTML card drawn into a canvas at devicePixelRatio 2: top, canvas grid in CSS pixels (blurry); bottom, grid in device pixels (sharp)](../../../assets/blog/html-in-canvas-blur-comparison.webp)
+
+A few things the docs don't mention:
+
+- Chrome also ships `canvas.captureElementImage()` and an `elementgeometryupdate` event. I never saw that event fire in any of my tests.
+- The event class is `CanvasPaintEvent`, and `drawable` only works as an HTML attribute; there's no matching JS property.
+- **Don't size from `offsetHeight`**: it rounds 145.5 up to 146 and slightly stretches the card. Use `getElementImageDefaultSize()` instead.
+- Headless Chrome with emulated DPR 2 reports `devicePixelContentBoxSize` wrong (at CSS size), so don't rely on headless CI to check sharpness. Headed Chrome reports it correctly.
+
+I couldn't automate a real Find-in-Page or screen reader test. `window.find()` did find the text inside the canvas.
 
 ## Wrapping Up
 

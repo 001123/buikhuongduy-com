@@ -2,6 +2,7 @@
 title: "Device Bound Session Credentials (DBSC): gắn phiên đăng nhập với thiết bị"
 description: "Cookie phiên bị đánh cắp cho phép kẻ tấn công bỏ qua cả mật khẩu lẫn 2FA. Device Bound Session Credentials (DBSC) trên Chrome gắn phiên đăng nhập với một khóa lưu trong phần cứng của thiết bị. Bài này giải thích DBSC hoạt động thế nào, ba thay đổi cần làm phía server và các trường hợp fallback cần tính trước."
 pubDate: 2026-11-11T00:29:00+07:00
+updatedDate: 2026-11-15T00:09:00+07:00
 category: web-platform
 tags: [web-platform, security, chrome, authentication, cookies]
 ---
@@ -47,11 +48,11 @@ Sau khi người dùng đăng nhập, trả cookie sống lâu như bình thư�
 
 ```http
 HTTP/1.1 200 OK
-Secure-Session-Registration: (ES256 RS256); path="/StartSession"
+Secure-Session-Registration: (ES256 RS256);path="/StartSession";challenge="random_challenge"
 Set-Cookie: auth_cookie=session_id; max-age=2592000; Domain=example.com; Secure; SameSite=Lax
 ```
 
-`(ES256 RS256)` là danh sách thuật toán ký mà server chấp nhận. Nếu thiết bị hỗ trợ lưu khóa bảo mật, Chrome sẽ gọi `/StartSession` và gửi public key trong một JWT.
+`(ES256 RS256)` là danh sách thuật toán ký mà server chấp nhận. Nếu thiết bị hỗ trợ lưu khóa bảo mật, Chrome sẽ gọi `/StartSession` và gửi public key trong một JWT ký trên `challenge`. Ví dụ trong hướng dẫn của Chrome thiếu `challenge`. Khi mình thử thiếu nó, Chrome vẫn gọi `/StartSession` nhưng không gửi JWT hay public key nào.
 
 Tên cookie (`auth_cookie` ở đây) tùy bạn đặt, miễn là khớp với trường `name` trong cấu hình phiên ở bước sau.
 
@@ -108,7 +109,7 @@ Khi cookie ngắn hạn hết hạn, Chrome và server trao đổi qua vài bư�
 
    ```http
    HTTP/1.1 403 Forbidden
-   Secure-Session-Challenge: "challenge_value"
+   Secure-Session-Challenge: "challenge_value";id="session_id"
    ```
 
 3. Chrome ký challenge bằng private key rồi gửi lại:
@@ -152,6 +153,28 @@ Khi đó Chrome dùng cookie sống lâu **nếu nó vẫn còn**. Đây cũng l
 ## Giới hạn
 
 DBSC không phải thuốc tiên. Nếu malware **đã có sẵn trên máy ngay lúc đăng ký phiên**, nó có thể lấy được private key và chiếm phiên giống như các kiểu trộm cookie khác. Tuy vậy, tấn công cần malware đúng lúc đăng nhập hoặc phải sửa driver TPM phức tạp và dễ bị phát hiện hơn nhiều so với việc chỉ copy một file cookie. DBSC làm chi phí trộm phiên tăng mạnh chứ không xóa bỏ hoàn toàn rủi ro.
+
+## Mình thử thì thấy
+
+Mình dựng một server Node tối giản gồm `/login`, `/StartSession`, `/refresh` và một endpoint cần đăng nhập, rồi chạy với Chrome 157 trên MacBook M4 Pro (ngày 14/11/2026, profile mới, không bật flag nào). Đặt cookie ngắn hạn 60 giây để dễ quan sát.
+
+**Chỉ chạy trên HTTPS, kể cả ở localhost.** Với `http://localhost`, Chrome lặng lẽ bỏ qua header đăng ký: không request, không cảnh báo trong console. Chuyển sang `https://localhost` với chứng chỉ tự ký thì `/StartSession` được gọi ngay, lần nào cũng dùng ES256. Máy Mac không có TPM nhưng DBSC vẫn bật mặc định. Mỗi lần ký mất khoảng 8–16 ms, gợi ý khóa nằm trong phần cứng, nhưng mình không kiểm chứng trực tiếp được.
+
+**Làm mới gần như vô hình.** Khi cookie ngắn hạn hết hạn, Chrome giữ request lại khoảng **93 ms** để làm mới. Server không bao giờ nhận request nào thiếu cookie. Nếu server gửi sẵn challenge kế tiếp trong response thành công, Chrome bỏ được vòng 403 và thời gian giữ còn khoảng **16 ms**. Cần lưu ý: Chrome vẫn ký một challenge đã 70 giây tuổi, nên server phải tự giới hạn tuổi của challenge. Với cookie 60 giây, Chrome làm mới ở gần như mọi request dù còn khoảng 54 giây. Với cookie 600 giây thì không. Đặt thời hạn quá ngắn đồng nghĩa với ký ở gần như mọi request.
+
+**Mô phỏng trộm cookie.** Cookie copy sang curl hoặc một profile Chrome khác dùng được ngay. Sau 65 giây, cookie ngắn hạn bị trộm hết hạn và không làm mới được, vì kẻ trộm không có khóa. Proof ký bằng khóa khác bị từ chối. Trong lúc đó, phiên của nạn nhân vẫn làm mới bình thường. Nhưng **cookie sống lâu 30 ngày vẫn mở được mọi thứ chỉ cần nó**. DBSC chỉ bảo vệ những endpoint mà server bắt buộc phải có cookie ngắn hạn. Nếu dùng cách hai cookie, đừng để cookie dài tự nó mở được dữ liệu nhạy cảm.
+
+**Khi server lỗi.** Endpoint làm mới trả 500 thì Chrome không chặn người dùng: request vẫn đi, không kèm cookie ngắn, có thêm header `Secure-Session-Skipped: server_error`. Sau 4 lần lỗi liên tiếp, Chrome tạm ngừng gọi `/refresh`, và chạy lại trong vòng 15 giây sau khi server hồi phục.
+
+Những chỗ tốn thời gian nhất đều đến từ chi tiết định dạng, và mình đã sửa lại các ví dụ ở trên:
+
+- Header đăng ký phải có `challenge="…"`.
+- Header challenge phải có `;id="<session>"`. Thiếu nó, Chrome bỏ ngang lần làm mới mà không thử lại.
+- Chrome gửi `Sec-Secure-Session-Id` và `Secure-Session-Response` **không có dấu ngoặc kép**, khác với đặc tả, nên server phải chấp nhận cả hai dạng.
+- JWT chỉ gồm `jti` (challenge) và `authorization`, không có `aud`/`iat`/`exp`. Public key nằm trong header JWT và chỉ có lúc đăng ký. Chữ ký ES256 ở dạng 64 byte thô, nên trên Node cần `dsaEncoding: "ieee-p1363"`.
+- Công cụ debug tốt nhất là sự kiện `Network.deviceBoundSessionEventOccurred` của DevTools Protocol. Nó cho biết chính xác vì sao đăng ký hay làm mới thất bại.
+
+Nhận định của mình: DBSC đã dùng được trên Chrome desktop mà không cần flag, và phía server không quá nhiều việc. Cái khó là đọc đúng từng dấu ngoặc trong header khi tài liệu còn chưa khớp với trình duyệt.
 
 ## Tổng kết
 

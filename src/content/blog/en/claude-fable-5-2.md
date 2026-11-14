@@ -2,6 +2,7 @@
 title: "Claude Fable 5.2: Stronger, Faster, and Cheaper Than Fable 5.1"
 description: "On November 9, 2026, Anthropic released Claude Fable 5.2 and Claude Mythos 5.2. This post sums up what is new: benchmark scores, pricing, speed, notable experiments, when to pick Fable over Opus 5.5, and what to watch for when calling it through the API."
 pubDate: 2026-11-10T23:27:00+07:00
+updatedDate: 2026-11-15T00:09:00+07:00
 category: ai
 tags: [ai, claude, anthropic, llm]
 ---
@@ -132,6 +133,30 @@ Anthropic says the model was tested before release by internal teams and outside
 - During training, Anthropic **deliberately limited** the capabilities that could most directly speed up AI development (for example, kernel optimization for AI chips), keeping them at about Opus 5.5 level.
 
 They also admit one hard problem: Fable 5.2 suspects it is being tested more often than any recent model, which makes it harder to know for sure how it will behave in the real world.
+
+## What I Found Trying It
+
+I had Opus 5.5 and Fable 5.2 solve three coding tasks via the API (November 14, 2026). Each model got only the spec, wrote one file in a single attempt, and was run against hidden tests:
+
+- **Easy:** related-posts scoring, 16 tests.
+- **Medium:** an LRU cache with TTL and size limits, 29 tests.
+- **Hard:** a line diff that handles 50,000 lines and matches `diff -u` output exactly, 27 tests.
+
+Each config ran twice per task. Costs use the official pricing: Opus 5.5 at $4 / $20 and Fable 5.2 at $8 / $40 per million tokens.
+
+| Config | Passed all tests | Mean time | Mean output tokens | Mean cost |
+|---|---|---|---|---|
+| Opus 5.5, medium effort | 6/6 | 27 s | 3,218 | $0.07 |
+| Fable 5.2, medium effort | 6/6 | 28 s | 3,300 | $0.14 |
+| Opus 5.5, max effort | 4/6 | 13 min | 90,404 | $1.81 |
+
+Three takeaways:
+
+- **For everyday work, Opus at medium is the right call.** At medium effort, both models passed every test, including the hard task, and used almost the same number of tokens. Since Fable's per-token price is double, it cost **twice as much** for the same result. That matches Anthropic's advice.
+- **Max effort isn't always better.** On the hard task, Opus at max spent all 128,000 output tokens thinking and **returned no code at all**, in both runs, about 19 minutes each. Those two runs alone cost $5.13. On the tasks it did finish, it cost about 26× Opus medium for the same result.
+- **Fable vs Opus at max (the comparison in this post):** Fable at high effort cost just 13% and 25% of Opus max on the easy and medium tasks, with identical test results. So "about half the cost" looks, if anything, modest. But that's one run per task, and on the hard task Fable high hit the token cap I set to stay on budget, so that run doesn't count.
+
+Limits of this test: only 2 runs per cell, and synthetic single-file tasks solved in one shot, far from the multi-step agentic work Anthropic's benchmarks measure. These tasks weren't hard enough to separate the two models, so where Fable really earns its price is in long, hard problems I didn't measure. The whole experiment cost $13.59.
 
 ## Conclusion
 

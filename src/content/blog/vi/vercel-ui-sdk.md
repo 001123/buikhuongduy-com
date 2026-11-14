@@ -2,6 +2,7 @@
 title: "UI SDK của Vercel: đưa cho AI agent \"behavior\" thay vì component"
 description: "UI SDK là thư viện của Vercel Labs gồm hơn 50 behavior như popup, selection, typeahead để AI agent tự ghép thành component trên React, Vue, Svelte, Solid và Web Components, rồi dùng chính các component đó nhanh hơn gấp đôi mà không cần chụp màn hình."
 pubDate: 2026-11-13T10:00:00+07:00
+updatedDate: 2026-11-15T00:09:00+07:00
 category: ai
 tags: [ai, agents, ui-sdk, vercel, components, accessibility]
 ---
@@ -183,6 +184,30 @@ when there's text. Clear empties the input and puts focus back in it. Use our ex
 ```
 
 Muốn hiểu sâu hơn thì đọc [Introduction](https://ui-sdk.dev/docs), guide [Build a Component](https://ui-sdk.dev/docs/guides) và phần [Built for Agents](https://ui-sdk.dev/docs/agents).
+
+## Mình thử thì thấy
+
+Mình nhờ Opus 5.5 (qua API) dựng một Combobox accessible theo hai cách, mỗi cách chạy hai lần (thử ngày 14/11/2026, `@ui-sdk/core` và `@ui-sdk/react` 0.1.0-beta.1, React 19). Cách **A** là React thuần, không kèm docs. Cách **B** là tự ghép từ behavior của UI SDK, kèm khoảng 123 KB docs và type. Sau đó mình kiểm tra cả bốn bản bằng 22 thao tác bàn phím và ARIA tự động (Playwright + Chrome 157) và bằng axe.
+
+| | React thuần (A) | UI SDK behavior (B) |
+|---|---|---|
+| Build được ngay, không sửa | 2/2 | 2/2 |
+| Qua 22 kiểm tra bàn phím/ARIA | 2/2 | 2/2 |
+| Lỗi axe | 0 | 1 lỗi critical ở một bản |
+| Token đầu vào / đầu ra | ~580 / ~3.900 | ~46.000 / ~7.300 |
+| Thời gian sinh code | ~30 s | ~69 s |
+| JS thêm vào bundle (gzip) | ~1,5 KB | ~16,5 KB |
+
+Kết quả khác với kỳ vọng của mình: **với một component quen thuộc như Combobox, Opus 5.5 viết React thuần đã đủ tốt**, nên UI SDK không cho thêm lợi thế về accessibility mà còn tốn token và bundle hơn. Lỗi axe ở bản B nằm ở trạng thái "không có kết quả": `aria-controls` trỏ tới một list không còn trên trang.
+
+Vài điểm "beta" khác:
+
+- `npm install` lấy về beta.1 vì tag `latest` chưa trỏ tới beta.2.
+- File `llms.txt` nặng 385 KB, là bản sao toàn bộ docs chứ không phải mục lục. Mình phải tự chọn phần cần đưa vào prompt.
+- Docs hướng agent dùng `createListbox` cho combobox chứ không phải `createPopup` + `createSelection` + `createTypeahead` như mình mô tả ở trên. Cả hai lần chạy, model đều chọn `createListbox`.
+- Combobox làm sẵn có lỗi: truyền `items` cùng với option tự render thì **mất chức năng lọc**, trái với docs. Bỏ `items` đi là chạy đúng.
+
+Nhận định của mình: phép thử này nhỏ (hai lần mỗi cách, một component, model không được tự chạy test để sửa), nên chưa nói được gì về các component lạ hay phức tạp hơn. Có thể đó mới là chỗ UI SDK phát huy. Với component phổ biến thì hiện chưa đáng đổi lấy chừng đó token và bundle. Phần mình thấy hứa hẹn hơn là agent bridge và WebMCP để agent *dùng* giao diện, nhưng phần đó mình chưa đo.
 
 ## Kết
 

@@ -2,6 +2,7 @@
 title: "HTML-in-Canvas: vẽ DOM sống, vẫn accessible, vào 2D, WebGL và WebGPU"
 description: "Chrome 157 chính thức có HTML-in-Canvas API: vẽ cây DOM sống vào canvas 2D, WebGL hoặc WebGPU mà vẫn giữ tương tác, accessibility, Find-in-Page và dịch trang. Bài này giải thích thuộc tính drawable, sự kiện paint, đồng bộ geometry, các lỗi về kích thước và cách fallback."
 pubDate: 2026-11-11T00:29:00+07:00
+updatedDate: 2026-11-15T00:09:00+07:00
 category: web-platform
 tags: [web-platform, canvas, webgl, webgpu, accessibility, chrome]
 ---
@@ -171,6 +172,34 @@ export function supportsHtmlInCanvas() {
 ```
 
 Nếu không hỗ trợ, fallback về một giao diện khác, lớp HTML nổi phía trên canvas, hoặc các thư viện như `three-html-render`, `html2canvas`, `dom-to-image`.
+
+## Mình thử thì thấy
+
+Mình làm hai demo nhỏ, một bản canvas 2D và một bản WebGL. Mỗi bản vẽ một thẻ HTML nghiêng nhẹ, gồm tiêu đề, đoạn văn, ô nhập và nút bấm. Sau đó mình kiểm tra bằng Playwright trên Chrome 157 (ngày 14/11/2026, MacBook M4 Pro).
+
+| Kiểm tra | 2D | WebGL |
+|---|---|---|
+| Nội dung có trong accessibility tree | ✅ | ✅ |
+| Bôi đen chữ (double-click, kéo chuột) | ✅ | ✅ |
+| Click nút, gõ vào ô nhập trên thẻ đang nghiêng | ✅ | ✅ nếu có `updateElementGeometry()` |
+| Không gọi `updateElementGeometry()` | (không cần) | ❌ click rơi xuống canvas, không trúng phần tử nào |
+| Geometry cũ sau khi dời thẻ 150px | (không cần) | ❌ click vẫn trúng chỗ cũ |
+| Vòng lặp `requestPaint()` | 60 fps (headless), 120 fps (màn 120 Hz) | như 2D |
+
+Phần geometry đúng như tài liệu mô tả: với WebGL, quên báo vị trí là phần tử "chết" hoàn toàn. Còn số fps chỉ là trần tần số quét màn hình, với một thẻ đơn giản thì không đo được giới hạn thật.
+
+**Độ mờ là lỗi dễ gặp nhất.** Ở `devicePixelRatio` 2, canvas có lưới bằng kích thước CSS cho chữ mờ thấy rõ. Theo một chỉ số độ nét đơn giản (độ biến thiên cạnh), bản này chỉ đạt khoảng **13%** so với DOM thường. Đặt lưới canvas theo pixel thiết bị thì đạt khoảng **99%**:
+
+![Cùng một thẻ HTML vẽ vào canvas ở devicePixelRatio 2: trên là lưới canvas theo pixel CSS (mờ), dưới là lưới theo pixel thiết bị (nét)](../../../assets/blog/html-in-canvas-blur-comparison.webp)
+
+Vài điểm tài liệu chưa nói:
+
+- Chrome còn có `canvas.captureElementImage()` và sự kiện `elementgeometryupdate`. Mình chưa thấy sự kiện này bắn trong lần thử nào.
+- Class của sự kiện là `CanvasPaintEvent`, và `drawable` chỉ dùng được dưới dạng thuộc tính HTML, không có property JS tương ứng.
+- **Đừng tính kích thước bằng `offsetHeight`**: nó làm tròn 145,5 thành 146 khiến thẻ bị kéo giãn nhẹ. Dùng `getElementImageDefaultSize()` thay thế.
+- Chrome headless có giả lập DPR 2 báo `devicePixelContentBoxSize` sai (bằng kích thước CSS), nên đừng dựa vào CI headless để kiểm tra độ nét. Bản có cửa sổ thì báo đúng.
+
+Find-in-Page và screen reader thật thì mình chưa kiểm tra được bằng tự động hoá. `window.find()` vẫn tìm thấy chữ trong canvas.
 
 ## Kết
 

@@ -2,6 +2,7 @@
 title: "Claude Fable 5.2: mạnh hơn, nhanh hơn và rẻ hơn Fable 5.1"
 description: "Ngày 9/11/2026, Anthropic ra mắt Claude Fable 5.2 và Claude Mythos 5.2. Bài này tóm tắt những gì mới: điểm benchmark, giá, tốc độ, các thí nghiệm đáng chú ý, khi nào nên dùng Fable thay vì Opus 5.5, và những điểm cần lưu ý khi gọi qua API."
 pubDate: 2026-11-10T23:27:00+07:00
+updatedDate: 2026-11-15T00:09:00+07:00
 category: ai
 tags: [ai, claude, anthropic, llm]
 ---
@@ -132,6 +133,30 @@ Anthropic cho biết model được kiểm tra trước khi phát hành bởi c�
 - Trong quá trình huấn luyện, Anthropic **cố ý hạn chế** những năng lực có thể trực tiếp đẩy nhanh việc phát triển AI (ví dụ tối ưu kernel cho chip AI), giữ ở mức khoảng Opus 5.5.
 
 Họ cũng thừa nhận một điểm khó: Fable 5.2 nghi ngờ mình đang bị kiểm tra thường xuyên hơn mọi model gần đây, nên khó biết chắc nó sẽ hành xử thế nào ngoài thực tế.
+
+## Mình thử thì thấy
+
+Mình cho Opus 5.5 và Fable 5.2 giải ba bài code qua API (ngày 14/11/2026). Mỗi model chỉ nhận đặc tả, viết một file trong một lần, rồi chạy với bộ test ẩn:
+
+- **Dễ:** chấm điểm bài viết liên quan, 16 test.
+- **Vừa:** LRU cache có TTL và giới hạn kích thước, 29 test.
+- **Khó:** diff theo dòng chịu được 50.000 dòng và xuất đúng định dạng `diff -u`, 27 test.
+
+Mỗi cấu hình chạy 2 lần mỗi bài. Chi phí tính theo bảng giá chính thức: Opus 5.5 là $4 / $20, Fable 5.2 là $8 / $40 mỗi triệu token.
+
+| Cấu hình | Qua hết test | Thời gian TB | Token ra TB | Chi phí TB |
+|---|---|---|---|---|
+| Opus 5.5, effort medium | 6/6 | 27 s | 3.218 | $0,07 |
+| Fable 5.2, effort medium | 6/6 | 28 s | 3.300 | $0,14 |
+| Opus 5.5, effort max | 4/6 | 13 phút | 90.404 | $1,81 |
+
+Ba điều mình rút ra:
+
+- **Với việc thường ngày, Opus medium là lựa chọn đúng.** Ở effort medium, cả hai model đều qua hết test, kể cả bài khó, và dùng số token gần như nhau. Vì giá mỗi token của Fable gấp đôi, nên Fable tốn **gấp đôi** cho cùng kết quả. Điều này khớp với lời khuyên của Anthropic.
+- **Effort max không phải lúc nào cũng tốt hơn.** Ở bài khó, Opus max nghĩ hết 128.000 token đầu ra mà **không trả về dòng code nào**, cả hai lần, mỗi lần khoảng 19 phút. Riêng hai lần đó tốn $5,13. Ở các bài nó làm xong, chi phí gấp khoảng 26 lần Opus medium cho cùng kết quả.
+- **So Fable với Opus max (phép so sánh trong bài):** Fable effort high chỉ tốn 13% và 25% chi phí của Opus max ở bài dễ và bài vừa, với kết quả test như nhau. Con số "khoảng một nửa chi phí" vì thế có vẻ còn khiêm tốn. Nhưng mỗi bài mình chỉ chạy một lần, và ở bài khó, Fable high chạm giới hạn token mình đặt để giữ ngân sách, nên lần đó không tính.
+
+Giới hạn của phép thử: chỉ 2 lần mỗi ô, bài tổng hợp một file và giải trong một lần, khác xa kiểu làm việc agentic nhiều bước mà benchmark của Anthropic đo. Các bài này chưa đủ khó để tách biệt hai model, nên chỗ Fable thật sự đáng tiền vẫn là bài toán dài và khó mà mình chưa đo được. Tổng chi phí thử nghiệm là $13,59.
 
 ## Kết
 
