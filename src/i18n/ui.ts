@@ -18,7 +18,7 @@ export const ui = {
     "seo.blog": "Blog của Bùi Khương Duy về frontend, React, Next.js, TypeScript, AI agents và DevOps: ghi chép, kinh nghiệm thực tế và bài học rút ra.",
     "seo.contact": "Liên hệ Bùi Khương Duy – sẵn sàng cho vai trò Senior/Lead Software Engineer (Full-Stack) hoặc AI-native engineering. Email, LinkedIn, GitHub và CV.",
     // "|" marks allowed line breaks; each segment stays on a single line.
-    "site.tagline": "Senior Software Engineer (Full-Stack, AI-Native)|với hơn 9 năm kinh nghiệm|React, Next.js, Node.js, TypeScript & DevOps",
+    "site.tagline": "Senior Software Engineer|(Full-Stack, AI-Native)|với hơn 9 năm kinh nghiệm|React, Next.js, Node.js, TypeScript & DevOps",
     "nav.label": "Điều hướng chính",
     "nav.about": "Giới Thiệu",
     "nav.blog": "Blog",
@@ -147,7 +147,7 @@ export const ui = {
     "seo.about": "Experience, skills and projects of Bui Khuong Duy, a full-stack Senior Software Engineer with 9+ years in React, Next.js, Node.js, TypeScript, AI agents and cloud infrastructure.",
     "seo.blog": "Bui Khuong Duy's blog on front-end engineering, React, Next.js, TypeScript, AI agents and DevOps: notes, hands-on experience and lessons learned.",
     "seo.contact": "Contact Bui Khuong Duy, open to Senior/Lead full-stack and AI-native engineering roles. Email, LinkedIn, GitHub and résumé.",
-    "site.tagline": "Senior Software Engineer (Full-Stack, AI-Native)|with 9+ years in|React, Next.js, Node.js, TypeScript & DevOps",
+    "site.tagline": "Senior Software Engineer|(Full-Stack, AI-Native)|with 9+ years in|React, Next.js, Node.js, TypeScript & DevOps",
     "nav.label": "Main navigation",
     "nav.about": "About",
     "nav.blog": "Blog",
