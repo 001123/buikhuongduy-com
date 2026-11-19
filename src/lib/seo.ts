@@ -83,7 +83,7 @@ export function structuredData(input: StructuredDataInput) {
     email: `mailto:${email}`,
     nationality: { "@type": "Country", name: "Vietnam" },
     knowsLanguage: (Object.keys(languages) as Lang[]).map((l) => locales[l].bcp47),
-    knowsAbout: ["Front-end engineering", "React", "Next.js", "TypeScript", "AI agents", "DevOps", "Kubernetes"],
+    knowsAbout: ["Full-stack engineering", "Front-end engineering", "React", "Next.js", "Node.js", "TypeScript", "GraphQL", "AI agents", "DevOps", "Kubernetes"],
     sameAs: [...socials.map((s) => s.href), cvUrl, "https://kd.io.vn/", "https://github.com/kd-labs-io"],
     worksFor: { "@id": kdLabs["@id"] },
   };
