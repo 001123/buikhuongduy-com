@@ -28,7 +28,7 @@ function readPublishedPosts() {
   for (const lang of /** @type {const} */ (['vi', 'en'])) {
     const dir = new URL(`./src/content/blog/${lang}/`, import.meta.url);
     for (const file of readdirSync(dir).filter((f) => /\.mdx?$/.test(f))) {
-      const fm = readFileSync(new URL(file, dir), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
+      const fm = readFileSync(new URL(file, dir), 'utf8').replace(/\r\n/g, '\n').match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
       if (/^draft:\s*true\s*$/m.test(fm)) continue;
       const date = (/** @type {string} */ key) => fm.match(new RegExp(`^${key}:\\s*["']?([^"'\\n]+)`, 'm'))?.[1];
       const lastmod = new Date(date('updatedDate') ?? date('pubDate') ?? NaN);

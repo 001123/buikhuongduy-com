@@ -27,7 +27,7 @@ const t = useTranslations(lang);
         <Heading class="line-clamp-3 font-serif text-lg font-semibold lg:text-xl text-paper group-hover:text-rice">{post.data.title}</Heading>
         <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-pretty text-paper/75">{post.data.description}</p>
         <div class="mt-auto flex items-center gap-x-2 pt-4 text-xs whitespace-nowrap text-paper/60">
-          <time class="shrink-0 text-paper/50" datetime={post.data.pubDate.toISOString()}>{formatDateTime(post.data.pubDate, lang)}</time>
+          <time class="shrink-0" datetime={post.data.pubDate.toISOString()}>{formatDateTime(post.data.pubDate, lang)}</time>
           {post.data.category && <><span aria-hidden="true" class="text-paper/30">·</span><span class="min-w-0 truncate font-medium text-rice/90">{categories[post.data.category][lang].name}</span></>}
           {post.data.draft && <span class="shrink-0 rounded-full border border-lotus/60 px-2 py-0.5 text-lotus">{t("blog.draft")}</span>}
         </div>
