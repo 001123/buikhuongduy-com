@@ -97,16 +97,19 @@ export default defineConfig({
       provider: fontProviders.fontsource(),
       name: 'Be Vietnam Pro',
       cssVariable: '--font-be-vietnam-pro',
-      weights: [400, 500, 600, 700],
-      subsets: ['latin', 'latin-ext', 'vietnamese'],
+      // Two weights and no latin-ext keep the home page at Lighthouse 100: every extra file loads before the hero
+      // image paints (Vietnamese text pulls latin + vietnamese per weight). 500 falls back to 400, 700 to 600.
+      weights: [400, 600],
+      subsets: ['latin', 'vietnamese'],
       fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
     },
     {
       provider: fontProviders.fontsource(),
       name: 'JetBrains Mono',
       cssVariable: '--font-jetbrains-mono',
-      weights: [400, 500],
-      subsets: ['latin', 'latin-ext', 'vietnamese'],
+      // Mono labels fill the home page too, so the same budget applies: one weight (500 falls back to 400).
+      weights: [400],
+      subsets: ['latin', 'vietnamese'],
       fallbacks: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
     },
   ],

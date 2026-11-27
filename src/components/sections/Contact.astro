@@ -2,7 +2,7 @@
 import SectionPage from "../../layouts/SectionPage.astro";
 import ContactIcon, { type IconName } from "../ContactIcon.astro";
 import { getLang, useTranslations } from "../../i18n/ui";
-import { cvUrl, email, socials } from "../../data/profile";
+import { cvPdfPath, cvUrl, email, socials } from "../../data/profile";
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
@@ -70,7 +70,7 @@ const links: { label: string; icon: IconName; value: string; href: string }[] = 
       }
 
       <a
-        href="/cv/bui-khuong-duy-cv.pdf"
+        href={cvPdfPath}
         download="Bui-Khuong-Duy-(Timi)-FE-EN-2026.pdf"
         type="application/pdf"
         class="group flex items-center justify-between gap-4 py-4 pb-1 transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"

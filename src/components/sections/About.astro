@@ -2,7 +2,7 @@
 import SectionPage from "../../layouts/SectionPage.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import mascot from "../../assets/mascot-pixel.gif";
-import { cvUrl, socials } from "../../data/profile";
+import { cvPdfPath, cvUrl, socials } from "../../data/profile";
 import { projects } from "../../data/projects";
 import { gitDates } from "../../lib/git-dates";
 
@@ -223,7 +223,7 @@ const projectList = projects[lang];
       <span aria-hidden="true">↗</span>
     </a>
     <a
-      href="/cv/bui-khuong-duy-cv.pdf"
+      href={cvPdfPath}
       download="Bui-Khuong-Duy-(Timi)-FE-EN-2026.pdf"
       type="application/pdf"
       class="inline-flex items-center gap-2 rounded-full border border-border-strong bg-surface-elevated px-5 py-2.5 text-sm font-medium text-fg transition-colors hover:border-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
