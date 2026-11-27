@@ -97,8 +97,10 @@ export default defineConfig({
       provider: fontProviders.fontsource(),
       name: 'Be Vietnam Pro',
       cssVariable: '--font-be-vietnam-pro',
-      weights: [400, 500, 600, 700],
-      subsets: ['latin', 'latin-ext', 'vietnamese'],
+      // Two weights and no latin-ext keep the home page at Lighthouse 100: every extra file loads before the hero
+      // image paints (Vietnamese text pulls latin + vietnamese per weight). 500 falls back to 400, 700 to 600.
+      weights: [400, 600],
+      subsets: ['latin', 'vietnamese'],
       fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
     },
     {
