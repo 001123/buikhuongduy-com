@@ -107,8 +107,9 @@ export default defineConfig({
       provider: fontProviders.fontsource(),
       name: 'JetBrains Mono',
       cssVariable: '--font-jetbrains-mono',
-      weights: [400, 500],
-      subsets: ['latin', 'latin-ext', 'vietnamese'],
+      // Mono labels fill the home page too, so the same budget applies: one weight (500 falls back to 400).
+      weights: [400],
+      subsets: ['latin', 'vietnamese'],
       fallbacks: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
     },
   ],
