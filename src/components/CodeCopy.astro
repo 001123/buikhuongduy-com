@@ -1,0 +1,59 @@
+---
+import { getLang, useTranslations } from "../i18n/ui";
+
+const t = useTranslations(getLang(Astro.currentLocale));
+---
+
+<span
+  hidden
+  data-code-copy-config
+  data-copy={t("blog.copyCode")}
+  data-copied={t("blog.codeCopied")}
+></span>
+
+<script>
+  function initCodeCopy() {
+    const cfg = document.querySelector<HTMLElement>("[data-code-copy-config]");
+    if (!cfg) return;
+    const copyLabel = cfg.dataset.copy ?? "Copy";
+    const copiedLabel = cfg.dataset.copied ?? "Copied";
+
+    document.querySelectorAll<HTMLPreElement>(".prose-editorial pre.astro-code").forEach((pre) => {
+      if (pre.parentElement?.classList.contains("code-block")) return;
+      const wrapper = document.createElement("div");
+      wrapper.className = "code-block";
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "code-copy-btn";
+      btn.textContent = copyLabel;
+      btn.setAttribute("aria-label", copyLabel);
+
+      let timer: number | undefined;
+      btn.addEventListener("click", async () => {
+        const text = pre.querySelector("code")?.textContent ?? pre.textContent ?? "";
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          return;
+        }
+        btn.textContent = copiedLabel;
+        btn.dataset.copied = "true";
+        clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          btn.textContent = copyLabel;
+          delete btn.dataset.copied;
+        }, 1800);
+      });
+
+      wrapper.appendChild(btn);
+    });
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    if (typeof requestIdleCallback === "function") requestIdleCallback(initCodeCopy);
+    else requestAnimationFrame(initCodeCopy);
+  });
+</script>

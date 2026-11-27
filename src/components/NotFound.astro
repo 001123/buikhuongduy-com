@@ -1,14 +1,12 @@
 ---
-// 404 page: "404" is written in ink, a red seal is stamped beside it, and golden leaves drift across the rice fields.
-// Hosts serve one /404.html for every missing URL, so both languages are rendered and the matching one
-// is shown from the URL prefix (/en/…) before first paint.
-import Background from "./Background.astro";
+// 404 page: crisp modern display "404" with the carved vermilion stamp & lục bát couplet.
+import ThemeToggle from "./ThemeToggle.astro";
 import { contentAnim } from "./transitions";
-import { defaultLang, homePath, languages, sectionPaths, ui, useTranslations, type Lang, type Section } from "../i18n/ui";
+import { defaultLang, homePath, languages, sectionPaths, ui, type Lang, type Section } from "../i18n/ui";
 
 const sections: Section[] = ["about", "blog", "contact"];
 const versions = (Object.keys(languages) as Lang[]).map((lang) => {
-  const t = useTranslations(lang);
+  const t = (key: keyof (typeof ui)[typeof defaultLang]) => ui[lang][key];
   const [sealTop, sealBottom] = t("notFound.seal").split("|");
   return {
     lang,
@@ -24,50 +22,12 @@ const versions = (Object.keys(languages) as Lang[]).map((lang) => {
 const titles = Object.fromEntries(
   (Object.keys(languages) as Lang[]).map((l) => [l, `${ui[l]["notFound.seoTitle"]} · ${ui[l]["site.name"]}`]),
 );
-
-// Deterministic pseudo-random values so every build renders the same leaves.
-let seed = 7;
-const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-const leaves = Array.from({ length: 14 }, () => ({
-  left: Math.round(rand() * 100),
-  size: 10 + Math.round(rand() * 12),
-  duration: 12 + Math.round(rand() * 10),
-  delay: -Math.round(rand() * 22),
-  drift: Math.round(rand() * 180 - 90),
-  spin: Math.round(rand() * 360 + 180),
-  tone: Math.floor(rand() * 3),
-}));
-
-const pill =
-  "motion-safe:animate-fade-up rounded-full border border-paper/45 bg-ink/40 px-5 py-2.5 text-sm font-medium text-paper shadow-lg shadow-ink/30 backdrop-blur-md glow-hover hover:-translate-y-0.5 hover:border-rice hover:text-rice active:translate-y-0 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:px-6 sm:text-base";
 ---
 
-<main class="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-16">
-  <Background dim />
-
-  <div aria-hidden="true" class="leaves pointer-events-none fixed inset-0 -z-[5] overflow-hidden">
-    {
-      leaves.map((l) => (
-        <span
-          class={`leaf leaf--${l.tone}`}
-          style={`--left:${l.left}%;--size:${l.size}px;--dur:${l.duration}s;--delay:${l.delay}s;--drift:${l.drift}px;--spin:${l.spin}deg`}
-        />
-      ))
-    }
+<main class="relative flex min-h-dvh flex-col items-center justify-center px-5 py-16 sm:px-6">
+  <div class="absolute top-4 right-4 sm:top-6 sm:right-6">
+    <ThemeToggle />
   </div>
-
-  <svg aria-hidden="true" class="absolute size-0">
-    <defs>
-      <filter id="ink-bleed" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="4" result="noise" />
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" />
-      </filter>
-      <linearGradient id="ink-fill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#f6ecd9" />
-        <stop offset="100%" stop-color="#d9b54a" />
-      </linearGradient>
-    </defs>
-  </svg>
 
   {
     versions.map(({ lang, t, sealTop, sealBottom, links }) => (
@@ -75,21 +35,21 @@ const pill =
         data-nf-lang={lang}
         lang={lang}
         hidden={lang !== defaultLang}
-        class="flex w-full max-w-2xl flex-col items-center gap-6 text-center sm:gap-7"
+        class="flex w-full max-w-xl flex-col items-center gap-6 text-center"
         transition:name={`content-404-${lang}`}
         transition:animate={contentAnim}
       >
-        <div class="relative w-full max-w-[34rem]">
-          <svg aria-hidden="true" viewBox="0 0 600 230" class="ink w-full overflow-visible">
-            <text x="50%" y="200" text-anchor="middle" class="ink__text" filter="url(#ink-bleed)">404</text>
-          </svg>
+        <div class="relative inline-flex items-start justify-center px-10">
+          <p aria-hidden="true" class="text-[clamp(4.5rem,18vw,8rem)] font-bold leading-none tracking-[-0.05em] text-fg select-none">
+            404
+          </p>
 
           <button
             type="button"
             data-seal
             title={t("notFound.restamp")}
             aria-label={t("notFound.restamp")}
-            class="seal absolute top-[6%] right-[1%] grid size-16 cursor-pointer place-items-center rounded-md bg-[#b3322a] font-serif text-[0.8rem] leading-tight font-semibold tracking-wider text-[#fbe9e4] uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rice sm:size-20 sm:text-base"
+            class="seal absolute -top-1 right-0 grid size-14 cursor-pointer place-items-center rounded-md bg-[#b3322a] text-[0.6875rem] leading-tight font-semibold tracking-wider text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:size-16 sm:text-xs"
           >
             <span class="pointer-events-none flex flex-col">
               <span>{sealTop}</span>
@@ -98,43 +58,45 @@ const pill =
           </button>
         </div>
 
-        <h1 class="motion-safe:animate-fade-up -mt-2 font-serif text-[clamp(1.75rem,6vw,2.75rem)] font-semibold tracking-wide text-paper text-glow [animation-delay:1.6s]">
+        <h1 class="text-[clamp(1.625rem,5vw,2.25rem)] font-semibold tracking-[-0.03em] text-fg">
           <span class="sr-only">404 · </span>
           {t("notFound.title")}
         </h1>
 
-        <blockquote class="motion-safe:animate-fade-up font-serif text-lg leading-relaxed text-paper/85 italic text-glow-soft [animation-delay:1.9s] sm:text-xl">
+        <blockquote class="text-lg leading-relaxed text-fg-secondary italic sm:text-xl">
           <p>{t("notFound.verse1")}</p>
           <p>{t("notFound.verse2")}</p>
         </blockquote>
 
-        <span aria-hidden="true" class="motion-safe:animate-fade-up h-px w-24 bg-linear-to-r from-transparent via-rice to-transparent [animation-delay:2.1s] sm:w-40" />
-
-        <div class="motion-safe:animate-fade-up space-y-2 text-sm text-paper/70 [animation-delay:2.2s] sm:text-base">
+        <div class="space-y-2 border-t border-border pt-6 text-sm text-fg-muted">
           <p>{t("notFound.lead")}</p>
           <p data-missing-wrap hidden>
             {t("notFound.path")}:
-            <code data-missing-path class="ml-1 rounded-md border border-paper/15 bg-ink/60 px-2 py-0.5 font-mono text-[0.85em] break-all text-rice" />
+            <code data-missing-path class="ml-1 rounded-md border border-border bg-surface px-2 py-0.5 font-mono text-xs break-all text-accent" />
           </p>
         </div>
 
-        <nav aria-label={t("notFound.suggest")} class="mt-3 flex flex-col items-center gap-4 sm:mt-5 sm:gap-5">
-          <p class="motion-safe:animate-fade-up -mr-[0.25em] text-xs tracking-[0.25em] text-paper/55 uppercase [animation-delay:2.3s]">{t("notFound.suggest")}</p>
-          <ul class="flex flex-wrap justify-center gap-x-3 gap-y-3 sm:gap-x-4">
-            {links.map(({ label, href }, i) => (
-              <li>
-                <a href={href} class={pill} style={`animation-delay:${2400 + i * 100}ms`}>
-                  {label}
-                </a>
-              </li>
-            ))}
+        <nav aria-label={t("notFound.suggest")} class="mt-2 flex flex-col items-center gap-3">
+          <p class="font-mono text-[0.6875rem] tracking-[0.16em] text-fg-muted uppercase">{t("notFound.suggest")}</p>
+          <ul class="flex flex-wrap justify-center gap-2">
+            {
+              links.map(({ label, href }) => (
+                <li>
+                  <a
+                    href={href}
+                    class="inline-flex rounded-full border border-border bg-surface-elevated px-4 py-2 text-sm font-medium text-fg transition-colors hover:border-border-strong hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))
+            }
           </ul>
         </nav>
       </div>
     ))
   }
 
-  <!-- Runs before first paint (and again after view-transition swaps) to show the visitor's language. -->
   <script is:inline define:vars={{ titles, defaultLang }}>
     (function () {
       var lang = /^\/en(\/|$)/.test(location.pathname) ? "en" : defaultLang;
@@ -156,7 +118,6 @@ const pill =
     document.querySelectorAll<HTMLElement>("[data-missing-path]").forEach((code) => (code.textContent = path));
     document.querySelectorAll<HTMLElement>("[data-missing-wrap]").forEach((wrap) => (wrap.hidden = false));
 
-    // Clicking the seal replays the stamp animation.
     document.querySelectorAll<HTMLElement>("[data-seal]").forEach((seal) =>
       seal.addEventListener("click", () => {
         seal.classList.remove("seal--again");
@@ -170,128 +131,35 @@ const pill =
 </script>
 
 <style>
-  .ink__text {
-    font-family: var(--font-serif);
-    font-size: 210px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    fill: url(#ink-fill);
-    stroke: var(--color-rice);
-    stroke-width: 2.5;
-    stroke-linejoin: round;
-    paint-order: stroke;
-  }
-
   .seal {
-    transform: rotate(-9deg);
-    opacity: 0.92;
-    /* Inner border like a carved stamp. */
+    transform: rotate(-8deg);
     box-shadow:
-      inset 0 0 0 3px #b3322a,
-      inset 0 0 0 4px rgb(251 233 228 / 0.55),
-      0 10px 24px rgb(0 0 0 / 0.4);
+      inset 0 0 0 2px #b3322a,
+      inset 0 0 0 3px rgb(255 255 255 / 0.45);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .ink__text {
-      fill-opacity: 0;
-      stroke-dasharray: 1400;
-      stroke-dashoffset: 1400;
-      animation:
-        ink-draw 1.8s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards,
-        ink-fill 0.9s ease-out 1.5s forwards;
-    }
-
     .seal {
-      opacity: 0;
-      animation: stamp 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) 1.9s forwards;
+      animation: stamp 0.4s cubic-bezier(0.2, 1.3, 0.4, 1) 0.15s both;
     }
 
     .seal--again {
-      animation: stamp 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
-    }
-
-    .leaf {
-      --from: #f4dc8a;
-      --to: #d9a63a;
-      position: absolute;
-      top: -5%;
-      left: var(--left);
-      width: var(--size);
-      height: calc(var(--size) * 1.5);
-      /* Almond leaf with a pointed tip and stem end. */
-      border-radius: 0 100% 0 100%;
-      background: linear-gradient(135deg, var(--from), var(--to));
-      opacity: 0.8;
-      filter: drop-shadow(0 2px 3px rgb(43 29 18 / 0.45));
-      animation: fall var(--dur) linear var(--delay) infinite;
-    }
-
-    /* Midrib running tip to stem. */
-    .leaf::after {
-      content: "";
-      position: absolute;
-      inset: 12% 48%;
-      background: rgb(120 72 16 / 0.45);
-      transform: rotate(-34deg);
-      border-radius: 1px;
-    }
-
-    .leaf--1 {
-      --from: #f0c75e;
-      --to: #c8862a;
-    }
-
-    .leaf--2 {
-      --from: #e9b44c;
-      --to: #a8641f;
-      opacity: 0.7;
-    }
-  }
-
-  @keyframes ink-draw {
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-
-  @keyframes ink-fill {
-    to {
-      fill-opacity: 1;
+      animation: stamp 0.4s cubic-bezier(0.2, 1.3, 0.4, 1) both;
     }
   }
 
   @keyframes stamp {
     0% {
       opacity: 0;
-      transform: rotate(-20deg) scale(2.4);
+      transform: rotate(-18deg) scale(1.8);
     }
     70% {
-      opacity: 0.95;
-      transform: rotate(-8deg) scale(0.94);
+      opacity: 1;
+      transform: rotate(-7deg) scale(0.95);
     }
     100% {
-      opacity: 0.92;
-      transform: rotate(-9deg) scale(1);
-    }
-  }
-
-  @keyframes fall {
-    /* Sways side to side and flips over like a dry leaf. */
-    0% {
-      transform: translate3d(0, 0, 0) rotate(0deg) rotateX(0deg);
-    }
-    25% {
-      transform: translate3d(calc(var(--drift) * 0.6), 28vh, 0) rotate(calc(var(--spin) * 0.25)) rotateX(70deg);
-    }
-    50% {
-      transform: translate3d(calc(var(--drift) * -0.4), 56vh, 0) rotate(calc(var(--spin) * 0.5)) rotateX(0deg);
-    }
-    75% {
-      transform: translate3d(calc(var(--drift) * 0.8), 84vh, 0) rotate(calc(var(--spin) * 0.75)) rotateX(-70deg);
-    }
-    100% {
-      transform: translate3d(var(--drift), 112vh, 0) rotate(var(--spin)) rotateX(0deg);
+      opacity: 1;
+      transform: rotate(-8deg) scale(1);
     }
   }
 </style>

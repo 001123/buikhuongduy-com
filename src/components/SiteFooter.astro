@@ -1,0 +1,57 @@
+---
+import { socials } from "../data/profile";
+import { homePath, useTranslations, type Lang } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-auto border-t border-border">
+  <div class="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-7 text-xs text-fg-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
+    <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono">
+      <span>© {year} {t("site.name")}</span>
+    </div>
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+      {
+        socials.map((s) => (
+          <a
+            href={s.href}
+            target="_blank"
+            rel="noopener me"
+            class="transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            {s.label}
+          </a>
+        ))
+      }
+      <a
+        href={`${homePath[lang]}rss.xml`}
+        class="font-mono transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        {t("footer.rss")}
+      </a>
+      <button
+        type="button"
+        data-back-to-top
+        class="inline-flex items-center gap-1 font-mono transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        <span aria-hidden="true">↑</span>
+        {t("footer.top")}
+      </button>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  document.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element)) return;
+    if (!e.target.closest("[data-back-to-top]")) return;
+    window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
+  });
+</script>

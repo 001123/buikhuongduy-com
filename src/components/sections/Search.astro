@@ -1,7 +1,6 @@
 ---
 // Site search page. The page is `noindex, follow` (internal results pages should not be indexed),
 // but a plain GET form keeps every query a real, shareable URL and the form works without JavaScript.
-// Results come from a small build-time JSON index, fetched only on this page.
 import SectionPage from "../../layouts/SectionPage.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { searchIndexPath } from "../../lib/search";
@@ -24,8 +23,12 @@ const action = sectionPaths.search[lang];
     data-text-error={t("search.error")}
   >
     <search>
-      <form action={action} method="get" class="group flex items-center gap-2 rounded-full border border-paper/30 bg-ink/40 p-1.5 pl-4 focus-within:border-rice glow-hover">
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5 shrink-0 text-rice">
+      <form
+        action={action}
+        method="get"
+        class="group flex items-center gap-2 rounded-lg border border-border bg-surface-elevated p-1.5 pl-3.5 transition-colors focus-within:border-accent"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4.5 shrink-0 text-fg-muted group-focus-within:text-accent">
           <circle cx="11" cy="11" r="7"></circle>
           <path d="m20 20-3.5-3.5"></path>
         </svg>
@@ -40,36 +43,38 @@ const action = sectionPaths.search[lang];
           aria-keyshortcuts="/"
           placeholder={t("search.placeholder")}
           data-search-input
-          class="min-w-0 flex-1 bg-transparent py-2 text-base text-paper outline-none placeholder:text-paper/50"
+          class="min-w-0 flex-1 bg-transparent py-1.5 text-sm text-fg outline-none placeholder:text-fg-muted/70 sm:text-base"
         />
         <button
           type="submit"
-          class="shrink-0 cursor-pointer rounded-full bg-paper px-4 py-2 text-sm font-medium text-ink hover:bg-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice active:scale-95"
+          class="shrink-0 cursor-pointer rounded-md bg-fg px-3.5 py-1.5 text-xs font-medium text-bg transition-colors hover:bg-accent hover:text-accent-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {t("search.submit")}
         </button>
       </form>
     </search>
 
-    <p data-search-status role="status" aria-live="polite" class="mt-5 mb-6 min-h-6 text-sm text-paper/70">{t("search.idle")}</p>
+    <p data-search-status role="status" aria-live="polite" class="mt-4 mb-6 min-h-6 font-mono text-xs text-fg-muted">{t("search.idle")}</p>
 
     <noscript>
-      <p class="mb-6 text-sm text-paper/70">
-        {t("search.noscript")} <a href={sectionPaths.blog[lang]} class="text-rice underline underline-offset-4">{t("nav.blog")} →</a>
+      <p class="mb-6 text-sm text-fg-secondary">
+        {t("search.noscript")}{" "}
+        <a href={sectionPaths.blog[lang]} class="text-accent underline underline-offset-4">{t("nav.blog")} →</a>
       </p>
     </noscript>
 
-    <ul data-search-results class="grid gap-6"></ul>
+    <ul data-search-results class="divide-y divide-border"></ul>
 
     <template data-search-card>
-      <li>
-        <a class="group flex h-full flex-col rounded-2xl border border-paper/15 bg-ink/40 p-5 glow-frame-hover hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:p-6">
-          <h2 data-title class="line-clamp-3 font-serif text-lg font-semibold text-paper group-hover:text-rice"></h2>
-          <p data-snippet class="mt-2 line-clamp-3 text-[0.8125rem] leading-relaxed text-pretty text-paper/75"></p>
-          <div class="mt-auto flex items-center gap-x-2 pt-4 text-xs whitespace-nowrap text-paper/60">
+      <li class="py-5 first:pt-0">
+        <a class="group block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+          <div class="flex flex-wrap items-center gap-x-2 font-mono text-xs tabular-nums text-fg-muted">
             <time data-date class="shrink-0"></time>
-            <span data-category class="ms-auto min-w-0 truncate font-medium text-rice/90"></span>
+            <span data-sep aria-hidden="true" class="text-border-strong">·</span>
+            <span data-category class="min-w-0 truncate font-medium text-accent"></span>
           </div>
+          <h2 data-title class="mt-1.5 font-serif text-lg font-medium leading-snug text-fg transition-colors group-hover:text-accent"></h2>
+          <p data-snippet class="mt-1.5 line-clamp-3 text-sm leading-relaxed text-pretty text-fg-secondary"></p>
         </a>
       </li>
     </template>
@@ -79,9 +84,9 @@ const action = sectionPaths.search[lang];
 <style>
   [data-search-results] :global(mark) {
     border-radius: 0.2em;
-    background: rgb(217 181 74 / 0.25);
-    color: inherit;
-    padding: 0 0.1em;
+    background: var(--accent-soft);
+    color: var(--fg);
+    padding: 0 0.12em;
   }
 </style>
 
@@ -97,7 +102,6 @@ const action = sectionPaths.search[lang];
     body: string;
   }
 
-  /** Text in one matching form: accents kept (lowercase only) or folded away. */
   interface Forms {
     title: string;
     description: string;
@@ -111,10 +115,6 @@ const action = sectionPaths.search[lang];
     folded: Forms;
   }
 
-  /**
-   * Lowercase; with `keepAccents` false also drop diacritics and đ → d, so "hieu nang" finds "Hiệu năng".
-   * A query typed with diacritics is matched accent-sensitively, so "nặng" does not hit "năng".
-   */
   function normalize(text: string, keepAccents: boolean): string {
     const lower = text.normalize("NFC").toLowerCase();
     return keepAccents ? lower : lower.normalize("NFD").replace(/\p{M}/gu, "").replace(/đ/g, "d");
@@ -122,7 +122,6 @@ const action = sectionPaths.search[lang];
 
   const hasAccents = (text: string) => /[\p{M}đĐ]/u.test(text.normalize("NFD"));
 
-  /** Normalized text plus, for each of its chars, the index of the original char it came from. */
   function normalizeWithMap(text: string, keepAccents: boolean): { folded: string; map: number[] } {
     let folded = "";
     const map: number[] = [];
@@ -136,9 +135,7 @@ const action = sectionPaths.search[lang];
 
   interface Query {
     keepAccents: boolean;
-    /** One regex per term, matching at the start of a word. */
     terms: RegExp[];
-    /** Whole query as a phrase, when it has several terms. */
     phrase?: RegExp;
   }
 
@@ -163,7 +160,6 @@ const action = sectionPaths.search[lang];
     return n;
   }
 
-  /** Original-text ranges `[start, end)` matched by any term, merged and sorted. */
   function matchRanges(text: string, query: Query): [number, number][] {
     const { folded, map } = normalizeWithMap(text, query.keepAccents);
     const ranges: [number, number][] = [];
@@ -183,7 +179,6 @@ const action = sectionPaths.search[lang];
     return merged;
   }
 
-  /** Text with matches wrapped in <mark>, built from text nodes (no HTML parsing). */
   function highlight(el: HTMLElement, raw: string, query: Query) {
     const text = raw.normalize("NFC");
     el.replaceChildren();
@@ -198,7 +193,6 @@ const action = sectionPaths.search[lang];
     el.append(text.slice(pos));
   }
 
-  /** About 180 characters of the body around the first match, trimmed to word boundaries. */
   function snippet(raw: string, query: Query): string | undefined {
     const body = raw.normalize("NFC");
     const first = matchRanges(body, query)[0];
@@ -210,7 +204,6 @@ const action = sectionPaths.search[lang];
     return `${start > 0 ? "… " : ""}${body.slice(start, end).trim()}${end < body.length ? " …" : ""}`;
   }
 
-  /** Every term must appear somewhere; title hits weigh most, then topic/tags, description, body. */
   function score(item: Indexed, query: Query): number {
     const f = query.keepAccents ? item.exact : item.folded;
     let total = 0;
@@ -301,8 +294,12 @@ const action = sectionPaths.search[lang];
           const inDescription = query.terms.some((re) => count(re, description, 1) > 0);
           highlight(li.querySelector("[data-snippet]")!, inDescription ? doc.description : (snippet(doc.body, query) ?? doc.description), query);
           const category = li.querySelector<HTMLElement>("[data-category]")!;
+          const sep = li.querySelector<HTMLElement>("[data-sep]")!;
           if (doc.category) category.textContent = doc.category;
-          else category.remove();
+          else {
+            category.remove();
+            sep.remove();
+          }
           const time = li.querySelector("time")!;
           time.dateTime = doc.date;
           time.textContent = doc.dateLabel;
@@ -327,7 +324,6 @@ const action = sectionPaths.search[lang];
     input.value = initial;
     if (initial) search(initial, false);
     else input.focus();
-    // Warm the index while the reader types.
     input.addEventListener("focus", () => loadIndex(text.index).catch(() => {}), { once: true });
   }
 

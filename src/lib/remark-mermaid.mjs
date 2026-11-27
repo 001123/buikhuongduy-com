@@ -1,29 +1,29 @@
 import { createMermaidRenderer } from "mermaid-isomorphic";
 import { visit } from "unist-util-visit";
 
-/** Same palette as the site theme (see global.css). */
+/** Light-mode editorial palette matching global.css; dark mode is overridden via CSS. */
 const mermaidConfig = {
   theme: "base",
   // Resolves to the site font (Astro Fonts API) in the page; defined below for build-time measuring.
   fontFamily: "var(--font-be-vietnam-pro)",
   themeVariables: {
-    darkMode: true,
-    background: "#2b1d12",
-    primaryColor: "#4a2f1c",
-    primaryTextColor: "#f6ecd9",
-    primaryBorderColor: "#d9b54a",
-    secondaryColor: "#3a2617",
-    tertiaryColor: "#2b1d12",
-    lineColor: "#d9b54a",
-    textColor: "#f6ecd9",
-    noteBkgColor: "#4a2f1c",
-    noteTextColor: "#f6ecd9",
-    noteBorderColor: "#e9a3b4",
-    actorBkg: "#4a2f1c",
-    actorBorder: "#d9b54a",
-    actorTextColor: "#f6ecd9",
-    signalColor: "#f6ecd9",
-    signalTextColor: "#f6ecd9",
+    darkMode: false,
+    background: "#F5F5F7",
+    primaryColor: "#FFFFFF",
+    primaryTextColor: "#0A0A0B",
+    primaryBorderColor: "#D4D4D8",
+    secondaryColor: "#F5F5F7",
+    tertiaryColor: "#FFFFFF",
+    lineColor: "#63636E",
+    textColor: "#0A0A0B",
+    noteBkgColor: "#FFF1E8",
+    noteTextColor: "#0A0A0B",
+    noteBorderColor: "#C84300",
+    actorBkg: "#FFFFFF",
+    actorBorder: "#D4D4D8",
+    actorTextColor: "#0A0A0B",
+    signalColor: "#0A0A0B",
+    signalTextColor: "#0A0A0B",
   },
 };
 

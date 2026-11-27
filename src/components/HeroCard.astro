@@ -1,0 +1,560 @@
+---
+import { cvUrl, email } from "../data/profile";
+import { getLang, type Lang } from "../i18n/ui";
+
+const lang: Lang = getLang(Astro.currentLocale);
+const isVi = lang === "vi";
+
+const tabs = [
+  { id: "stack", label: "Stack", cmd: "duy --inspect stack", badge: "4 layers" },
+  { id: "impact", label: isVi ? "Hệ thống" : "Impact", cmd: "duy --metrics prod", badge: "production" },
+  { id: "now", label: isVi ? "Hiện tại" : "Now", cmd: "duy --status availability", badge: "UTC+7 · HCMC" },
+] as const;
+
+const stackRows = [
+  {
+    group: "Frontend",
+    items: [
+      { label: "React", accent: true },
+      { label: "Next.js", accent: false },
+      { label: "Astro", accent: true },
+      { label: "TypeScript", accent: false },
+    ],
+  },
+  {
+    group: "Backend",
+    items: [
+      { label: "Node.js", accent: false },
+      { label: "GraphQL", accent: false },
+      { label: "PostgreSQL", accent: false },
+    ],
+  },
+  {
+    group: "AI-Native",
+    items: [
+      { label: "AI Agents", accent: true },
+      { label: "ACP", accent: false },
+      { label: "MCP", accent: false },
+      { label: "Eval", accent: false },
+    ],
+  },
+  {
+    group: "Platform",
+    items: [
+      { label: "Kubernetes", accent: false },
+      { label: "Cloudflare", accent: false },
+      { label: "CI/CD", accent: false },
+    ],
+  },
+];
+
+const impactRows = [
+  {
+    org: "Hello Health Group",
+    metric: "30M+ / mo",
+    desc: isVi ? "Nền tảng web đa thị trường" : "Multi-market web platform",
+    fill: "96%",
+  },
+  {
+    org: "Saladin Insurance",
+    metric: "2M+ users",
+    desc: isVi ? "Web & mobile bảo hiểm số" : "Insurtech web & mobile",
+    fill: "82%",
+  },
+  {
+    org: "KD Code",
+    metric: "VS Code · ACP",
+    desc: isVi ? "Extension điều phối multi-agent" : "Multi-agent coding extension",
+    fill: "74%",
+  },
+  {
+    org: "buikhuongduy.com",
+    metric: "100×4 · <30s",
+    desc: isVi ? "Astro tĩnh & CI dưới 30 giây" : "Static Astro & fast CI",
+    fill: "100%",
+  },
+];
+
+const nowRows = [
+  {
+    icon: "role" as const,
+    label: isVi ? "Vai trò" : "Role",
+    value: "Lead / Senior FE · Full-Stack (AI-Native)",
+  },
+  {
+    icon: "focus" as const,
+    label: isVi ? "Trọng tâm" : "Focus",
+    value: isVi
+      ? "Quy trình AI agent, design system, hiệu năng web"
+      : "AI agent workflows, design systems, web perf",
+  },
+  {
+    icon: "location" as const,
+    label: isVi ? "Địa điểm" : "Location",
+    value: isVi ? "TP. Hồ Chí Minh · Remote / Hybrid" : "Ho Chi Minh City · Remote / Hybrid",
+  },
+];
+---
+
+<aside
+  data-hero-card
+  data-tilt-card
+  aria-label={isVi ? "Hồ sơ kỹ thuật nhanh" : "Engineering snapshot"}
+  class="hero-card-shell shadow-[0_14px_42px_-18px_rgba(0,0,0,0.16)] dark:shadow-[0_18px_52px_-20px_rgba(0,0,0,0.72)]"
+>
+  <div class="spotlight-card relative z-10 rounded-[calc(1rem-1px)] border-0 bg-surface-elevated">
+    <!-- Header Chrome with sliding tab indicator & auto-cycle progress hairline -->
+    <div class="relative flex flex-wrap items-center justify-between gap-2 border-b border-border bg-surface/80 px-4 py-2.5">
+      <div class="flex items-center gap-2">
+        <span aria-hidden="true" class="relative flex size-2">
+          <span class="status-ping-ring absolute inline-flex h-full w-full rounded-[2px] bg-accent-vivid opacity-75"></span>
+          <span class="relative inline-flex size-2 rounded-[2px] bg-accent-vivid"></span>
+        </span>
+        <span class="font-mono text-xs font-medium text-fg-secondary">duy.profile.ts</span>
+      </div>
+
+      <div
+        role="tablist"
+        aria-label={isVi ? "Chuyển mục hồ sơ" : "Profile sections"}
+        class="hero-card-tablist relative flex items-center gap-0.5 rounded-lg border border-border/80 bg-surface-elevated/70 p-0.5"
+      >
+        <span
+          data-hero-tab-pill
+          aria-hidden="true"
+          class="pointer-events-none absolute inset-y-0.5 left-0 rounded-md bg-accent transition-[transform,width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        ></span>
+        {
+          tabs.map((tab, idx) => (
+            <button
+              type="button"
+              role="tab"
+              id={`hero-tab-${tab.id}`}
+              aria-controls={`hero-panel-${tab.id}`}
+              aria-selected={idx === 0 ? "true" : "false"}
+              data-hero-tab={tab.id}
+              data-hero-cmd-text={tab.cmd}
+              data-hero-badge-text={tab.badge}
+              class:list={[
+                "relative z-10 rounded-md px-2.5 py-1 font-mono text-[0.6875rem] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent",
+                idx === 0 ? "bg-accent text-accent-fg" : "text-fg-muted hover:text-fg",
+              ]}
+            >
+              {tab.label}
+            </button>
+          ))
+        }
+      </div>
+
+      <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] overflow-hidden">
+        <span data-hero-progress class="hero-tab-progress block h-full origin-left bg-accent-vivid/80"></span>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="p-4 sm:p-5">
+      <!-- Live Mini Command Strip -->
+      <div class="mb-3.5 flex items-center justify-between gap-2 rounded-lg border border-border/80 bg-surface/80 px-3 py-1.5 font-mono text-[0.6875rem]">
+        <span class="min-w-0 truncate">
+          <span class="text-accent">$</span>
+          <span data-hero-cmd class="ml-1.5 text-fg-secondary">{tabs[0].cmd}</span><span
+            aria-hidden="true"
+            class="hero-cursor ml-0.5 inline-block h-3 w-1.5 translate-y-0.5 bg-accent-vivid"
+          ></span>
+        </span>
+        <span data-hero-badge class="shrink-0 text-fg-muted">{tabs[0].badge}</span>
+      </div>
+
+      <!-- Shared grid cell locks all tabs to equal height across viewports -->
+      <div class="grid grid-cols-1">
+        <!-- Stack Panel: Step-by-step Pipeline Nodes -->
+        <div
+          id="hero-panel-stack"
+          role="tabpanel"
+          aria-labelledby="hero-tab-stack"
+          data-hero-panel="stack"
+          data-active="true"
+          aria-hidden="false"
+          class="relative col-start-1 row-start-1 flex h-full flex-col justify-between pl-4"
+        >
+          <div aria-hidden="true" class="pointer-events-none absolute top-3 bottom-3 left-[4.5px] w-px bg-border"></div>
+
+          {
+            stackRows.map((row, rIdx) => (
+              <div
+                style={`--row-i: ${rIdx}`}
+                class="hero-row relative flex flex-1 flex-wrap items-center justify-between gap-2 border-b border-border/70 py-2 first:pt-0 last:border-b-0 last:pb-0"
+              >
+                <span class="relative flex items-center font-mono text-[0.6875rem] text-fg-muted">
+                  <span
+                    aria-hidden="true"
+                    class="pointer-events-none absolute -left-[15px] top-1/2 flex size-2 -translate-y-1/2 items-center justify-center"
+                  >
+                    <span class="size-2 rounded-full border border-border-strong bg-surface-elevated"></span>
+                    <span class="hero-step-ring absolute inset-0 rounded-full bg-accent-vivid opacity-0"></span>
+                    <span class="hero-step-active absolute inset-0 rounded-full bg-accent-vivid opacity-0"></span>
+                  </span>
+                  {row.group}
+                </span>
+                <div class="flex flex-wrap justify-end gap-1.5">
+                  {row.items.map((item) => (
+                    <span
+                      class:list={[
+                        "rounded-md border px-2 py-0.5 font-mono text-[0.6875rem] transition-all duration-150 hover:-translate-y-0.5 hover:border-accent/60 hover:text-accent",
+                        item.accent
+                          ? "border-accent/35 bg-accent-soft text-accent"
+                          : "border-border bg-surface text-fg-secondary",
+                      ]}
+                    >
+                      {item.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+
+        <!-- Impact Panel: Staggered Scale Bars -->
+        <div
+          id="hero-panel-impact"
+          role="tabpanel"
+          aria-labelledby="hero-tab-impact"
+          data-hero-panel="impact"
+          data-active="false"
+          aria-hidden="true"
+          inert
+          class="col-start-1 row-start-1 flex h-full flex-col justify-between gap-2"
+        >
+          {
+            impactRows.map((item, rIdx) => (
+              <div
+                style={`--row-i: ${rIdx}`}
+                class="hero-row border-b border-border/70 pb-2 last:border-b-0 last:pb-0"
+              >
+                <div class="flex items-baseline justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-medium text-fg">{item.org}</p>
+                    <p class="truncate text-xs text-fg-muted">{item.desc}</p>
+                  </div>
+                  <span class="shrink-0 font-mono text-xs font-medium tabular-nums text-accent">{item.metric}</span>
+                </div>
+                <div aria-hidden="true" class="mt-1.5 h-1 overflow-hidden rounded-full bg-border/80">
+                  <div class="hero-impact-bar h-full rounded-full bg-accent-vivid/85" style={`width: ${item.fill}`}></div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+
+        <!-- Now Panel: Crisp Iconography, Single Live Badge & Quick Actions -->
+        <div
+          id="hero-panel-now"
+          role="tabpanel"
+          aria-labelledby="hero-tab-now"
+          data-hero-panel="now"
+          data-active="false"
+          aria-hidden="true"
+          inert
+          class="col-start-1 row-start-1 flex h-full flex-col justify-between gap-2"
+        >
+          {
+            nowRows.map((row, rIdx) => (
+              <div style={`--row-i: ${rIdx}`} class="hero-row flex items-center gap-3 border-b border-border/70 pb-2">
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    "grid size-7 shrink-0 place-items-center rounded-lg border",
+                    row.icon === "role"
+                      ? "border-accent/25 bg-accent-soft/60 text-accent"
+                      : "border-border bg-surface text-fg-muted",
+                  ]}
+                >
+                  {row.icon === "role" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
+                      <rect x="3" y="7" width="18" height="13" rx="2"></rect>
+                      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  )}
+                  {row.icon === "focus" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
+                      <path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Z"></path>
+                      <path d="m4 12 8 4.5 8-4.5"></path>
+                      <path d="m4 16.5 8 4.5 8-4.5"></path>
+                    </svg>
+                  )}
+                  {row.icon === "location" && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
+                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                  )}
+                </span>
+
+                <div class="min-w-0 flex-1">
+                  <p class="font-mono text-[0.6875rem] text-fg-muted">{row.label}</p>
+                  <p class="mt-0.5 truncate text-sm font-medium text-fg">{row.value}</p>
+                </div>
+              </div>
+            ))
+          }
+
+          <div style="--row-i: 3" class="hero-row flex items-center justify-between gap-2.5 pt-0.5">
+            <div class="flex min-w-0 items-center gap-3">
+              <span aria-hidden="true" class="grid size-7 shrink-0 place-items-center rounded-lg border border-border bg-surface text-fg-muted">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
+                  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                  <path d="m3 7 9 6 9-6"></path>
+                </svg>
+              </span>
+              <div class="min-w-0">
+                <p class="font-mono text-[0.6875rem] text-fg-muted">Email</p>
+                <p class="truncate font-mono text-xs text-fg-secondary">{email}</p>
+              </div>
+            </div>
+            <div class="flex shrink-0 items-center gap-1.5">
+              <button
+                type="button"
+                data-hero-copy-email={email}
+                data-label-idle={isVi ? "Chép" : "Copy"}
+                data-label-copied={isVi ? "Đã chép" : "Copied"}
+                aria-label={isVi ? "Sao chép địa chỉ email" : "Copy email address"}
+                class="inline-flex items-center gap-1.5 rounded-lg border border-border-strong bg-surface px-2.5 py-1.5 font-mono text-[0.6875rem] font-medium text-fg transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                <svg data-copy-icon aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
+                  <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <svg data-check-icon aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden size-3.5 text-status-open">
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                <span data-copy-text>{isVi ? "Chép" : "Copy"}</span>
+              </button>
+              <a
+                href={cvUrl}
+                target="_blank"
+                rel="noopener"
+                class="inline-flex items-center gap-1 rounded-lg border border-accent/35 bg-accent-soft/70 px-2.5 py-1.5 font-mono text-[0.6875rem] font-medium text-accent transition-colors hover:bg-accent hover:text-accent-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path>
+                  <path d="M14 2v6h6"></path>
+                </svg>
+                <span>CV</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Telemetry Strip -->
+    <div class="flex items-center justify-between gap-2 border-t border-border bg-surface/60 px-4 py-2 font-mono text-[0.6875rem] text-fg-muted">
+      <span>Astro 7 · TypeScript · Tailwind</span>
+      <span class="whitespace-nowrap font-medium text-accent">Lighthouse 100×4</span>
+    </div>
+  </div>
+</aside>
+
+<script>
+  let heroCardTimer: number | undefined;
+  let heroCmdTimer: number | undefined;
+  let heroDelayTimer: number | undefined;
+
+  function placeHeroTabPill(card: HTMLElement) {
+    const tablist = card.querySelector<HTMLElement>("[role='tablist']");
+    const pill = card.querySelector<HTMLElement>("[data-hero-tab-pill]");
+    const active = card.querySelector<HTMLElement>("[role='tab'][aria-selected='true']");
+    if (!tablist || !pill || !active) return;
+
+    tablist.dataset.pillReady = "1";
+    pill.style.width = `${active.offsetWidth}px`;
+    pill.style.transform = `translateX(${active.offsetLeft}px)`;
+  }
+
+  function initHeroCard() {
+    clearInterval(heroCardTimer);
+    clearInterval(heroCmdTimer);
+    clearTimeout(heroDelayTimer);
+
+    const cards = document.querySelectorAll<HTMLElement>("[data-hero-card]");
+    if (cards.length === 0) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const canHover = window.matchMedia("(hover: hover)").matches;
+
+    cards.forEach((card) => {
+      const tabs = [...card.querySelectorAll<HTMLButtonElement>("[data-hero-tab]")];
+      const panels = [...card.querySelectorAll<HTMLElement>("[data-hero-panel]")];
+      const cmdEl = card.querySelector<HTMLElement>("[data-hero-cmd]");
+      const badgeEl = card.querySelector<HTMLElement>("[data-hero-badge]");
+      const progressEl = card.querySelector<HTMLElement>("[data-hero-progress]");
+
+      const restartProgress = () => {
+        if (!progressEl || reduceMotion) return;
+        progressEl.classList.remove("is-running");
+        requestAnimationFrame(() => {
+          progressEl.classList.add("is-running");
+        });
+      };
+
+      const setCommand = (text: string, badge: string, animate: boolean) => {
+        clearInterval(heroCmdTimer);
+        if (badgeEl) badgeEl.textContent = badge;
+        if (!cmdEl) return;
+        if (!animate || reduceMotion) {
+          cmdEl.textContent = text;
+          return;
+        }
+        let i = 0;
+        cmdEl.textContent = "";
+        heroCmdTimer = window.setInterval(() => {
+          i += 1;
+          cmdEl.textContent = text.slice(0, i);
+          if (i >= text.length) clearInterval(heroCmdTimer);
+        }, 14);
+      };
+
+      let roBound = false;
+      const enablePillTracker = () => {
+        if (roBound || !card.isConnected) return;
+        roBound = true;
+        placeHeroTabPill(card);
+        if ("ResizeObserver" in window) {
+          new ResizeObserver(() => placeHeroTabPill(card)).observe(card);
+        }
+      };
+
+      const activateTab = (targetTab: HTMLButtonElement, animateCmd = true) => {
+        enablePillTracker();
+        card.dataset.tabSwitched = "1";
+        const targetId = targetTab.dataset.heroTab;
+        tabs.forEach((t) => {
+          const active = t === targetTab;
+          t.setAttribute("aria-selected", String(active));
+          t.className = active
+            ? "relative z-10 rounded-md px-2.5 py-1 font-mono text-[0.6875rem] font-medium text-accent-fg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+            : "relative z-10 rounded-md px-2.5 py-1 font-mono text-[0.6875rem] font-medium text-fg-muted transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent";
+        });
+
+        panels.forEach((panel) => {
+          const match = panel.dataset.heroPanel === targetId;
+          panel.dataset.active = String(match);
+          panel.setAttribute("aria-hidden", String(!match));
+          panel.toggleAttribute("inert", !match);
+        });
+
+        requestAnimationFrame(() => placeHeroTabPill(card));
+        setCommand(
+          targetTab.dataset.heroCmdText ?? "",
+          targetTab.dataset.heroBadgeText ?? "",
+          animateCmd,
+        );
+        restartProgress();
+      };
+
+      heroDelayTimer = window.setTimeout(() => {
+        enablePillTracker();
+        if (card.isConnected && !card.dataset.paused) restartProgress();
+      }, 1200);
+
+      if (!card.dataset.bound) {
+        card.dataset.bound = "1";
+        let manuallyPinned = false;
+        let hoveredOrFocused = false;
+
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            manuallyPinned = true;
+            card.dataset.paused = "true";
+            clearInterval(heroCardTimer);
+            activateTab(tab, true);
+          });
+        });
+
+        card.addEventListener("pointerenter", () => {
+          hoveredOrFocused = true;
+          card.dataset.paused = "true";
+        });
+        card.addEventListener("pointerleave", () => {
+          hoveredOrFocused = false;
+          if (!manuallyPinned) delete card.dataset.paused;
+        });
+        card.addEventListener("focusin", () => {
+          hoveredOrFocused = true;
+          card.dataset.paused = "true";
+        });
+        card.addEventListener("focusout", () => {
+          hoveredOrFocused = false;
+          if (!manuallyPinned) delete card.dataset.paused;
+        });
+
+        const copyBtn = card.querySelector<HTMLButtonElement>("[data-hero-copy-email]");
+        if (copyBtn) {
+          const copyText = copyBtn.querySelector<HTMLElement>("[data-copy-text]");
+          const copyIcon = copyBtn.querySelector<HTMLElement>("[data-copy-icon]");
+          const checkIcon = copyBtn.querySelector<HTMLElement>("[data-check-icon]");
+          let timer: number | undefined;
+          copyBtn.addEventListener("click", async () => {
+            const addr = copyBtn.dataset.heroCopyEmail;
+            if (!addr) return;
+            try {
+              await navigator.clipboard.writeText(addr);
+            } catch {
+              return;
+            }
+            if (copyText) copyText.textContent = copyBtn.dataset.labelCopied ?? "Copied";
+            copyIcon?.classList.add("hidden");
+            checkIcon?.classList.remove("hidden");
+            copyBtn.dataset.copied = "true";
+            copyBtn.classList.add("border-accent", "text-accent");
+            clearTimeout(timer);
+            timer = window.setTimeout(() => {
+              if (copyText) copyText.textContent = copyBtn.dataset.labelIdle ?? "Copy";
+              copyIcon?.classList.remove("hidden");
+              checkIcon?.classList.add("hidden");
+              delete copyBtn.dataset.copied;
+              copyBtn.classList.remove("border-accent", "text-accent");
+            }, 1600);
+          });
+        }
+
+        if (canHover && !reduceMotion && card.hasAttribute("data-tilt-card")) {
+          card.addEventListener(
+            "pointermove",
+            (e) => {
+              const rect = card.getBoundingClientRect();
+              const nx = (e.clientX - rect.left) / rect.width - 0.5;
+              const ny = (e.clientY - rect.top) / rect.height - 0.5;
+              const rx = (-ny * 5.2).toFixed(2);
+              const ry = (nx * 5.2).toFixed(2);
+              card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+            },
+            { passive: true },
+          );
+          card.addEventListener("pointerleave", () => {
+            card.style.transform = "";
+          });
+        }
+
+        if (!reduceMotion && tabs.length > 1) {
+          heroCardTimer = window.setInterval(() => {
+            if (!card.isConnected) {
+              clearInterval(heroCardTimer);
+              return;
+            }
+            if (manuallyPinned || hoveredOrFocused || document.hidden) return;
+            const currentIdx = tabs.findIndex((t) => t.getAttribute("aria-selected") === "true");
+            const nextTab = tabs[(currentIdx + 1) % tabs.length];
+            if (nextTab) activateTab(nextTab, true);
+          }, 6500);
+        }
+      }
+    });
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    if (typeof requestIdleCallback === "function") requestIdleCallback(initHeroCard);
+    else requestAnimationFrame(initHeroCard);
+  });
+</script>

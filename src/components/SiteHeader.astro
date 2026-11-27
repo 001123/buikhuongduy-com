@@ -1,0 +1,270 @@
+---
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+import SearchBox from "./SearchBox.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import { cvUrl } from "../data/profile";
+import { homePath, sectionPaths, useTranslations, type Lang } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+  links: Record<Lang, string>;
+}
+
+const { lang, links } = Astro.props;
+const t = useTranslations(lang);
+
+const currentPath = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const isHome = currentPath === homePath[lang];
+
+const navItems = [
+  {
+    section: "home",
+    num: "01",
+    label: t("nav.home"),
+    href: homePath[lang],
+    active: isHome,
+  },
+  ...(["about", "blog", "contact"] as const).map((s, idx) => {
+    const href = sectionPaths[s][lang];
+    const active = s === "blog" ? currentPath.startsWith(href) : currentPath === href;
+    return {
+      section: s,
+      num: `0${idx + 2}`,
+      label: t(`nav.${s}`),
+      href,
+      active,
+    };
+  }),
+];
+
+const activeLabel = navItems.find((item) => item.active)?.label ?? t("nav.home");
+---
+
+<header class="sticky top-0 z-40 border-b border-border/80 bg-bg/85 backdrop-blur-md">
+  <div class="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
+    <!-- Mobile Hamburger Trigger + Active Route Label -->
+    <div class="flex min-w-0 items-center gap-2.5 sm:hidden">
+      <button
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-nav-drawer"
+        aria-label={t("nav.menuOpen")}
+        data-label-open={t("nav.menuOpen")}
+        data-label-close={t("nav.menuClose")}
+        class="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-fg transition-colors hover:border-border-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        <span aria-hidden="true" class="relative block h-3.5 w-4">
+          <span class="hamburger-line hamburger-line-1"></span>
+          <span class="hamburger-line hamburger-line-2"></span>
+          <span class="hamburger-line hamburger-line-3"></span>
+        </span>
+      </button>
+      <span class="truncate text-sm font-medium text-fg">{activeLabel}</span>
+    </div>
+
+    <!-- Desktop Nav: Minimal Developer Path / Numbered Nav -->
+    <nav aria-label={t("nav.label")} class="hidden sm:block">
+      <ul class="flex items-center gap-1 text-[0.8125rem]">
+        {
+          navItems.map(({ num, label, href, active }, idx) => (
+            <li class="flex items-center gap-1">
+              {idx > 0 && (
+                <span aria-hidden="true" class="hidden select-none font-mono text-[0.6875rem] text-border-strong md:inline">
+                  /
+                </span>
+              )}
+              <a
+                href={href}
+                aria-current={active ? "page" : undefined}
+                class:list={[
+                  "group relative inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                  active
+                    ? "bg-accent-soft text-accent after:pointer-events-none after:absolute after:inset-x-2.5 after:-bottom-[12px] after:h-[1.5px] after:rounded-full after:bg-accent-vivid"
+                    : "text-fg-secondary hover:bg-surface/80 hover:text-fg",
+                ]}
+              >
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    "font-mono text-[0.6875rem] tabular-nums transition-colors",
+                    active ? "text-accent" : "text-fg-muted/80 group-hover:text-accent",
+                  ]}
+                >
+                  {num}
+                </span>
+                <span>{label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <!-- Right Utilities -->
+    <div class="flex shrink-0 items-center gap-1.5">
+      <SearchBox lang={lang} />
+      <LanguageSwitcher lang={lang} links={links} />
+      <ThemeToggle />
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Navigation Drawer (placed outside header to avoid backdrop-blur fixed-position trap) -->
+<div
+  id="mobile-nav-drawer"
+  data-mobile-drawer
+  data-open="false"
+  aria-hidden="true"
+  inert
+  class="fixed inset-0 top-14 z-30 sm:hidden"
+>
+  <button
+    type="button"
+    tabindex="-1"
+    aria-label={t("nav.menuClose")}
+    data-mobile-backdrop
+    class="absolute inset-0 bg-bg/65 backdrop-blur-xs"
+  ></button>
+
+  <div
+    data-mobile-sheet
+    class="relative mx-4 mt-3 overflow-hidden rounded-2xl border border-border-strong bg-surface-elevated p-3 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.28)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.85)]"
+  >
+    <div class="flex items-center justify-between px-2 pb-2 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-fg-muted">
+      <span>{t("nav.menuLabel")}</span>
+      <span>HCMC · VN</span>
+    </div>
+
+    <nav aria-label={t("nav.label")}>
+      <ul class="space-y-1">
+        {
+          navItems.map(({ num, label, href, active }) => (
+            <li>
+              <a
+                href={href}
+                data-mobile-nav-link
+                aria-current={active ? "page" : undefined}
+                class:list={[
+                  "flex min-h-[44px] items-center justify-between rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                  active
+                    ? "border-accent/35 bg-accent-soft text-accent"
+                    : "border-transparent text-fg hover:border-border hover:bg-surface",
+                ]}
+              >
+                <span class="flex items-center gap-3">
+                  <span
+                    class:list={[
+                      "font-mono text-[0.6875rem] tabular-nums",
+                      active ? "text-accent" : "text-fg-muted",
+                    ]}
+                  >
+                    {num}
+                  </span>
+                  <span>{label}</span>
+                </span>
+                {active ? (
+                  <span aria-hidden="true" class="size-2 rounded-full bg-accent-vivid"></span>
+                ) : (
+                  <span aria-hidden="true" class="font-mono text-xs text-fg-muted">→</span>
+                )}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="mt-3 flex items-center gap-2 border-t border-border pt-3">
+      <button
+        type="button"
+        data-cmd-open
+        data-mobile-close
+        class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-3 text-xs font-medium text-fg transition-colors hover:border-border-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-fg-muted">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <span>{t("cmd.open")}</span>
+      </button>
+      <a
+        href={cvUrl}
+        target="_blank"
+        rel="noopener"
+        data-mobile-close
+        class="inline-flex h-10 items-center justify-center gap-1 rounded-xl border border-border-strong bg-surface-elevated px-3.5 font-mono text-xs font-medium text-fg transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        <span>{t("nav.cv")}</span>
+        <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  let mobileMenuBound = false;
+
+  function setMobileDrawerOpen(open: boolean, returnFocus = false) {
+    const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+    const drawer = document.querySelector<HTMLElement>("[data-mobile-drawer]");
+    if (!toggle || !drawer) return;
+
+    drawer.dataset.open = String(open);
+    drawer.setAttribute("aria-hidden", String(!open));
+    drawer.toggleAttribute("inert", !open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute(
+      "aria-label",
+      open ? (toggle.dataset.labelClose ?? "Close menu") : (toggle.dataset.labelOpen ?? "Open menu"),
+    );
+    document.body.style.overflow = open ? "hidden" : "";
+
+    if (!open && returnFocus) {
+      toggle.focus();
+    } else if (open) {
+      const activeOrFirst =
+        drawer.querySelector<HTMLElement>("[data-mobile-nav-link][aria-current='page']") ??
+        drawer.querySelector<HTMLElement>("[data-mobile-nav-link]");
+      activeOrFirst?.focus();
+    }
+  }
+
+  function initMobileMenu() {
+    setMobileDrawerOpen(false);
+    if (mobileMenuBound) return;
+    mobileMenuBound = true;
+
+    document.addEventListener("click", (e) => {
+      if (!(e.target instanceof Element)) return;
+      if (e.target.closest("[data-menu-toggle]")) {
+        const drawer = document.querySelector<HTMLElement>("[data-mobile-drawer]");
+        const nextOpen = drawer?.dataset.open !== "true";
+        setMobileDrawerOpen(nextOpen);
+        return;
+      }
+      if (e.target.closest("[data-mobile-backdrop], [data-mobile-close], [data-mobile-nav-link]")) {
+        setMobileDrawerOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      const drawer = document.querySelector<HTMLElement>("[data-mobile-drawer]");
+      if (drawer?.dataset.open === "true") {
+        setMobileDrawerOpen(false, true);
+      }
+    });
+
+    window.matchMedia("(min-width: 640px)").addEventListener("change", (mq) => {
+      if (mq.matches) setMobileDrawerOpen(false);
+    });
+
+    document.addEventListener("astro:before-swap", () => {
+      document.body.style.overflow = "";
+    });
+  }
+
+  initMobileMenu();
+  document.addEventListener("astro:page-load", initMobileMenu);
+</script>

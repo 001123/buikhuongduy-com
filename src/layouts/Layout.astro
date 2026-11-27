@@ -2,9 +2,9 @@
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import { Font } from "astro:assets";
-import LanguageSwitcher from "../components/LanguageSwitcher.astro";
-import SearchBox from "../components/SearchBox.astro";
-import CursorEffects from "../components/CursorEffects.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import CommandPalette from "../components/CommandPalette.astro";
 import Analytics from "../components/Analytics.astro";
 import { defaultLang, getLang, homePath, languages, locales, useTranslations, type Lang } from "../i18n/ui";
 import { cleanText, structuredData, type ArticleMeta, type Crumb, type PageType } from "../lib/seo";
@@ -23,8 +23,8 @@ interface Props {
   pageType?: PageType;
   /** Set on blog posts to emit article metadata. */
   article?: ArticleMeta;
-  /** Disable the fixed language switcher when the page places it elsewhere. */
-  floatingLangSwitcher?: boolean;
+  /** Disable header/footer chrome (used by the bilingual 404 page). */
+  showChrome?: boolean;
   /** Keep the page out of search results (e.g. 404); also drops canonical, hreflang and JSON-LD. */
   noindex?: boolean;
   /** Breadcrumb trail after Home, for JSON-LD. */
@@ -46,7 +46,7 @@ const {
   translations,
   pageType = "WebPage",
   article,
-  floatingLangSwitcher = true,
+  showChrome = true,
   noindex = false,
   breadcrumbs,
   itemList,
@@ -78,7 +78,6 @@ const jsonLd = structuredData({
   description,
   pageType: article ? "WebPage" : pageType,
   image: ogImage,
-  // Stable URL served by src/pages/avatar.webp.ts (hashed asset names change between builds).
   avatar: new URL("/avatar.webp", site),
   article,
   breadcrumbs,
@@ -92,6 +91,8 @@ const jsonLd = structuredData({
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#09090B" media="(prefers-color-scheme: dark)" />
     <meta name="description" content={description} />
     <meta name="author" content={t("site.name")} />
     <meta name="robots" content={noindex ? "noindex, follow" : "index, follow, max-image-preview:large"} />
@@ -139,9 +140,8 @@ const jsonLd = structuredData({
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
-    {/* Preload every weight used above the fold (500 for nav/labels, Fraunces 400 for intros); a late weight swaps text after FCP and inflates mobile Speed Index. */}
-    <Font cssVariable="--font-be-vietnam-pro" preload={[{ weight: 400, style: "normal", subset: "latin" }, { weight: 400, style: "normal", subset: "vietnamese" }, { weight: 500, style: "normal", subset: "latin" }, { weight: 500, style: "normal", subset: "vietnamese" }]} />
-    <Font cssVariable="--font-fraunces" preload={[{ weight: 400, style: "normal", subset: "latin" }, { weight: 400, style: "normal", subset: "vietnamese" }, { weight: 600, style: "normal", subset: "latin" }, { weight: 600, style: "normal", subset: "vietnamese" }]} />
+    <Font cssVariable="--font-be-vietnam-pro" preload={[{ weight: 400, style: "normal", subset: "latin" }, { weight: 400, style: "normal", subset: "vietnamese" }, { weight: 500, style: "normal", subset: "latin" }, { weight: 500, style: "normal", subset: "vietnamese" }, { weight: 600, style: "normal", subset: "latin" }, { weight: 600, style: "normal", subset: "vietnamese" }]} />
+    <Font cssVariable="--font-jetbrains-mono" />
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
@@ -156,9 +156,20 @@ const jsonLd = structuredData({
     <ClientRouter />
     <Analytics />
     <script is:inline>
-      // Apply the blog reading mode before first paint to avoid a content flash.
-      // A `?mode=` URL param (shared links) wins over the reader's saved preference.
+      // Apply theme and blog reading mode before first paint and across view transitions.
       (function () {
+        function resolveTheme() {
+          try {
+            var saved = localStorage.getItem("theme");
+            if (saved === "dark" || saved === "light") return saved;
+          } catch (e) {}
+          return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        function applyTheme(doc) {
+          var t = resolveTheme();
+          doc.documentElement.classList.toggle("dark", t === "dark");
+          doc.documentElement.style.colorScheme = t;
+        }
         function applyReadingMode(doc, url) {
           var m = new URL(url).searchParams.get("mode");
           if (m !== "tldr" && m !== "normal" && m !== "advanced") {
@@ -168,32 +179,38 @@ const jsonLd = structuredData({
           }
           if (m === "tldr" || m === "advanced") doc.documentElement.dataset.readingMode = m;
         }
+        applyTheme(document);
         applyReadingMode(document, location.href);
-        if (!window.__readingModeHooked) {
-          window.__readingModeHooked = true;
-          // View transitions replace <html> attributes; restore the mode on the incoming page before it is swapped in.
+        if (!window.__pageHeadHooks) {
+          window.__pageHeadHooks = true;
           document.addEventListener("astro:before-swap", function (e) {
+            applyTheme(e.newDocument);
             applyReadingMode(e.newDocument, e.to.href);
           });
         }
       })();
     </script>
   </head>
-  <body class="bg-ink font-sans text-paper antialiased">
+  <body class="flex min-h-dvh flex-col bg-bg font-sans text-fg antialiased">
     {
-      floatingLangSwitcher && (
-        <div class="fixed top-4 right-4 z-50 flex items-center gap-2 sm:top-6 sm:right-6">
-          <SearchBox lang={lang} />
-          <LanguageSwitcher lang={lang} links={links} class="" />
-        </div>
+      showChrome ? (
+        <>
+          <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-fg focus:px-3 focus:py-1.5 focus:text-sm focus:font-medium focus:text-bg"
+          >
+            Skip to content
+          </a>
+          <SiteHeader lang={lang} links={links} />
+          <main id="main-content" class="flex-1">
+            <slot />
+          </main>
+          <SiteFooter lang={lang} />
+          <CommandPalette lang={lang} links={links} />
+        </>
+      ) : (
+        <slot />
       )
     }
-    <slot />
-    <CursorEffects />
-    <script>
-      document.addEventListener("astro:after-swap", () => {
-        document.documentElement.classList.add("navigated");
-      });
-    </script>
   </body>
 </html>

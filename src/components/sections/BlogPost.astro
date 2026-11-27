@@ -3,13 +3,23 @@ import { render } from "astro:content";
 import SectionPage from "../../layouts/SectionPage.astro";
 import ReadingModes from "../ReadingModes.astro";
 import MediaViewer from "../MediaViewer.astro";
+import CodeCopy from "../CodeCopy.astro";
 import PostActions from "../PostActions.astro";
-import OrnamentDivider from "../OrnamentDivider.astro";
 import PostFeedback from "../PostFeedback.astro";
 import AuthorBox from "../AuthorBox.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { categories } from "../../data/categories";
-import { categoryPath, formatDateTime, postAlternates, postTranslations, postUrl, relatedPosts, type Post } from "../../lib/blog";
+import {
+  categoryPath,
+  formatDateTime,
+  formatShortDate,
+  postAlternates,
+  postTranslations,
+  postUrl,
+  readingTimeMinutes,
+  relatedPosts,
+  type Post,
+} from "../../lib/blog";
 
 interface Props {
   post: Post;
@@ -23,6 +33,8 @@ const hasModes = Boolean(remarkPluginFrontmatter.hasModes);
 const hasMermaid = Boolean(remarkPluginFrontmatter.hasMermaid);
 // Markdown or inline HTML images; the viewer (and its script) ships only when there is something to zoom.
 const hasImages = /!\[[^\]]*\]\(|<img\b/i.test(post.body ?? "");
+const hasCode = /```/.test(post.body ?? "");
+const readingLabel = t("blog.readingTime").replace("{n}", String(readingTimeMinutes(post.body)));
 const alternates = await postAlternates(post);
 const translations = await postTranslations(post);
 const { title, seoTitle, description, pubDate, updatedDate, tags, draft, category } = post.data;
@@ -48,42 +60,107 @@ const related = await relatedPosts(post);
   backHref={sectionPaths.blog[lang]}
   backLabel={t("blog.back")}
 >
-  <div slot="meta" class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-paper/60">
-    {cat && (
-      <a href={cat.path} class="rounded-full border border-rice/50 px-2.5 py-0.5 text-xs font-medium text-rice glow-hover hover:border-rice hover:bg-rice/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
-        {cat.name}
-      </a>
-    )}
-    <span>{t("blog.published")} <time datetime={pubDate.toISOString()}>{formatDateTime(pubDate, lang)}</time></span>
-    {updatedDate && <span>{t("blog.updated")} <time datetime={updatedDate.toISOString()}>{formatDateTime(updatedDate, lang)}</time></span>}
-    {draft && <span class="rounded-full border border-lotus/60 px-2 py-0.5 text-xs text-lotus">{t("blog.draft")}</span>}
-    {tags.length > 0 && (
-      <ul class="flex flex-wrap gap-2">
-        {tags.map((tag) => <li class="rounded-full bg-paper/10 px-2.5 py-0.5 text-xs text-paper/70">#{tag}</li>)}
-      </ul>
-    )}
-  </div>
-  {hasModes && <div slot="meta" class="mt-2"><ReadingModes /></div>}
-  {hasModes ? <div class="reading-content"><Content /></div> : <Content />}
-  <AuthorBox />
-  {related.length > 0 && (
-    <section class="not-prose mt-14" aria-labelledby="related-heading">
-      <OrnamentDivider class="mb-8" />
-      <h2 id="related-heading" class="font-serif text-xl font-semibold text-paper sm:text-2xl">{t("blog.related")}</h2>
-      <ul class="mt-4 grid gap-3">
-        {related.map((p) => (
-          <li>
-            <a href={postUrl(p)} class="group block rounded-xl border border-paper/15 bg-ink/40 px-4 py-3 glow-frame-hover hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice">
-              <span class="block font-medium text-paper group-hover:text-rice">{p.data.title}</span>
-              <span class="mt-1 block line-clamp-2 text-sm text-paper/65">{p.data.description}</span>
+  <div slot="meta" class="mt-2 flex flex-col gap-3">
+    <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 font-mono text-xs text-fg-muted">
+      {
+        cat && (
+          <>
+            <a
+              href={cat.path}
+              class="font-medium text-accent underline decoration-accent/35 underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              {cat.name}
             </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
-  <OrnamentDivider class="mt-14" />
-  <PostActions slug={post.id} />
-  <PostFeedback slug={post.id} title={title} />
+            <span aria-hidden="true" class="text-border-strong">·</span>
+          </>
+        )
+      }
+      <span>
+        {t("blog.published")} <time datetime={pubDate.toISOString()}>{formatDateTime(pubDate, lang)}</time>
+      </span>
+      {
+        updatedDate && (
+          <>
+            <span aria-hidden="true" class="text-border-strong">·</span>
+            <span>
+              {t("blog.updated")} <time datetime={updatedDate.toISOString()}>{formatDateTime(updatedDate, lang)}</time>
+            </span>
+          </>
+        )
+      }
+      <span aria-hidden="true" class="text-border-strong">·</span>
+      <span>{readingLabel}</span>
+      {
+        draft && (
+          <>
+            <span aria-hidden="true" class="text-border-strong">·</span>
+            <span class="rounded border border-accent/40 px-1.5 py-0.5 text-[0.6875rem] text-accent">
+              {t("blog.draft")}
+            </span>
+          </>
+        )
+      }
+    </div>
+    {
+      tags.length > 0 && (
+        <ul class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-xs text-fg-muted">
+          {tags.map((tag) => (
+            <li>#{tag}</li>
+          ))}
+        </ul>
+      )
+    }
+    {
+      hasModes && (
+        <div class="pt-1">
+          <ReadingModes />
+        </div>
+      )
+    }
+  </div>
+
+  {hasModes ? <div class="reading-content"><Content /></div> : <Content />}
+
+  <AuthorBox />
+
+  {
+    related.length > 0 && (
+      <section class="not-prose mt-12 border-t border-border pt-8" aria-labelledby="related-heading">
+        <h2 id="related-heading" class="font-mono text-xs font-medium uppercase tracking-[0.12em] text-fg-muted">
+          {t("blog.related")}
+        </h2>
+        <ul class="mt-4 divide-y divide-border">
+          {related.map((p) => (
+            <li class="py-3.5 first:pt-0 last:pb-0">
+              <a
+                href={postUrl(p)}
+                class="group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+              >
+                <div class="min-w-0">
+                  <span class="block text-base font-medium text-fg transition-colors group-hover:text-accent">
+                    {p.data.title}
+                  </span>
+                  <span class="mt-1 block line-clamp-1 text-sm text-fg-muted">{p.data.description}</span>
+                </div>
+                <time
+                  datetime={p.data.pubDate.toISOString()}
+                  class="shrink-0 font-mono text-xs tabular-nums text-fg-muted"
+                >
+                  {formatShortDate(p.data.pubDate, lang)}
+                </time>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <div class="not-prose mt-12 border-t border-border pt-8">
+    <PostActions slug={post.id} />
+    <PostFeedback slug={post.id} title={title} />
+  </div>
+
+  {hasCode && <CodeCopy />}
   {(hasMermaid || hasImages) && <MediaViewer />}
 </SectionPage>

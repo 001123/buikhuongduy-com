@@ -1,40 +1,38 @@
 ---
 import SectionPage from "../../layouts/SectionPage.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
-import { Image } from "astro:assets";
-import avatar from "../../assets/avatar_cv.webp";
+import mascot from "../../assets/mascot-pixel.gif";
 import { cvUrl, socials } from "../../data/profile";
+import { projects } from "../../data/projects";
 import { gitDates } from "../../lib/git-dates";
 
-// The About page's content lives in this file and the shared profile data.
-const dates = gitDates(["src/components/sections/About.astro", "src/data/profile.ts"]);
+const dates = gitDates(["src/components/sections/About.astro", "src/data/profile.ts", "src/data/projects.ts"]);
 
 const linkedinUrl = socials.find((s) => s.icon === "linkedin")!.href;
 const kdLabsName = "KD Labs";
 const kdLabsUrl = "https://kd.io.vn";
-const linkClass = "no-underline hover:underline";
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 
-const skills = [
-  "AI Agents, Skills, MCP",
-  "JavaScript / TypeScript",
-  "React / Next.js, Micro-frontends",
-  "Vue / Nuxt",
-  "CSS, SCSS, Tailwind",
-  "Node.js, Bun, GraphQL, REST APIs",
-  "SQL, NoSQL",
-  "Docker, Kubernetes, Terraform, CI/CD",
-  "AWS, GCP, Cloudflare",
-  "Vitest, Playwright, agent-browser",
-  "Webpack, Vite",
-  "UI/UX",
-];
+const skillGroups = {
+  vi: [
+    { group: "Frontend", items: "JavaScript / TypeScript, React / Next.js, Micro-frontends, Vue / Nuxt, CSS, SCSS, Tailwind, UI/UX" },
+    { group: "Backend & Data", items: "Node.js, Bun, GraphQL, REST APIs, SQL, NoSQL" },
+    { group: "Infra & DevOps", items: "Docker, Kubernetes, Terraform, CI/CD, AWS, GCP, Cloudflare" },
+    { group: "AI & Testing", items: "AI Agents, Skills, MCP, Vitest, Playwright, agent-browser, Webpack, Vite" },
+  ],
+  en: [
+    { group: "Frontend", items: "JavaScript / TypeScript, React / Next.js, Micro-frontends, Vue / Nuxt, CSS, SCSS, Tailwind, UI/UX" },
+    { group: "Backend & Data", items: "Node.js, Bun, GraphQL, REST APIs, SQL, NoSQL" },
+    { group: "Infra & DevOps", items: "Docker, Kubernetes, Terraform, CI/CD, AWS, GCP, Cloudflare" },
+    { group: "AI & Testing", items: "AI Agents, Skills, MCP, Vitest, Playwright, agent-browser, Webpack, Vite" },
+  ],
+}[lang];
 
 const content = {
   vi: {
-    avatarAlt: "Ảnh chân dung Bùi Khương Duy",
+    avatarAlt: "Mascot pixel của Bùi Khương Duy",
     intro: [
       "Xin chào, mình là Duy (Timi), Lead/Senior Frontend Engineer kiêm Full-Stack Developer theo hướng AI-native với hơn 9 năm kinh nghiệm xây dựng trọn vẹn sản phẩm web và mobile lưu lượng lớn. Thế mạnh của mình là frontend với React, Next.js, Vue và TypeScript, cùng kinh nghiệm thực tế ở backend và hạ tầng: dịch vụ Node.js, GraphQL và REST API, SQL/NoSQL, AWS và Cloudflare với Terraform, Docker, Kubernetes và CI/CD.",
       "Mình từng dẫn dắt đội 10 lập trình viên, thiết kế nền tảng multi-tenant phục vụ hàng triệu lượt truy cập mỗi tháng, và làm sản phẩm từ nền tảng bảo hiểm hơn 2 triệu khách hàng đến các trang sức khoẻ hơn 30 triệu lượt xem mỗi tháng. Mình đưa AI vào cả sản phẩm lẫn cách đội làm việc, từ backend Node.js cho AI Content Engine dùng LLM đến quy trình Claude Code cho cả team.",
@@ -42,23 +40,17 @@ const content = {
       "Suốt chặng đường đó, trải qua nhiều dự án, nhiều đội nhóm và cả những lúc vấp ngã, mình vẫn luôn cố gắng học hỏi và tối ưu từng ngày. Mình biết ơn tất cả những người đã giúp đỡ, đồng hành và chỉ dạy, cùng những bài học từ cuộc sống đã giúp mình trưởng thành như hôm nay.",
     ],
     jobs: [
-      { period: "08/2026 — nay", role: "Founder", org: "KD Labs", note: "Xây KD Code (VS Code extension) và Simple OTP (mobile app cho Android và iOS), hai sản phẩm mã nguồn mở (MIT); các dự án khác vẫn đang được phát triển. Nghiên cứu và áp dụng phương pháp AI-native để phát triển phần mềm nhanh hơn, hiệu quả hơn và an toàn hơn." },
-      { period: "04/2025 — 08/2026", role: "Lead Senior Engineer", org: "AFD", note: "Dẫn dắt đội 10 lập trình viên, xây nền tảng multi-tenant trên Contentful, Strapi và Payload CMS phục vụ hàng triệu lượt truy cập mỗi tháng, phát triển mobile app bằng Expo, xây backend Node.js cho AI Content Engine nội bộ và đưa quy trình AI-native thành chuẩn của team." },
-      { period: "08/2021 — 04/2025", role: "Senior Frontend Developer", org: "10X / Saladin", note: "Xây Saladin, nền tảng bảo hiểm một cửa đạt hơn 2 triệu khách hàng; dựng design system từ đầu và tích hợp MoMo, ZaloPay, Payoo, OnePay, Viettel Money." },
-      { period: "01/2020 — 05/2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Chuyển 9 trang sức khoẻ (HelloBacsi, HelloSehat), tổng traffic hơn 30 triệu lượt truy cập mỗi tháng, từ WordPress sang Next.js trong 2 tháng, giảm thời gian tải từ 4–5 giây xuống dưới 2 giây." },
-      { period: "08/2018 — 10/2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Ra mắt 2 ứng dụng mobile cho khách hàng doanh nghiệp, một app đạt hơn 10 triệu lượt tải." },
-      { period: "10/2017 — 08/2018", role: "Junior Web Developer", org: "Maple Studio", note: "Làm hơn 10 theme WordPress, Shopify, Haravan, tất cả đúng tiến độ." },
-    ],
-    projects: [
-      { name: "KD Code", summary: "Extension VS Code mã nguồn mở để chat và điều phối nhiều coding agent (Claude, Codex, OpenCode) qua Agent Client Protocol, có so sánh Best-of-N trên Git worktree riêng.", tags: ["TypeScript", "VS Code API", "ACP"], href: "https://marketplace.visualstudio.com/items?itemName=kd-labs.kd-code" },
-      { name: "Simple OTP", summary: "Ứng dụng 2FA mã nguồn mở, không kết nối mạng, cho iOS và Android. Mã hoá bằng AES-256-GCM trong Keychain/Keystore, hỗ trợ TOTP/HOTP và quét QR.", tags: ["iOS", "Android", "AES-256-GCM"], href: "https://github.com/kd-labs-io/simple-otp" },
-      { name: "Blog kd.io.vn", summary: "Blog kỹ thuật về hệ thống AI-native, điều phối multi-agent, bảo mật mobile và mật mã học.", tags: ["Astro", "AI", "Security"], href: "https://kd.io.vn" },
-      { name: "Onbai Online", summary: "Web app thời gian thực để cùng bạn bè luyện kiến thức trực tuyến.", tags: ["Realtime", "Web"], href: "https://github.com/onbai-oss" },
+      { period: "08/2026 – nay", role: "Founder", org: "KD Labs", note: "Xây KD Code (VS Code extension) và Simple OTP (mobile app cho Android và iOS), hai sản phẩm mã nguồn mở (MIT); các dự án khác vẫn đang được phát triển. Nghiên cứu và áp dụng phương pháp AI-native để phát triển phần mềm nhanh hơn, hiệu quả hơn và an toàn hơn." },
+      { period: "04/2025 – 08/2026", role: "Lead Senior Engineer", org: "AFD", note: "Dẫn dắt đội 10 lập trình viên, xây nền tảng multi-tenant trên Contentful, Strapi và Payload CMS phục vụ hàng triệu lượt truy cập mỗi tháng, phát triển mobile app bằng Expo, xây backend Node.js cho AI Content Engine nội bộ và đưa quy trình AI-native thành chuẩn của team." },
+      { period: "08/2021 – 04/2025", role: "Senior Frontend Developer", org: "10X / Saladin", note: "Xây Saladin, nền tảng bảo hiểm một cửa đạt hơn 2 triệu khách hàng; dựng design system từ đầu và tích hợp MoMo, ZaloPay, Payoo, OnePay, Viettel Money." },
+      { period: "01/2020 – 05/2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Chuyển 9 trang sức khoẻ (HelloBacsi, HelloSehat), tổng traffic hơn 30 triệu lượt truy cập mỗi tháng, từ WordPress sang Next.js trong 2 tháng, giảm thời gian tải từ 4–5 giây xuống dưới 2 giây." },
+      { period: "08/2018 – 10/2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Ra mắt 2 ứng dụng mobile cho khách hàng doanh nghiệp, một app đạt hơn 10 triệu lượt tải." },
+      { period: "10/2017 – 08/2018", role: "Junior Web Developer", org: "Maple Studio", note: "Làm hơn 10 theme WordPress, Shopify, Haravan, tất cả đúng tiến độ." },
     ],
     languages: "Tiếng Việt (bản ngữ) · Tiếng Anh (giao tiếp công việc)",
   },
   en: {
-    avatarAlt: "Portrait of Bui Khuong Duy",
+    avatarAlt: "Pixel mascot of Bui Khuong Duy",
     intro: [
       "Hi, I'm Duy (Timi), an AI-native Lead/Senior Frontend Engineer and Full-Stack Developer with 9+ years of experience building high-traffic web and mobile products end to end. My core strength is the frontend with React, Next.js, Vue and TypeScript, backed by hands-on work in backend and infrastructure: Node.js services, GraphQL and REST APIs, SQL/NoSQL, and AWS and Cloudflare with Terraform, Docker, Kubernetes and CI/CD.",
       "I've led a team of 10 developers, architected multi-tenant platforms serving millions of monthly visits, and shipped products ranging from a 2M+ customer insurance platform to healthcare sites with 30M+ monthly views. I build AI into both products and the way teams work, from the Node.js backend of an LLM-powered content engine to Claude Code workflows across the team.",
@@ -66,25 +58,17 @@ const content = {
       "Over these 9+ years, through many projects, teams and a few stumbles along the way, I keep learning and improving every day. I'm grateful to everyone who has helped, guided and worked alongside me, and to the life lessons that shaped who I am today.",
     ],
     jobs: [
-      { period: "Aug 2026 — now", role: "Founder", org: "KD Labs", note: "Building KD Code (a VS Code extension) and Simple OTP (a mobile app for Android and iOS), two open-source (MIT) products, with more projects in development. Researching and applying AI-native practices to build software faster, more efficiently and more securely." },
-      { period: "Apr 2025 — Aug 2026", role: "Lead Senior Engineer", org: "AFD", note: "Led a team of 10 developers, built a multi-tenant platform on Contentful, Strapi and Payload CMS serving millions of monthly visits, developed a mobile app with Expo, built the Node.js backend of an internal AI Content Engine and made AI-native development the team standard." },
-      { period: "Aug 2021 — Apr 2025", role: "Senior Frontend Developer", org: "10X / Saladin", note: "Built Saladin, a one-stop insurance platform that grew to 2M+ customers; designed the design system from scratch and integrated MoMo, ZaloPay, Payoo, OnePay and Viettel Money." },
-      { period: "Jan 2020 — May 2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Migrated 9 healthcare sites (HelloBacsi, HelloSehat) serving over 30 million monthly visits from WordPress to Next.js in 2 months, cutting load time from 4–5s to under 2s." },
-      { period: "Aug 2018 — Oct 2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Shipped 2 mobile apps for enterprise clients, one with 10M+ downloads." },
-      { period: "Oct 2017 — Aug 2018", role: "Junior Web Developer", org: "Maple Studio", note: "Delivered 10+ WordPress, Shopify and Haravan themes, all on schedule." },
-    ],
-    projects: [
-      { name: "KD Code", summary: "Open-source VS Code extension to chat with and orchestrate coding agents (Claude, Codex, OpenCode) over the Agent Client Protocol, with Best-of-N comparison in isolated Git worktrees.", tags: ["TypeScript", "VS Code API", "ACP"], href: "https://marketplace.visualstudio.com/items?itemName=kd-labs.kd-code" },
-      { name: "Simple OTP", summary: "Open-source, zero-network 2FA app for iOS and Android. Secrets are encrypted with AES-256-GCM in Keychain/Keystore, with TOTP/HOTP and QR import.", tags: ["iOS", "Android", "AES-256-GCM"], href: "https://github.com/kd-labs-io/simple-otp" },
-      { name: "kd.io.vn blog", summary: "Technical writing on AI-native systems, multi-agent orchestration, mobile security and cryptography.", tags: ["Astro", "AI", "Security"], href: "https://kd.io.vn" },
-      { name: "Onbai Online", summary: "Realtime web app for practicing knowledge online with friends.", tags: ["Realtime", "Web"], href: "https://github.com/onbai-oss" },
+      { period: "Aug 2026 – now", role: "Founder", org: "KD Labs", note: "Building KD Code (a VS Code extension) and Simple OTP (a mobile app for Android and iOS), two open-source (MIT) products, with more projects in development. Researching and applying AI-native practices to build software faster, more efficiently and more securely." },
+      { period: "Apr 2025 – Aug 2026", role: "Lead Senior Engineer", org: "AFD", note: "Led a team of 10 developers, built a multi-tenant platform on Contentful, Strapi and Payload CMS serving millions of monthly visits, developed a mobile app with Expo, built the Node.js backend of an internal AI Content Engine and made AI-native development the team standard." },
+      { period: "Aug 2021 – Apr 2025", role: "Senior Frontend Developer", org: "10X / Saladin", note: "Built Saladin, a one-stop insurance platform that grew to 2M+ customers; designed the design system from scratch and integrated MoMo, ZaloPay, Payoo, OnePay and Viettel Money." },
+      { period: "Jan 2020 – May 2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Migrated 9 healthcare sites (HelloBacsi, HelloSehat) serving over 30 million monthly visits from WordPress to Next.js in 2 months, cutting load time from 4–5s to under 2s." },
+      { period: "Aug 2018 – Oct 2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Shipped 2 mobile apps for enterprise clients, one with 10M+ downloads." },
+      { period: "Oct 2017 – Aug 2018", role: "Junior Web Developer", org: "Maple Studio", note: "Delivered 10+ WordPress, Shopify and Haravan themes, all on schedule." },
     ],
     languages: "Vietnamese (native) · English (working proficiency)",
   },
 }[lang];
 
-// Same format as job periods: "11/2026" (vi), "Nov 2026" (en).
-// Rendered at build time, then refreshed in the browser so the static page never shows a stale month.
 function formatMonth(date: Date, l: string) {
   return l === "vi"
     ? `${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`
@@ -95,25 +79,27 @@ const buildMonth = {
   label: formatMonth(now, lang),
   iso: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`,
 };
+const projectList = projects[lang];
 ---
 
 <SectionPage section="about" title={t("about.title")} lead={t("about.lead")} dates={dates}>
-  <div class="flow-root text-justify [&>p:first-of-type]:mt-0">
-    <div class="not-prose mb-6 flex justify-center sm:float-left sm:mt-[0.5em] sm:mb-4 sm:mr-8">
+  <div class="flow-root text-base leading-7 text-pretty [&>p]:leading-7 [&>p:first-of-type]:mt-0">
+    <div class="not-prose mb-6 flex justify-center sm:float-left sm:mt-1 sm:mr-7 sm:mb-4">
       <a
         href={linkedinUrl}
         target="_blank"
         rel="noopener"
         aria-label={`${content.avatarAlt} (LinkedIn)`}
-        class="rounded-full glow-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+        class="block rounded-xl transition-transform duration-200 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
       >
-        <Image
-          src={avatar}
+        <img
+          src={mascot.src}
           alt={content.avatarAlt}
-          width={384}
-          height={384}
+          width={144}
+          height={144}
           loading="eager"
-          class="size-36 rounded-full border border-paper/20 object-cover shadow-xl shadow-ink/50 transition-colors hover:border-rice sm:size-40"
+          decoding="async"
+          class="size-32 object-contain sm:size-36"
         />
       </a>
     </div>
@@ -122,20 +108,18 @@ const buildMonth = {
         i === content.intro.length - 1 ? (
           <p>
             {p} {t("about.blog")}{" "}
-            <a href={sectionPaths.blog[lang]} class="no-underline hover:underline inline-flex items-center gap-1 whitespace-nowrap">
-              {t("about.blogLink")}
-              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
-                <path d="M12 7v14"></path>
-                <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
-              </svg>
-            </a>
+            <a href={sectionPaths.blog[lang]}>{t("about.blogLink")}</a>.
           </p>
         ) : p.includes(kdLabsName) ? (
           <p>
             {p.split(kdLabsName).map((part, j) =>
-              j === 0 ? part : (
+              j === 0 ? (
+                part
+              ) : (
                 <Fragment>
-                  <a href={kdLabsUrl} target="_blank" rel="noopener" class={linkClass}>{kdLabsName}</a>
+                  <a href={kdLabsUrl} target="_blank" rel="noopener">
+                    {kdLabsName}
+                  </a>
                   {part}
                 </Fragment>
               ),
@@ -149,35 +133,44 @@ const buildMonth = {
   </div>
 
   <h2>{t("about.experience")}</h2>
-  <ol class="not-prose space-y-6 border-l border-rice/40 pl-6">
-    <li class="relative">
-      <span aria-hidden="true" class="absolute top-2 -left-[1.82rem] flex size-2.5">
-        <span class="absolute inset-0 rounded-full bg-rice motion-safe:animate-ping motion-safe:[animation-duration:2.4s]"></span>
-        <span class="relative size-2.5 rounded-full bg-rice shadow-[0_0_8px_rgb(217_181_74/0.9)]"></span>
-      </span>
-      <p class="text-sm text-rice">
+  <ol class="not-prose divide-y divide-border border-y border-border">
+    <li class="grid gap-1.5 py-5 sm:grid-cols-[10.5rem_1fr] sm:gap-x-6">
+      <p class="flex items-center gap-2 self-start pt-0.5 font-mono text-xs tabular-nums text-fg-muted">
+        <span aria-hidden="true" class="size-2 rounded-full bg-status-open"></span>
         <time data-current-month data-lang={lang} datetime={buildMonth.iso}>{buildMonth.label}</time>
       </p>
-      <p class="font-medium text-paper">
-        {t("about.hire")} <a href={sectionPaths.contact[lang]} class="text-rice underline decoration-rice/50 underline-offset-4 hover:decoration-rice">{t("about.hireLink")} →</a>
+      <p class="font-medium text-fg">
+        {t("about.hire")}{" "}
+        <a
+          href={sectionPaths.contact[lang]}
+          class="text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-accent"
+        >
+          {t("about.hireLink")} →
+        </a>
       </p>
     </li>
     {
       content.jobs.map((job) => (
-        <li class="relative">
-          <span aria-hidden="true" class="absolute top-2 -left-[1.82rem] size-2.5 rounded-full bg-rice"></span>
-          <p class="text-sm text-rice">{job.period}</p>
-          <p class="font-medium text-paper">
-            {job.role} ·{" "}
-            {job.org === kdLabsName ? (
-              <a href={kdLabsUrl} target="_blank" rel="noopener" class="text-paper/80 underline decoration-paper/30 underline-offset-4 hover:text-rice hover:decoration-rice">
-                {job.org}
-              </a>
-            ) : (
-              <span class="text-paper/80">{job.org}</span>
-            )}
-          </p>
-          <p class="text-paper/70">{job.note}</p>
+        <li class="grid gap-1.5 py-5 sm:grid-cols-[10.5rem_1fr] sm:gap-x-6">
+          <p class="pt-0.5 font-mono text-xs tabular-nums text-fg-muted">{job.period}</p>
+          <div>
+            <p class="font-medium text-fg">
+              {job.role} ·{" "}
+              {job.org === kdLabsName ? (
+                <a
+                  href={kdLabsUrl}
+                  target="_blank"
+                  rel="noopener"
+                  class="text-fg-secondary underline decoration-border-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+                >
+                  {job.org}
+                </a>
+              ) : (
+                <span class="text-fg-secondary">{job.org}</span>
+              )}
+            </p>
+            <p class="mt-1.5 text-sm leading-relaxed text-fg-secondary">{job.note}</p>
+          </div>
         </li>
       ))
     }
@@ -186,52 +179,54 @@ const buildMonth = {
   <h2>{t("projects.title")}</h2>
   <div class="not-prose grid gap-4 sm:grid-cols-2">
     {
-      content.projects.map((p) => (
+      projectList.map((p) => (
         <a
           href={p.href}
           target="_blank"
           rel="noopener"
-          class="group flex flex-col gap-3 rounded-2xl border border-paper/20 bg-ink/40 p-5 backdrop-blur-md glow-hover hover:-translate-y-0.5 hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+          class="spotlight-card group flex flex-col rounded-xl p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          <h3 class="font-serif text-xl font-semibold text-paper group-hover:text-rice">{p.name}</h3>
-          <p class="text-paper/75">{p.summary}</p>
-          <ul class="mt-auto flex flex-wrap gap-2">
-            {p.tags.map((tag) => (
-              <li class="rounded-full border border-rice/40 px-2.5 py-0.5 text-xs text-rice">{tag}</li>
-            ))}
-          </ul>
+          <div class="flex items-baseline justify-between gap-2">
+            <h3 class="text-base font-semibold tracking-tight text-fg transition-colors group-hover:text-accent">{p.name}</h3>
+            <span aria-hidden="true" class="font-mono text-xs text-fg-muted transition-colors group-hover:text-accent">↗</span>
+          </div>
+          <p class="mt-1.5 text-sm leading-relaxed text-fg-secondary">{p.summary}</p>
+          <p class="mt-auto pt-3 font-mono text-[0.75rem] text-fg-muted">{p.tags.join(" · ")}</p>
         </a>
       ))
     }
   </div>
 
   <h2>{t("projects.skills")}</h2>
-  <ul class="not-prose flex flex-wrap gap-2">
-    {skills.map((s) => <li class="rounded-full border border-paper/30 bg-ink/40 px-3 py-1 text-sm text-paper">{s}</li>)}
-  </ul>
+  <dl class="not-prose divide-y divide-border border-y border-border">
+    {
+      skillGroups.map((s) => (
+        <div class="grid gap-1 py-3.5 sm:grid-cols-[10.5rem_1fr] sm:gap-x-6">
+          <dt class="font-mono text-xs font-medium text-fg-muted sm:pt-0.5">{s.group}</dt>
+          <dd class="text-sm leading-relaxed text-fg-secondary">{s.items}</dd>
+        </div>
+      ))
+    }
+  </dl>
 
   <h2>{t("about.languages")}</h2>
-  <p>{content.languages}</p>
+  <p class="text-base leading-7">{content.languages}</p>
 
-  <p class="not-prose mt-12 flex flex-wrap gap-3">
+  <div class="not-prose mt-10 flex flex-wrap gap-3 border-t border-border pt-8">
     <a
       href={cvUrl}
       target="_blank"
       rel="noopener"
-      class="inline-flex items-center gap-2 rounded-full border border-rice/80 bg-rice/15 px-5 py-2.5 font-medium text-rice glow-hover hover:bg-rice hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+      class="inline-flex items-center gap-2 rounded-full bg-fg px-5 py-2.5 text-sm font-medium text-bg transition-colors hover:bg-accent hover:text-accent-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
     >
       {t("cv.view")}
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
-        <path d="M14 4h6v6"></path>
-        <path d="M20 4 10 14"></path>
-        <path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"></path>
-      </svg>
+      <span aria-hidden="true">↗</span>
     </a>
     <a
       href="/cv/bui-khuong-duy-cv.pdf"
       download="Bui-Khuong-Duy-(Timi)-FE-EN-2026.pdf"
       type="application/pdf"
-      class="inline-flex items-center gap-2 rounded-full border border-paper/40 bg-ink/40 px-5 py-2.5 font-medium text-paper glow-hover hover:border-rice hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+      class="inline-flex items-center gap-2 rounded-full border border-border-strong bg-surface-elevated px-5 py-2.5 text-sm font-medium text-fg transition-colors hover:border-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
     >
       {t("cv.download")}
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
@@ -240,7 +235,7 @@ const buildMonth = {
         <path d="M5 20h14"></path>
       </svg>
     </a>
-  </p>
+  </div>
 </SectionPage>
 
 <script>

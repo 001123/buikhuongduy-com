@@ -177,3 +177,25 @@ export function formatDateTime(date: Date, lang: Lang): string {
   const time = new Intl.DateTimeFormat(locales[lang].bcp47, { ...opts, hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
   return `${day} · ${time}`;
 }
+
+/** Compact editorial date for listing rows (e.g. "08/11/2026" or "Nov 08, 2026"). */
+export function formatShortDate(date: Date, lang: Lang): string {
+  return new Intl.DateTimeFormat(locales[lang].bcp47, {
+    day: "2-digit",
+    month: lang === "vi" ? "2-digit" : "short",
+    year: "numeric",
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).format(date);
+}
+
+/** Estimated reading time in minutes (excluding `:::tldr` summary blocks and Mermaid diagrams). */
+export function readingTimeMinutes(body: string | undefined): number {
+  if (!body) return 1;
+  const cleaned = body
+    .replace(/:::tldr[\s\S]*?:::/g, " ")
+    .replace(/```mermaid[\s\S]*?```/g, " ")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/[#>*_`[\]()!|-]/g, " ");
+  const words = cleaned.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}

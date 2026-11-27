@@ -10,7 +10,11 @@ const modes = [
 ---
 
 <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-  <div role="radiogroup" aria-label={t("blog.mode.label")} class="reading-modes relative isolate inline-flex rounded-lg border border-paper/25 bg-ink/40 p-1 text-[0.8125rem]">
+  <div
+    role="radiogroup"
+    aria-label={t("blog.mode.label")}
+    class="reading-modes relative isolate inline-flex rounded-lg border border-border bg-surface p-1 text-xs"
+  >
     <span class="mode-pill" aria-hidden="true"></span>
     {
       modes.map((m) => (
@@ -20,7 +24,7 @@ const modes = [
           data-mode-option={m.id}
           aria-checked={m.id === "normal" ? "true" : "false"}
           title={m.hint}
-          class="rounded-md border border-transparent px-2.5 py-1.5 cursor-pointer font-medium text-paper/70 transition-[color,background-color] duration-200 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+          class="cursor-pointer rounded-md border border-transparent px-2.5 py-1 font-medium text-fg-muted transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {m.label}
         </button>
@@ -41,28 +45,25 @@ const modes = [
     const group = document.querySelector<HTMLElement>(".reading-modes");
     const selected = group?.querySelector<HTMLElement>('[data-mode-option][aria-checked="true"]');
     if (!group || !selected) return;
-    // Sub-pixel exact, relative to the group's padding box (where the pill is positioned).
     const g = group.getBoundingClientRect();
     const b = selected.getBoundingClientRect();
     group.style.setProperty("--pill-x", `${b.left - g.left - group.clientLeft}px`);
     group.style.setProperty("--pill-w", `${b.width}px`);
     if (!group.dataset.pill) {
       group.dataset.pill = "";
-      // Enable the slide only after the first placement, so it does not animate in on load.
       requestAnimationFrame(() => requestAnimationFrame(() => (group.dataset.pill = "ready")));
     }
   }
 
-  // Fades the post body in after its sections are swapped.
   function fadeContent() {
     if (reduceMotion()) return;
     document.querySelectorAll<HTMLElement>(".reading-content").forEach((el) => {
       el.animate(
         [
-          { opacity: 0, transform: "translateY(6px)" },
+          { opacity: 0, transform: "translateY(4px)" },
           { opacity: 1, transform: "none" },
         ],
-        { duration: 280, easing: "cubic-bezier(0.2, 0, 0, 1)" },
+        { duration: 220, easing: "cubic-bezier(0.2, 0, 0, 1)" },
       );
     });
   }
@@ -72,20 +73,17 @@ const modes = [
     document.querySelectorAll<HTMLButtonElement>("[data-mode-option]").forEach((b) => {
       b.setAttribute("aria-checked", String(b.dataset.modeOption === mode));
     });
-    placePill();
-    // Keep the address bar shareable: `?mode=` reflects the current mode ("normal" is the default, so no param).
+    requestAnimationFrame(placePill);
     const url = new URL(location.href);
     if (mode === "normal") url.searchParams.delete("mode");
     else url.searchParams.set("mode", mode);
     if (url.href !== location.href) history.replaceState(history.state, "", url);
-    // Lets content that cannot render while hidden (e.g. Mermaid) catch up.
     document.dispatchEvent(new CustomEvent("reading-mode-change", { detail: mode }));
   }
 
   document.addEventListener("astro:page-load", () => {
     const options = document.querySelectorAll<HTMLButtonElement>("[data-mode-option]");
     if (options.length === 0) return;
-    // A shared link's `?mode=` wins for this visit without overwriting the reader's saved preference.
     const fromUrl = new URL(location.href).searchParams.get("mode");
     const saved = localStorage.getItem(KEY);
     apply(isMode(fromUrl) ? fromUrl : isMode(saved) ? saved : "normal");
@@ -98,7 +96,6 @@ const modes = [
         fadeContent();
       });
     });
-    // Button widths change once web fonts load or the viewport resizes.
     const group = document.querySelector<HTMLElement>(".reading-modes");
     if (group) new ResizeObserver(placePill).observe(group);
     document.fonts?.ready.then(placePill);

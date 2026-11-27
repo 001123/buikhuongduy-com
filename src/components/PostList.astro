@@ -1,37 +1,95 @@
 ---
 import { categories } from "../data/categories";
 import { getLang, useTranslations } from "../i18n/ui";
-import { formatDateTime, postUrl, type Post } from "../lib/blog";
+import { formatShortDate, postUrl, readingTimeMinutes, type Post } from "../lib/blog";
 
 interface Props {
   posts: Post[];
-  /** Extra classes for the list, e.g. grid columns. */
+  /** Extra classes for the list. */
   class?: string;
   /** Heading level for post titles; use h3 when the list sits under a section h2. */
   headingLevel?: "h2" | "h3";
+  /** Compact row layout for the home page. */
+  compact?: boolean;
+  /** Show 01, 02… numbering. */
+  numbered?: boolean;
 }
 
-const { posts, class: className, headingLevel = "h2" } = Astro.props;
+const { posts, class: className, headingLevel = "h2", compact = false, numbered = false } = Astro.props;
 const Heading = headingLevel;
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 ---
 
-<ul class:list={["not-prose grid gap-6", className]}>
-  {posts.map((post) => (
-    <li>
-      <a
-        href={postUrl(post)}
-        class="group flex h-full flex-col rounded-2xl border border-paper/15 bg-ink/40 p-5 glow-frame-hover hover:border-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice sm:p-6"
-      >
-        <Heading class="line-clamp-3 font-serif text-lg font-semibold lg:text-xl text-paper group-hover:text-rice">{post.data.title}</Heading>
-        <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-pretty text-paper/75">{post.data.description}</p>
-        <div class="mt-auto flex items-center gap-x-2 pt-4 text-xs whitespace-nowrap text-paper/60">
-          <time class="shrink-0" datetime={post.data.pubDate.toISOString()}>{formatDateTime(post.data.pubDate, lang)}</time>
-          {post.data.category && <><span aria-hidden="true" class="text-paper/30">·</span><span class="min-w-0 truncate font-medium text-rice/90">{categories[post.data.category][lang].name}</span></>}
-          {post.data.draft && <span class="shrink-0 rounded-full border border-lotus/60 px-2 py-0.5 text-lotus">{t("blog.draft")}</span>}
-        </div>
-      </a>
-    </li>
-  ))}
+<ul class:list={["not-prose divide-y divide-border", className]}>
+  {
+    posts.map((post, i) => {
+      const minutes = readingTimeMinutes(post.body);
+      const readingLabel = t("blog.readingTime").replace("{n}", String(minutes));
+      const categoryName = post.data.category ? categories[post.data.category][lang].name : undefined;
+      const num = String(i + 1).padStart(2, "0");
+
+      return compact ? (
+        <li data-reveal={numbered ? "pending" : undefined}>
+          <a
+            href={postUrl(post)}
+            class="group flex items-baseline gap-4 rounded-lg px-2 py-4 transition-colors hover:bg-surface sm:gap-6 sm:px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            {numbered && (
+              <span aria-hidden="true" class="shrink-0 font-mono text-xs font-medium text-accent tabular-nums">
+                {num}
+              </span>
+            )}
+            <div class="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+              <div class="min-w-0 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none">
+                <Heading class="text-base font-medium leading-snug tracking-[-0.01em] text-fg transition-colors group-hover:text-accent sm:text-[1.0625rem]">
+                  {post.data.title}
+                </Heading>
+                <p class="mt-1 line-clamp-1 text-sm text-fg-muted">{post.data.description}</p>
+              </div>
+              <div class="flex shrink-0 items-center gap-2 font-mono text-xs tabular-nums text-fg-muted">
+                {categoryName && <span class="text-accent">{categoryName}</span>}
+                {categoryName && <span aria-hidden="true" class="text-border-strong">·</span>}
+                <time datetime={post.data.pubDate.toISOString()}>{formatShortDate(post.data.pubDate, lang)}</time>
+                <span aria-hidden="true" class="hidden text-accent transition-transform group-hover:translate-x-0.5 sm:inline">→</span>
+              </div>
+            </div>
+          </a>
+        </li>
+      ) : (
+        <li class="py-6 first:pt-0">
+          <a
+            href={postUrl(post)}
+            class="group block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+          >
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs tabular-nums text-fg-muted">
+              <time datetime={post.data.pubDate.toISOString()}>{formatShortDate(post.data.pubDate, lang)}</time>
+              <span aria-hidden="true" class="text-border-strong">·</span>
+              <span>{readingLabel}</span>
+              {categoryName && (
+                <>
+                  <span aria-hidden="true" class="text-border-strong">·</span>
+                  <span class="font-medium text-accent">{categoryName}</span>
+                </>
+              )}
+              {post.data.draft && (
+                <>
+                  <span aria-hidden="true" class="text-border-strong">·</span>
+                  <span class="rounded border border-accent/40 px-1.5 py-0.5 text-[0.6875rem] text-accent">
+                    {t("blog.draft")}
+                  </span>
+                </>
+              )}
+            </div>
+            <Heading class="mt-1.5 text-xl font-semibold leading-snug tracking-[-0.02em] text-fg transition-colors group-hover:text-accent">
+              {post.data.title}
+            </Heading>
+            <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-pretty text-fg-secondary">
+              {post.data.description}
+            </p>
+          </a>
+        </li>
+      );
+    })
+  }
 </ul>

@@ -97,18 +97,17 @@ export default defineConfig({
       provider: fontProviders.fontsource(),
       name: 'Be Vietnam Pro',
       cssVariable: '--font-be-vietnam-pro',
-      weights: [400, 500],
+      weights: [400, 500, 600, 700],
       subsets: ['latin', 'latin-ext', 'vietnamese'],
       fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
     },
     {
       provider: fontProviders.fontsource(),
-      name: 'Fraunces',
-      cssVariable: '--font-fraunces',
-      // Static weights actually used (400 body/quotes, 600 headings, 700 404 seal); the variable file is ~120 KB per subset.
-      weights: [400, 600, 700],
+      name: 'JetBrains Mono',
+      cssVariable: '--font-jetbrains-mono',
+      weights: [400, 500],
       subsets: ['latin', 'latin-ext', 'vietnamese'],
-      fallbacks: ['Georgia', 'serif'],
+      fallbacks: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
     },
   ],
   // The site CSS is small; inlining it removes the render-blocking request.
@@ -139,6 +138,13 @@ export default defineConfig({
     }),
   ],
   markdown: {
+    shikiConfig: {
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark-dimmed',
+      },
+      defaultColor: false,
+    },
     processor: unified({
       remarkPlugins: [remarkDirective, remarkReadingModes, remarkMermaid],
       rehypePlugins: [[rehypePostImages, { domains: IMAGE_DOMAINS }]],

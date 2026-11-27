@@ -1,11 +1,7 @@
 ---
 import Layout from "./Layout.astro";
-import Background from "../components/Background.astro";
-import LanguageSwitcher from "../components/LanguageSwitcher.astro";
-import SearchBox from "../components/SearchBox.astro";
-import ScrollToTop from "../components/ScrollToTop.astro";
 import { contentAnim } from "../components/transitions";
-import { getLang, homePath, sectionPaths, useTranslations, type Lang, type Section } from "../i18n/ui";
+import { getLang, sectionPaths, useTranslations, type Lang, type Section } from "../i18n/ui";
 import type { ArticleMeta, Crumb, PageType } from "../lib/seo";
 import type { PageDates } from "../lib/git-dates";
 
@@ -23,7 +19,7 @@ interface Props {
   article?: ArticleMeta;
   /** Path of this page in each language. Defaults to the section paths. */
   alternates?: Record<Lang, string>;
-  /** Back link target. Defaults to the home page. */
+  /** Optional back link shown above the page header (e.g. on blog posts and category pages). */
   backHref?: string;
   backLabel?: string;
   /** Keep this page out of search results. */
@@ -49,8 +45,8 @@ const {
   translations,
   article,
   alternates = sectionPaths[section],
-  backHref = homePath[lang],
-  backLabel = t("nav.home"),
+  backHref,
+  backLabel = t("nav.back"),
   noindex,
   breadcrumbs,
   itemList,
@@ -58,9 +54,7 @@ const {
   page = 1,
 } = Astro.props;
 
-// Keep titles and descriptions unique across listing pages.
 const pageLabel = page > 1 ? `${t("blog.page")} ${page}` : "";
-// Articles drop the site-name suffix: Google shows the site name separately, and the space is better spent on the post title.
 const docTitle = article ? (seoTitle ?? title) : [title, pageLabel, t("site.name")].filter(Boolean).join(" · ");
 const docDescription = pageLabel ? `${description} (${pageLabel})` : description;
 
@@ -71,12 +65,7 @@ const pageTypes: Record<Section, PageType> = {
   search: "SearchResultsPage",
 };
 
-// Site-wide footer nav so every inner page links to the main sections.
-const footerLinks = [
-  { label: t("nav.home"), href: homePath[lang] },
-  ...(["about", "blog", "contact"] as const).map((s) => ({ label: t(`nav.${s}`), href: sectionPaths[s][lang] })),
-];
-const currentPath = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const kicker = t(`section.${section}Kicker`);
 ---
 
 <Layout
@@ -91,58 +80,49 @@ const currentPath = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${A
   breadcrumbs={breadcrumbs}
   itemList={itemList}
   dates={dates}
-  floatingLangSwitcher={false}
 >
-  <main class="relative isolate min-h-dvh px-2.5 py-4 sm:px-6 sm:py-8">
-    <Background dim />
+  {article && <div aria-hidden="true" class="reading-progress"></div>}
 
-    <article class="relative mx-auto max-w-[54rem] rounded-2xl border border-paper/15 bg-ink px-4 pt-5 pb-8 sm:rounded-3xl shadow-2xl shadow-ink/50 sm:px-12 sm:pt-9 sm:pb-14" transition:name={`content-${section}`} transition:animate={contentAnim}>
-      <!-- Subtle golden light streak along the top edge -->
-      <span aria-hidden="true" class="pointer-events-none absolute inset-x-[30%] -top-px h-px bg-gradient-to-r from-transparent via-rice/55 to-transparent"></span>
-      <span aria-hidden="true" class="pointer-events-none absolute inset-x-[38%] -top-1.5 h-3 rounded-full bg-rice/[0.08] blur-md"></span>
-      <div class="mb-6 flex items-center justify-between gap-3 sm:mb-9">
-        <a
-          href={backHref}
-          class="inline-flex items-center gap-1.5 rounded-full border border-paper/40 bg-ink/40 px-3 py-1.5 text-sm font-medium text-paper shadow-lg shadow-ink/30 backdrop-blur-md glow-hover hover:border-rice hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
-        >
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
-            <path d="M15 18l-6-6 6-6"></path>
-          </svg>
-          {backLabel}
-        </a>
-        <div class="flex items-center gap-2">
-          {section !== "search" && <SearchBox lang={lang} />}
-          <LanguageSwitcher lang={lang} links={alternates} class="" />
+  <article
+    class:list={[
+      "mx-auto px-5 pt-10 pb-16 sm:px-8 sm:pt-14 sm:pb-24",
+      article ? "max-w-[46rem]" : "max-w-[52rem]",
+    ]}
+    transition:name={`content-${section}`}
+    transition:animate={contentAnim}
+  >
+    {
+      backHref && (
+        <div class="mb-6">
+          <a
+            href={backHref}
+            class="inline-flex items-center gap-1.5 font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <span aria-hidden="true">←</span>
+            {backLabel}
+          </a>
         </div>
-      </div>
-      <header class="mb-8 flex flex-col items-start gap-3 sm:mb-10 sm:gap-4">
-        <h1 class:list={["font-serif leading-tight font-semibold tracking-wide text-pretty text-paper", article ? "text-[clamp(1.375rem,4.5vw,2.25rem)]" : "text-[clamp(1.625rem,6vw,2.75rem)]"]}>{title}</h1>
-        <span aria-hidden="true" class="h-px w-24 bg-linear-to-r from-rice to-transparent sm:w-40"></span>
-        <p class="text-base text-pretty text-paper/80 sm:text-lg">{lead}</p>
-        <slot name="meta" />
-      </header>
-      <div class="prose prose-invert max-w-none max-sm:text-[0.9375rem] [--tw-prose-invert-body:color-mix(in_oklab,var(--color-paper)_88%,transparent)] prose-headings:font-serif prose-headings:text-paper prose-a:text-rice prose-a:glow-text-hover prose-strong:text-paper">
-        <slot />
-      </div>
-    </article>
-    <ScrollToTop />
-    <nav aria-label={t("nav.label")} class="relative mx-auto mt-6 max-w-[54rem] sm:mt-8">
-      <ul class="flex flex-wrap items-center justify-center gap-x-1 gap-y-2 text-sm">
-        {
-          footerLinks.map(({ label, href }, i) => (
-            <li class="flex items-center gap-x-1">
-              {i > 0 && <span aria-hidden="true" class="text-paper/30">·</span>}
-              <a
-                href={href}
-                aria-current={currentPath === href ? "page" : undefined}
-                class="rounded-full px-3 py-1.5 text-paper/70 glow-hover hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice aria-[current=page]:text-rice"
-              >
-                {label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-  </main>
+      )
+    }
+
+    <header class="mb-10 flex flex-col items-start gap-3 border-b border-border pb-7">
+      {!article && <p class="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-accent">{kicker}</p>}
+      <h1
+        class:list={[
+          "font-semibold tracking-[-0.03em] text-pretty text-fg",
+          article
+            ? "text-[clamp(1.625rem,4.5vw,2.375rem)] leading-[1.16]"
+            : "text-[clamp(2rem,5vw,2.75rem)] leading-[1.12]",
+        ]}
+      >
+        {title}
+      </h1>
+      <p class="text-base leading-relaxed text-pretty text-fg-secondary sm:text-[1.0625rem]">{lead}</p>
+      <slot name="meta" />
+    </header>
+
+    <div class="prose prose-editorial max-w-none">
+      <slot />
+    </div>
+  </article>
 </Layout>

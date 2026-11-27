@@ -8,7 +8,7 @@ import { getLang, useTranslations } from "../i18n/ui";
 
 const t = useTranslations(getLang(Astro.currentLocale));
 const btn =
-  "inline-flex size-9 items-center justify-center rounded-full text-paper/80 transition-colors hover:bg-paper/10 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
+  "inline-flex size-9 items-center justify-center rounded-md text-fg-secondary transition-colors hover:bg-surface hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round", class: "size-5" } as const;
 ---
 
@@ -17,11 +17,10 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
   aria-label={t("viewer.dialog")}
   data-open-diagram={t("viewer.openDiagram")}
   data-open-image={t("viewer.openImage")}
-  class="not-prose m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-paper backdrop:bg-ink/50 backdrop:backdrop-blur-[2px] open:flex sm:items-center sm:justify-center sm:p-6 lg:p-10"
+  class="not-prose m-0 h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-fg backdrop:bg-black/60 backdrop:backdrop-blur-[2px] open:flex sm:items-center sm:justify-center sm:p-6 lg:p-10"
 >
-  <!-- Framed panel on larger screens; the dialog padding around it acts as the backdrop (click to close). -->
-  <div data-panel class="flex h-full w-full flex-col overflow-hidden bg-ink sm:max-w-7xl sm:rounded-2xl sm:border sm:border-paper/15 sm:shadow-2xl sm:shadow-black/60">
-    <div class="z-10 flex shrink-0 justify-center border-b border-paper/10 p-2">
+  <div data-panel class="flex h-full w-full flex-col overflow-hidden bg-surface-elevated sm:max-w-7xl sm:rounded-xl sm:border sm:border-border sm:shadow-2xl">
+    <div class="z-10 flex shrink-0 justify-center border-b border-border bg-bg p-2">
       <div class="flex items-center gap-0.5">
         <button type="button" data-action="zoom-out" class={btn} aria-label={t("viewer.zoomOut")} title={`${t("viewer.zoomOut")} (−)`}>
           <svg {...icon}><circle cx="11" cy="11" r="7"></circle><path d="M8 11h6M20 20l-4-4"></path></svg>
@@ -29,7 +28,7 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
         <button
           type="button"
           data-action="reset"
-          class="h-9 min-w-16 rounded-full px-2 text-center text-sm tabular-nums text-paper/80 transition-colors hover:bg-paper/10 hover:text-rice focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+          class="h-9 min-w-16 rounded-md px-2 text-center font-mono text-xs tabular-nums text-fg-secondary transition-colors hover:bg-surface hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           aria-label={t("viewer.reset")}
           title={`${t("viewer.reset")} (0)`}
         >
@@ -38,7 +37,7 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
         <button type="button" data-action="zoom-in" class={btn} aria-label={t("viewer.zoomIn")} title={`${t("viewer.zoomIn")} (+)`}>
           <svg {...icon}><circle cx="11" cy="11" r="7"></circle><path d="M8 11h6M11 8v6M20 20l-4-4"></path></svg>
         </button>
-        <span aria-hidden="true" class="mx-1 h-5 w-px bg-paper/20"></span>
+        <span aria-hidden="true" class="mx-1 h-5 w-px bg-border"></span>
         <button type="button" data-action="fit" class={btn} aria-label={t("viewer.fit")} title={t("viewer.fit")}>
           <svg {...icon}><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
         </button>
@@ -46,20 +45,20 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
           <svg {...icon}><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
         </button>
         <button type="button" data-action="actual" class={btn} aria-label={t("viewer.actual")} title={`${t("viewer.actual")} (1)`}>
-          <span aria-hidden="true" class="text-xs font-semibold">1:1</span>
+          <span aria-hidden="true" class="font-mono text-xs font-semibold">1:1</span>
         </button>
-        <span aria-hidden="true" class="mx-1 h-5 w-px bg-paper/20"></span>
+        <span aria-hidden="true" class="mx-1 h-5 w-px bg-border"></span>
         <button type="button" data-action="close" class={btn} aria-label={t("viewer.close")} title={`${t("viewer.close")} (Esc)`}>
           <svg {...icon}><path d="M6 6l12 12M18 6L6 18"></path></svg>
         </button>
       </div>
     </div>
-    <div data-viewport class="relative min-h-0 flex-1 cursor-grab touch-none overflow-hidden select-none active:cursor-grabbing">
+    <div data-viewport class="relative min-h-0 flex-1 cursor-grab touch-none overflow-hidden bg-surface select-none active:cursor-grabbing">
       <div data-stage class="absolute top-0 left-0 origin-top-left"></div>
     </div>
-    <div class="flex shrink-0 flex-col items-center gap-1 border-t border-paper/10 px-4 py-2.5 text-center">
-      <p data-caption hidden class="max-w-3xl text-sm text-paper/85"></p>
-      <p class="text-xs text-paper/55 max-sm:hidden">{t("viewer.hint")}</p>
+    <div class="flex shrink-0 flex-col items-center gap-1 border-t border-border bg-bg px-4 py-2.5 text-center">
+      <p data-caption hidden class="max-w-3xl text-sm text-fg-secondary"></p>
+      <p class="font-mono text-xs text-fg-muted max-sm:hidden">{t("viewer.hint")}</p>
     </div>
   </div>
 </dialog>
@@ -70,7 +69,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
   const MIN = 0.1;
   const MAX = 8;
   const STEP = 1.25;
-  /** Movement (px) below which a pointer press counts as a tap, not a drag. */
   const TAP = 6;
 
   const view = { scale: 1, x: 0, y: 0, width: 0, height: 0 };
@@ -79,9 +77,7 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
   let stage: HTMLElement;
   let level: HTMLElement;
   let caption: HTMLElement;
-  /** What the download button saves: an inline SVG or an image URL. */
   let current: { svg: SVGSVGElement } | { src: string } | null = null;
-  /** Raster images are not upscaled when fitted (they would only get blurry). */
   let raster = false;
 
   const clamp = (v: number) => Math.min(MAX, Math.max(MIN, v));
@@ -91,7 +87,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     level.textContent = `${Math.round(view.scale * 100)}%`;
   }
 
-  /** Zooms to `next`, keeping the point (cx, cy) of the viewport fixed. */
   function zoomTo(next: number, cx = viewport.clientWidth / 2, cy = viewport.clientHeight / 2) {
     const scale = clamp(next);
     view.x = cx - ((cx - view.x) * scale) / view.scale;
@@ -116,7 +111,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
 
   const fit = () => center(fitScale());
 
-  /** Double-click / double-tap: zoom in on the point, or back to fit when already zoomed in. */
   function toggleZoom(cx: number, cy: number) {
     const base = fitScale();
     if (view.scale > base * 1.05) fit();
@@ -147,7 +141,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
   }
 
   async function openImage(source: HTMLImageElement) {
-    // `src` is the full-size fallback; `currentSrc` may be a small srcset candidate that blurs when zoomed.
     const src = source.src || source.currentSrc;
     const img = new Image();
     img.src = src;
@@ -157,7 +150,7 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     try {
       await img.decode();
     } catch {
-      return; // Broken image: nothing to show.
+      return;
     }
     img.width = img.naturalWidth;
     img.height = img.naturalHeight;
@@ -180,7 +173,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
       href = current.src;
       name = new URL(href, location.href).pathname.split("/").pop() || "image";
     }
-    // Cross-origin images ignore `download`; they open in a new tab instead.
     const a = Object.assign(document.createElement("a"), { href, download: name, target: "_blank", rel: "noopener" });
     a.click();
     if (href.startsWith("blob:")) URL.revokeObjectURL(href);
@@ -221,8 +213,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     });
     window.addEventListener("resize", () => dialog.open && fit());
 
-    // Clicks outside the panel land on the dialog itself (its padding or ::backdrop): close.
-    // Both press and release must be outside, so a drag that ends there does not close.
     let pressedOutside = false;
     dialog.addEventListener("pointerdown", (e) => (pressedOutside = e.target === dialog));
     dialog.addEventListener("click", (e) => {
@@ -235,7 +225,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
       return [e.clientX - rect.left, e.clientY - rect.top] as const;
     };
 
-    // Mouse wheel zooms; trackpad pinch arrives as a wheel event with ctrlKey and small deltas.
     viewport.addEventListener(
       "wheel",
       (e) => {
@@ -246,7 +235,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
       { passive: false },
     );
 
-    // Drag to pan, two fingers to pinch-zoom (and pan), tap outside the media to close.
     const pointers = new Map<number, { x: number; y: number }>();
     let pinch = 0;
     let mid: { x: number; y: number } | null = null;
@@ -291,13 +279,11 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
         pinch = 0;
         mid = null;
       }
-      // Tapping the dark area around the media closes the viewer, like most lightboxes.
       if (wasTap && downTarget === viewport) closeSoon();
     };
     viewport.addEventListener("pointerup", release);
     viewport.addEventListener("pointercancel", release);
 
-    // Delay closing so a double-tap/double-click on the backdrop can still cancel it.
     let closeTimer = 0;
     function closeSoon() {
       clearTimeout(closeTimer);
@@ -314,7 +300,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
   const expandIcon =
     '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>';
 
-  /** Adds an expand button to each diagram; clicking the diagram itself also opens the viewer. */
   function makeDiagramExpandable(figure: HTMLElement) {
     if (figure.dataset.expandable) return;
     figure.dataset.expandable = "true";
@@ -336,7 +321,6 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     figure.addEventListener("click", openThis);
   }
 
-  /** Wraps a post image in a button that opens it in the viewer. Linked images keep their link. */
   function makeImageExpandable(img: HTMLImageElement) {
     if (img.closest("a, button, figure.mermaid, [data-no-zoom]")) return;
     const button = Object.assign(document.createElement("button"), { type: "button", className: "media-zoomable" });
@@ -348,10 +332,14 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
   }
 
   document.addEventListener("astro:page-load", () => {
-    bindViewer();
-    if (!dialog) return;
-    document.querySelectorAll<HTMLElement>("figure.mermaid").forEach(makeDiagramExpandable);
-    document.querySelectorAll<HTMLImageElement>("article .prose img").forEach(makeImageExpandable);
+    const setupTriggers = () => {
+      bindViewer();
+      if (!dialog) return;
+      document.querySelectorAll<HTMLElement>("figure.mermaid").forEach(makeDiagramExpandable);
+      document.querySelectorAll<HTMLImageElement>("article .prose img").forEach(makeImageExpandable);
+    };
+    if (typeof requestIdleCallback === "function") requestIdleCallback(setupTriggers);
+    else requestAnimationFrame(setupTriggers);
   });
 </script>
 
@@ -360,36 +348,25 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     position: relative;
     margin-block: 1.75em;
     overflow-x: auto;
-    border: 1px solid rgb(246 236 217 / 0.15);
-    border-radius: 1rem;
-    background: rgb(43 29 18 / 0.5);
-    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--surface);
+    padding: 1.5rem 2.75rem 1.25rem 1.25rem;
     text-align: center;
   }
 
   figure.mermaid[data-expandable] {
     cursor: zoom-in;
-    transition:
-      border-color 250ms,
-      box-shadow 250ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: border-color 180ms ease;
   }
 
-  /* Same rice-gold glow as `glow-hover` buttons (global.css). */
   @media (hover: hover) {
     figure.mermaid[data-expandable]:hover {
-      border-color: var(--color-rice);
-      box-shadow:
-      0 0 0 1px rgb(217 181 74 / 0.2),
-      0 0 18px rgb(217 181 74 / 0.3),
-      0 8px 24px rgb(43 29 18 / 0.35);
+      border-color: var(--border-strong);
     }
 
     .media-zoomable:hover img {
-      outline-color: var(--color-rice);
-      box-shadow:
-      0 0 0 1px rgb(217 181 74 / 0.2),
-      0 0 18px rgb(217 181 74 / 0.3),
-      0 8px 24px rgb(43 29 18 / 0.35);
+      border-color: var(--border-strong);
     }
   }
 
@@ -406,54 +383,51 @@ const icon = { "aria-hidden": "true", viewBox: "0 0 24 24", fill: "none", stroke
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 9999px;
-    color: rgb(246 236 217 / 0.8);
-    background: rgb(43 29 18 / 0.7);
-    transition: color 250ms, background-color 250ms;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+    background: var(--surface-elevated);
+    transition: color 150ms ease, border-color 150ms ease;
   }
 
   .media-expand:hover {
-    color: var(--color-rice);
-    background: rgb(246 236 217 / 0.1);
+    color: var(--accent);
+    border-color: var(--border-strong);
   }
 
   .media-expand:focus-visible {
-    outline: 2px solid var(--color-rice);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
 
   .media-expand svg {
-    width: 1rem;
-    height: 1rem;
+    width: 0.95rem;
+    height: 0.95rem;
   }
 
   .media-zoomable {
     display: block;
     max-width: 100%;
     padding: 0;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     cursor: zoom-in;
   }
 
   .media-zoomable img {
     margin-block: 0;
     border-radius: inherit;
-    outline: 1px solid transparent;
-    outline-offset: 0;
-    transition:
-      outline-color 250ms,
-      box-shadow 250ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: border-color 180ms ease;
   }
 
   .media-zoomable:focus-visible {
-    outline: 2px solid var(--color-rice);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
   }
 
   #media-viewer[open] {
-    animation: media-viewer-in 180ms ease-out;
+    animation: media-viewer-in 160ms ease-out;
   }
 
   @keyframes media-viewer-in {

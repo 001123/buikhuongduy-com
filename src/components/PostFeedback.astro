@@ -38,16 +38,16 @@ const id = `feedback-${slug.replace(/[^\w-]/g, "-")}`;
   novalidate
 >
   <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-    <span id={`${id}-title`} class="text-sm font-medium text-paper/80">{t("feedback.title")}</span>
+    <span id={`${id}-title`} class="text-sm font-medium text-fg-secondary">{t("feedback.title")}</span>
     <div class="flex items-center" role="radiogroup" aria-labelledby={`${id}-title`}>
       {
         ratingLabels.map((label, i) => (
           <label
-            class="star cursor-pointer rounded-md p-1 text-paper/35 transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-1 has-focus-visible:outline-rice"
+            class="star cursor-pointer rounded-md p-1 text-border-strong transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-1 has-focus-visible:outline-accent"
             title={label}
           >
             <input type="radio" name="rating" value={i + 1} class="sr-only" />
-            <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true">
+            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true">
               <path d="M12 2.5l2.94 5.96 6.56.95-4.75 4.63 1.12 6.54L12 17.5l-5.87 3.08 1.12-6.54L2.5 9.41l6.56-.95L12 2.5z" />
             </svg>
             <span class="sr-only">{`${i + 1}/5 – ${label}`}</span>
@@ -55,43 +55,43 @@ const id = `feedback-${slug.replace(/[^\w-]/g, "-")}`;
         ))
       }
     </div>
-    <span class="text-sm font-medium text-rice" data-rating-label aria-hidden="true"></span>
+    <span class="font-mono text-xs font-medium text-accent" data-rating-label aria-hidden="true"></span>
   </div>
 
   <div class="feedback-details mt-4" data-feedback-details hidden>
-    <label for={`${id}-comment`} class="block text-sm text-paper/70">{t("feedback.commentLabel")}</label>
+    <label for={`${id}-comment`} class="block text-sm text-fg-secondary">{t("feedback.commentLabel")}</label>
     <textarea
       id={`${id}-comment`}
       name="comment"
       rows="3"
       maxlength="1500"
       placeholder={t("feedback.commentPlaceholder")}
-      class="mt-2 block w-full resize-y rounded-xl border border-paper/20 bg-ink/50 px-3.5 py-2.5 text-sm text-paper placeholder:text-paper/35 focus-visible:border-rice/60 focus-visible:outline-none"
+      class="mt-2 block w-full resize-y rounded-lg border border-border bg-surface-elevated px-3.5 py-2.5 text-sm text-fg placeholder:text-fg-muted/70 focus-visible:border-accent focus-visible:outline-none"
     ></textarea>
-  
+
     <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
       <button
         type="submit"
-        class="inline-flex items-center gap-2 rounded-full border border-rice/50 bg-rice/10 px-4 py-2 text-sm font-medium text-rice glow-hover hover:border-rice hover:bg-rice/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice"
+        class="inline-flex items-center gap-2 rounded-md bg-fg px-4 py-2 text-sm font-medium text-bg transition-colors hover:bg-accent hover:text-accent-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
-        <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M22 2 11 13" />
           <path d="M22 2 15 22l-4-9-9-4 20-7Z" />
         </svg>
         <span>{t("feedback.submit")}</span>
       </button>
-      <p class="text-xs text-paper/60">
+      <p class="text-xs text-fg-muted">
         {t("feedback.hint")}{" "}
-        <a href={`mailto:${email}`} class="text-paper/70 underline decoration-paper/30 underline-offset-2 hover:text-rice">{email}</a>
+        <a href={`mailto:${email}`} class="text-fg-secondary underline decoration-border-strong underline-offset-2 hover:text-accent">{email}</a>
       </p>
     </div>
   </div>
-  <p class="mt-2 text-sm text-rice empty:hidden" role="status" aria-live="polite" data-feedback-status></p>
+  <p class="mt-2 text-sm text-accent empty:hidden" role="status" aria-live="polite" data-feedback-status></p>
 </form>
 
 <style>
   .star.on {
-    color: var(--color-rice);
+    color: var(--accent);
   }
 
   .star.on svg {
@@ -103,11 +103,11 @@ const id = `feedback-${slug.replace(/[^\w-]/g, "-")}`;
   }
 
   .star:hover svg {
-    transform: scale(1.12);
+    transform: scale(1.1);
   }
 
   .feedback-details.reveal {
-    animation: feedback-reveal 0.25s ease-out;
+    animation: feedback-reveal 0.22s ease-out;
   }
 
   @keyframes feedback-reveal {
@@ -149,7 +149,6 @@ const id = `feedback-${slug.replace(/[^\w-]/g, "-")}`;
     const status = form.querySelector<HTMLElement>("[data-feedback-status]")!;
     const comment = form.querySelector<HTMLTextAreaElement>("textarea")!;
     const details = form.querySelector<HTMLElement>("[data-feedback-details]")!;
-    // Reveal the feedback form once the reader picks a star (including re-picking a saved rating).
     const reveal = () => {
       if (!details.hidden) return;
       details.hidden = false;

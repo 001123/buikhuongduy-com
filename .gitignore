@@ -29,3 +29,5 @@ tmp/
 
 # Lighthouse CI reports
 .lighthouseci/
+
+.worktrees/

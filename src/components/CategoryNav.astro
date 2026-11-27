@@ -13,28 +13,40 @@ const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 const cats = await getCategories(lang);
 const chip =
-  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rice";
-const idle = "glow-hover border-paper/20 text-paper/80 hover:border-rice hover:text-rice";
-const active = "border-rice bg-rice/10 text-rice";
+  "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+const idle = "text-fg-muted hover:bg-surface hover:text-fg";
+const active = "bg-fg text-bg";
 ---
 
 {
   cats.length > 0 && (
-    <nav aria-label={t("blog.categories")} class="not-prose mb-8">
-      <ul class="flex flex-wrap gap-2">
+    <nav aria-label={t("blog.categories")} class="not-prose mb-8 border-b border-border pb-4">
+      <ul class="flex flex-wrap gap-1.5">
         <li>
-          <a href={sectionPaths.blog[lang]} class:list={[chip, current ? idle : active]} aria-current={current ? undefined : "page"}>
+          <a
+            href={sectionPaths.blog[lang]}
+            class:list={[chip, current ? idle : active]}
+            aria-current={current ? undefined : "page"}
+          >
             {t("blog.allTopics")}
           </a>
         </li>
-        {cats.map((c) => (
-          <li>
-            <a href={categoryPath(lang, c.slug)} class:list={[chip, c.slug === current ? active : idle]} aria-current={c.slug === current ? "page" : undefined}>
-              {c.name}
-              <span class="text-xs text-paper/50">{c.posts.length}</span>
-            </a>
-          </li>
-        ))}
+        {
+          cats.map((c) => (
+            <li>
+              <a
+                href={categoryPath(lang, c.slug)}
+                class:list={[chip, c.slug === current ? active : idle]}
+                aria-current={c.slug === current ? "page" : undefined}
+              >
+                <span>{c.name}</span>
+                <span class:list={["font-mono text-[0.6875rem] tabular-nums", c.slug === current ? "opacity-75" : "text-fg-muted"]}>
+                  {c.posts.length}
+                </span>
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
   )
