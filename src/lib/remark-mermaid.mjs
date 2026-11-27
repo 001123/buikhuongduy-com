@@ -4,8 +4,8 @@ import { visit } from "unist-util-visit";
 /** Light-mode editorial palette matching global.css; dark mode is overridden via CSS. */
 const mermaidConfig = {
   theme: "base",
-  // Resolves to the site font (Astro Fonts API) in the page; defined below for build-time measuring.
-  fontFamily: "var(--font-be-vietnam-pro)",
+  // Resolves to the site's system font stack in the page; defined below for build-time measuring.
+  fontFamily: "var(--font-system-sans)",
   themeVariables: {
     darkMode: false,
     background: "#F5F5F7",
@@ -27,10 +27,9 @@ const mermaidConfig = {
   },
 };
 
-// Load the site font so Mermaid measures labels with the same metrics the page renders them with.
+// Same system stack as global.css, so Mermaid measures labels with a font close to what readers see.
 const css = [
-  ...[400, 500].map((w) => import.meta.resolve(`@fontsource/be-vietnam-pro/${w}.css`)),
-  `data:text/css,${encodeURIComponent(':root { --font-be-vietnam-pro: "Be Vietnam Pro", sans-serif; }')}`,
+  `data:text/css,${encodeURIComponent(':root { --font-system-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif; }')}`,
 ];
 
 // Uses the system Chrome, so no Playwright browser download is needed (GitHub runners ship Chrome).

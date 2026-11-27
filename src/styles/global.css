@@ -4,6 +4,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /* System font stacks: no web font files, so nothing competes with the hero image (LCP). */
+  --font-system-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
+  --font-system-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "Roboto Mono", monospace;
   --bg: #FFFFFF;
   --surface: #F5F5F7;
   --surface-elevated: #FFFFFF;
@@ -38,10 +41,10 @@ html.dark {
 }
 
 @theme inline {
-  --font-sans: var(--font-be-vietnam-pro);
-  --font-display: var(--font-be-vietnam-pro);
-  --font-serif: var(--font-be-vietnam-pro);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-sans: var(--font-system-sans);
+  --font-display: var(--font-system-sans);
+  --font-serif: var(--font-system-sans);
+  --font-mono: var(--font-system-mono);
 
   --color-bg: var(--bg);
   --color-surface: var(--surface);
