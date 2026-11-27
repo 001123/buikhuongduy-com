@@ -10,11 +10,11 @@ export const defaultLang: Lang = "vi";
 export const ui = {
   vi: {
     "site.name": "Bùi Khương Duy",
-    "site.description": "Bùi Khương Duy – Lead/Senior Frontend Engineer và Full-Stack Developer (AI-Native) với hơn 9 năm kinh nghiệm React, Next.js, Node.js, TypeScript, DevOps và Kubernetes. Kinh nghiệm, dự án và bài viết blog.",
+    "site.description": "Bùi Khương Duy, Lead/Senior Frontend Engineer & Full-Stack Developer (AI-Native), hơn 9 năm làm React, Next.js, Node.js, TypeScript và DevOps.",
     "seo.homeTitle": "Bùi Khương Duy – Lead/Senior Frontend & Full-Stack Engineer",
     "seo.jobTitle": "Lead/Senior Frontend Engineer & Full-Stack Developer (AI-Native)",
     "seo.ogImageAlt": "Bùi Khương Duy — Lead/Senior Frontend Engineer & Full-Stack Developer (AI-Native), hơn 9 năm kinh nghiệm React, Next.js, Node.js, TypeScript & DevOps",
-    "seo.about": "Kinh nghiệm, kỹ năng và dự án của Bùi Khương Duy – Lead/Senior Frontend Engineer và Full-Stack Developer hơn 9 năm làm React, Next.js, Node.js, TypeScript, AI agents và hạ tầng cloud.",
+    "seo.about": "Kinh nghiệm, kỹ năng và dự án của Bùi Khương Duy, Lead/Senior Frontend Engineer & Full-Stack Developer hơn 9 năm làm React, Next.js, Node.js.",
     "seo.blog": "Blog của Bùi Khương Duy về frontend, React, Next.js, TypeScript, AI agents và DevOps: ghi chép, kinh nghiệm thực tế và bài học rút ra.",
     "seo.contact": "Liên hệ Bùi Khương Duy – sẵn sàng cho vai trò Lead/Senior Frontend Engineer hoặc Full-Stack Developer theo hướng AI-native. Email, LinkedIn, GitHub và CV.",
     // "|" marks allowed line breaks; each segment stays on a single line.
@@ -185,11 +185,11 @@ export const ui = {
   },
   en: {
     "site.name": "Bui Khuong Duy",
-    "site.description": "Bui Khuong Duy – Lead/Senior Frontend Engineer and Full-Stack Developer (AI-Native) with 9+ years in React, Next.js, Node.js, TypeScript, DevOps and Kubernetes. Explore my experience, projects and blog posts.",
+    "site.description": "Bui Khuong Duy, Lead/Senior Frontend Engineer & Full-Stack Developer (AI-Native) with 9+ years in React, Next.js, Node.js, TypeScript and DevOps.",
     "seo.homeTitle": "Bui Khuong Duy – Lead/Senior Frontend & Full-Stack Engineer",
     "seo.jobTitle": "Lead/Senior Frontend Engineer & Full-Stack Developer (AI-Native)",
     "seo.ogImageAlt": "Bui Khuong Duy — Lead/Senior Frontend Engineer & Full-Stack Developer (AI-Native) with 9+ years in React, Next.js, Node.js, TypeScript & DevOps",
-    "seo.about": "Experience, skills and projects of Bui Khuong Duy, a Lead/Senior Frontend Engineer and Full-Stack Developer with 9+ years in React, Next.js, Node.js, TypeScript, AI agents and cloud infrastructure.",
+    "seo.about": "Experience, skills and projects of Bui Khuong Duy, a Lead/Senior Frontend Engineer & Full-Stack Developer with 9+ years in React, Next.js, Node.js.",
     "seo.blog": "Bui Khuong Duy's blog on front-end engineering, React, Next.js, TypeScript, AI agents and DevOps: notes, hands-on experience and lessons learned.",
     "seo.contact": "Contact Bui Khuong Duy, open to Lead/Senior Frontend Engineer and Full-Stack Developer roles with an AI-native focus. Email, LinkedIn, GitHub and résumé.",
     "site.tagline": "Lead/Senior Frontend Engineer|& Full-Stack Developer (AI-Native)|with 9+ years in|React, Next.js, Node.js, TypeScript & DevOps",

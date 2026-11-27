@@ -1,6 +1,9 @@
 /** Online CV page. */
 export const cvUrl = "https://cv.buikhuongduy.com";
 
+/** Downloadable PDF CV served from public/cv. */
+export const cvPdfPath = "/cv/bui-khuong-duy-cv.pdf";
+
 export const email = "contact@buikhuongduy.com";
 
 export const socials = [

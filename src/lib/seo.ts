@@ -1,4 +1,4 @@
-import { cvUrl, email, socials } from "../data/profile";
+import { cvPdfPath, cvUrl, email, socials } from "../data/profile";
 import { defaultLang, homePath, languages, locales, sectionPaths, ui, type Lang } from "../i18n/ui";
 import type { PageDates } from "./git-dates";
 
@@ -86,6 +86,19 @@ export function structuredData(input: StructuredDataInput) {
     knowsAbout: ["Full-stack engineering", "Front-end engineering", "React", "Next.js", "Node.js", "TypeScript", "GraphQL", "AI agents", "DevOps", "Kubernetes"],
     sameAs: [...socials.map((s) => s.href), cvUrl, "https://kd.io.vn/", "https://github.com/kd-labs-io"],
     worksFor: { "@id": kdLabs["@id"] },
+    homeLocation: {
+      "@type": "Place",
+      name: "Ho Chi Minh City, Vietnam",
+      address: { "@type": "PostalAddress", addressLocality: "Ho Chi Minh City", addressCountry: "VN" },
+    },
+    // Past employers, matching the experience list on the About page and the CV.
+    alumniOf: ["AFD", "10X / Saladin", "Hello Health Group", "Sutrix Group", "Maple Studio"].map((name) => ({ "@type": "Organization", name })),
+    subjectOf: {
+      "@type": "DigitalDocument",
+      name: `${ui.en["site.name"]} CV`,
+      url: abs(cvPdfPath),
+      encodingFormat: "application/pdf",
+    },
   };
 
   const website = {
