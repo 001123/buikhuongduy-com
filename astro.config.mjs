@@ -3,10 +3,28 @@ import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
-import partytown from '@astrojs/partytown';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import { readdirSync, readFileSync } from 'node:fs';
 import { sectionPaths } from './src/i18n/ui.ts';
 import { categoryIndexMinPosts } from './src/data/categories.ts';
+
+/**
+ * Partytown's worker files, copied to /~partytown/ at build time. Unlike @astrojs/partytown this injects no snippet
+ * into <head>: Analytics.astro boots Partytown only after the page has loaded, so GA never competes with the LCP image.
+ */
+function partytownLib() {
+  const ptRequire = createRequire(createRequire(import.meta.url).resolve('@astrojs/partytown/package.json'));
+  const { copyLibFiles } = ptRequire('@qwik.dev/partytown/utils');
+  return {
+    name: 'partytown-lib',
+    hooks: {
+      'astro:build:done': async ({ dir }) => {
+        await copyLibFiles(fileURLToPath(new URL('~partytown', dir)), { debugDir: false });
+      },
+    },
+  };
+}
 
 const SITE = 'https://buikhuongduy.com';
 /** Remote hosts whose images are downloaded and optimized at build time (Markdown `![](https://...)`). */
@@ -107,7 +125,7 @@ export default defineConfig({
   },
   integrations: [
     // GA4 runs in a web worker; see src/components/Analytics.astro.
-    partytown(),
+    partytownLib(),
     // hreflang lives only in the HTML head (Layout.astro), so the sitemap carries no alternates.
     sitemap({
       filter: (page) => !noindexPaths.has(new URL(page).pathname),

@@ -3,12 +3,29 @@
  * Google Analytics 4, run off the main thread by Partytown so it does not affect Lighthouse scores.
  * Renders nothing unless PUBLIC_GA4_ID (e.g. G-XXXXXXXXXX) is set at build time.
  *
+ * Partytown boots only after the window `load` event (and an idle moment), so gtag.js and Partytown's own files
+ * never share bandwidth with the hero image while the page is loading. The lib files come from the
+ * `partytownLib()` integration in astro.config.mjs.
+ *
  * Page views with the ClientRouter: after each navigation Astro swaps these <head> scripts
  * (Partytown has rewritten their type, so they no longer match the incoming page), Partytown
  * runs them again in the worker, and `gtag('config')` sends a page_view for the new URL.
  * No manual page_view call is needed; adding one would double count.
  */
+import { createRequire } from "node:module";
+import path from "node:path";
+
 const id = import.meta.env.PUBLIC_GA4_ID;
+const lib = "/~partytown/";
+let snippet = "";
+if (id) {
+  const ptRequire = createRequire(createRequire(path.join(process.cwd(), "package.json")).resolve("@astrojs/partytown/package.json"));
+  const { partytownSnippet } = ptRequire("@qwik.dev/partytown/integration");
+  // Keep the sandbox iframe across ClientRouter swaps (same as @astrojs/partytown does).
+  snippet =
+    partytownSnippet({ lib, debug: false }) +
+    `;(e=>{e.addEventListener("astro:before-swap",e=>{let r=document.body.querySelector("iframe[src*='${lib}']");if(r)e.newDocument.body.append(r)})})(document);`;
+}
 ---
 
 {
@@ -22,6 +39,21 @@ const id = import.meta.env.PUBLIC_GA4_ID;
         };
         gtag("js", new Date());
         gtag("config", id);
+      </script>
+      <script is:inline define:vars={{ snippet }}>
+        (function () {
+          if (window.__ptBoot) return;
+          window.__ptBoot = true;
+          const boot = () => {
+            const s = document.createElement("script");
+            s.textContent = snippet;
+            document.head.appendChild(s);
+          };
+          const whenIdle = () =>
+            "requestIdleCallback" in window ? requestIdleCallback(boot, { timeout: 3000 }) : setTimeout(boot, 1500);
+          if (document.readyState === "complete") whenIdle();
+          else window.addEventListener("load", whenIdle, { once: true });
+        })();
       </script>
     </>
   )
