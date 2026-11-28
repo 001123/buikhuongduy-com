@@ -14,6 +14,7 @@ export interface Project {
   tags: string[];
   href?: string;
   linkLabel?: string;
+  links?: { label: string; href: string }[];
 }
 
 export const projects: Record<Lang, Project[]> = {
@@ -71,6 +72,10 @@ export const projects: Record<Lang, Project[]> = {
       summary:
         "Chuyển đổi 9 trang sức khoẻ từ WordPress sang Next.js SSR trong 2 tháng (giảm tải từ 4–5s xuống dưới 2s). Xây trình dựng chatbot React Flow, ads manager Vue.js kéo thả, trình biên tập React và symptom checker.",
       tags: ["Next.js SSR", "React Flow", "Vue.js", "TypeScript"],
+      links: [
+        { label: "hellobacsi.com", href: "https://hellobacsi.com/" },
+        { label: "hellosehat.com", href: "https://hellosehat.com/" },
+      ],
     },
     {
       id: "afd-platform",
@@ -178,6 +183,10 @@ export const projects: Record<Lang, Project[]> = {
       summary:
         "Migrated 9 regional healthcare sites from WordPress to Next.js SSR in 2 months (cutting load time from 4–5s to under 2s). Also built a React Flow chatbot builder, Vue.js drag-and-drop ads manager, React content editor, and symptom checker.",
       tags: ["Next.js SSR", "React Flow", "Vue.js", "TypeScript"],
+      links: [
+        { label: "hellobacsi.com", href: "https://hellobacsi.com/" },
+        { label: "hellosehat.com", href: "https://hellosehat.com/" },
+      ],
     },
     {
       id: "afd-platform",

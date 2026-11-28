@@ -7,6 +7,7 @@ export interface ExperienceItem {
   role: string;
   org: string;
   orgUrl?: string;
+  links?: { label: string; href: string }[];
   workMode?: string;
   teamSize: string;
   isCurrent?: boolean;
@@ -98,6 +99,10 @@ export const experiences: Record<Lang, ExperienceItem[]> = {
       duration: "1 năm 4 tháng",
       role: "Senior Web Developer",
       org: "Hello Health Group",
+      links: [
+        { label: "hellobacsi.com", href: "https://hellobacsi.com/" },
+        { label: "hellosehat.com", href: "https://hellosehat.com/" },
+      ],
       teamSize: "Đội 8 người",
       summary: "Chuyển đổi nền tảng web sức khoẻ lưu lượng lớn sang Next.js SSR và xây dựng loạt công cụ vận hành nội bộ cho marketing, content và data.",
       metrics: ["30M+ lượt xem/tháng", "9 site trong 2 tháng", "Tải trang < 2s"],
@@ -221,6 +226,10 @@ export const experiences: Record<Lang, ExperienceItem[]> = {
       duration: "1 yr 4 mos",
       role: "Senior Web Developer",
       org: "Hello Health Group",
+      links: [
+        { label: "hellobacsi.com", href: "https://hellobacsi.com/" },
+        { label: "hellosehat.com", href: "https://hellosehat.com/" },
+      ],
       teamSize: "Team of 8",
       summary: "Migrated high-traffic regional healthcare platforms to Next.js SSR and built internal workflow tools for marketing, editorial, and data teams.",
       metrics: ["30M+ monthly views", "9 sites in 2 mos", "< 2s load time"],

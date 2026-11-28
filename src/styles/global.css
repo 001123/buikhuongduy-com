@@ -964,6 +964,29 @@ html.reveal-ready [data-reveal="visible"] {
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Circular theme toggle reveal (isolated from Astro ClientRouter page transitions) */
+html.theme-transition * {
+  view-transition-name: none !important;
+}
+
+html.theme-transition::view-transition-group(root) {
+  animation: none;
+}
+
+html.theme-transition::view-transition-old(root),
+html.theme-transition::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.theme-transition::view-transition-old(root) {
+  z-index: 1;
+}
+
+html.theme-transition::view-transition-new(root) {
+  z-index: 9999;
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
   ::view-transition-old(*),
