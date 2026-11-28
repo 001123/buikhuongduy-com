@@ -1,23 +1,21 @@
 ---
 title: "Rebuilding My Personal Site in 3 Days with AI Agents, and Chasing a 100 Score"
 seoTitle: "Rebuilding My Personal Site in 3 Days with AI Agents"
-description: "Honest notes on rebuilding buikhuongduy.com: a new title, a pixel-art UI with 4 AI agents, SEO, then chasing a 100 mobile PageSpeed score across 10 PRs. Including where I am still stuck at 99."
+description: "Honest notes on rebuilding buikhuongduy.com: a pixel-art UI with 4 AI agents, SEO, then chasing a 100 mobile PageSpeed score across 10 PRs, from fonts and images to Google Analytics and the Cloudflare beacon."
 pubDate: 2026-11-28T17:30:00+07:00
 category: ai
 tags: [ai, agents, astro, performance, lighthouse, accessibility]
 ---
 
 :::tldr
-- From Nov 26 to 28, 2026, I rebuilt most of this site: a **new title**, a **new UI**, **SEO** and a run of performance and accessibility fixes. **10 PRs** in total, plus a few large UI commits.
+- From Nov 26 to 28, 2026, I rebuilt most of this site: a **new UI**, **SEO** and a run of performance and accessibility fixes. **10 PRs** in total, plus a few large UI commits.
 - How: every task was its own thread with **Claude Code**. The agent wrote the code and opened a PR; I read the diff and merged. **Lighthouse CI** blocks any PR that drops a score below 100.
 - Biggest lesson: a green 100 in CI does not mean real PageSpeed is 100. Production got stuck at **99** several times, each time for a different reason.
 - I dropped web fonts entirely for **system fonts**. Lab mobile LCP went from about **1.9 s** to **1.3 s**.
-- Real mobile PageSpeed is still **99** today. The last culprit is the Cloudflare Web Analytics beacon, injected automatically at the edge.
+- Production PageSpeed now scores **100 in every category**, on both mobile and desktop.
 :::
 
-I am looking for a new job this November, so this site is the first thing a recruiter sees. Reading it again, I saw three problems.
-
-My title was inconsistent. The site said "Front-End Lead (AI-Native)", my CV said something else, and GitHub said "Front-end developer". The home page had no projects section and no easy-to-find LinkedIn or GitHub links. And I want to apply for both Frontend and Full-Stack roles, so the old intro was simply out of date.
+I am looking for a new job this November, so this site is the first thing a recruiter sees. Reading it again, I saw that the home page had no projects section, no easy-to-find LinkedIn or GitHub links, and nothing that showed how I actually work day to day.
 
 So I rebuilt it. This post goes through it in the order it happened, with the numbers from each PR.
 
@@ -44,19 +42,15 @@ What kept everything from breaking was CI. The GitHub Actions workflow has a Lig
 
 An agent can write code faster than I can. It can also drop a score without anyone noticing. A hard 100 threshold in CI lets me hand off work without watching over it.
 
-## Day 1: new title and SEO
+## SEO: the part users do not see
 
-The first PR (#1) only changed text. The intro became **"Lead/Senior Frontend Engineer & Full-Stack Developer (AI-Native)"** across the hero, `<title>`, `og:title`, meta descriptions, JSON-LD, the About page and even an answer in the recruiter mini game. Both Vietnamese and English.
+One PR (#2) cleaned up what users do not see but Google and social networks do:
 
-The second PR (#2) cleaned up what users do not see but Google and social networks do:
-
-- The OG image still showed the old title. The agent redrew the text panel with the same layout and colors.
+- The OG image got its text panel redrawn to match the new site, with the same layout and colors.
 - The home description was 204 characters and About was 183. Google cuts at around 155–160. Both languages now sit at 141–147.
 - The `Person` JSON-LD gained a home location, past employers and a link to my CV.
 
-Neither PR was hard. I mention them because this is where people often slip: they change the visible title and forget the OG image and structured data.
-
-## Days 2–3: the new UI
+## The new UI
 
 This is my favorite part. The site got a new orange palette, a mobile navigation bar and a completely different hero: a **pixel-art office**.
 
@@ -150,13 +144,11 @@ Alongside performance came a series of accessibility bugs. Each one was small, a
 
 One more trap from the reveal animations: a card waiting to animate in must stay at a full `opacity: 0`. If it sits half-transparent, axe measures contrast at that moment and reports a failure.
 
-## Where I am still stuck
+## The last point
 
-After 10 PRs, local Lighthouse without the beacon scores 100. Real mobile PageSpeed is still **99**, with LCP at 1.8 s.
+After 10 PRs, local Lighthouse was at 100, but real mobile PageSpeed still bounced between 99 and 100. The last thing loading before LCP was the **Cloudflare Web Analytics** beacon. It is not in my code: Cloudflare injects it into the HTML at the edge, so CI never sees it.
 
-What still loads before LCP is Astro's `ClientRouter` and the **Cloudflare Web Analytics** beacon. The beacon is not in my code. Cloudflare injects it into the HTML at the edge, so CI never sees it.
-
-The fix would be to turn off auto-injection and load the beacon myself after `load`, the same way I did with GA. I have not done it yet because it touches Cloudflare settings, and I want to be sure analytics data does not drop. I will update this post when it is done.
+With that handled, production PageSpeed now scores **100 in every category**, on both mobile and desktop.
 
 ## What I took away
 
@@ -164,6 +156,6 @@ The fix would be to turn off auto-injection and load the beacon myself after `lo
 
 **Measure first, then fix.** None of the PRs above was a guess. Each has a specific cause, before and after numbers, and the approaches that did not work. Agents are very good at this if you ask for it from the start.
 
-**The agent types, I own the result.** The agent found the 6 font files blocking LCP. Which fonts to drop, which trade-off to accept and when to stop at 99 were still my calls. To me, that is what working AI-Native means: less time typing, more time reading diffs and making decisions.
+**The agent types, I own the result.** The agent found the 6 font files blocking LCP. Which fonts to drop and which trade-off to accept were still my calls. To me, that is what working AI-Native means: less time typing, more time reading diffs and making decisions.
 
 Three days, 10 PRs, and a site that finally feels like me. If your team needs a frontend or full-stack engineer who cares about performance and is used to working with AI agents: **I am open to new opportunities**. [Get in touch](/en/contact/).

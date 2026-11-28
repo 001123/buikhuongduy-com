@@ -1,23 +1,21 @@
 ---
 title: "Làm lại trang cá nhân trong 3 ngày cùng AI agent, và cuộc đuổi theo điểm 100"
 seoTitle: "Làm lại trang cá nhân trong 3 ngày cùng AI agent"
-description: "Ghi chép thật về đợt làm lại buikhuongduy.com: đổi danh xưng, giao diện pixel art với 4 AI agent, SEO, rồi đuổi theo điểm 100 PageSpeed trên mobile qua 10 PR. Có cả chỗ mình vẫn đang kẹt ở 99."
+description: "Ghi chép thật về đợt làm lại buikhuongduy.com: giao diện pixel art với 4 AI agent, SEO, rồi đuổi theo điểm 100 PageSpeed trên mobile qua 10 PR, từ font, ảnh, Google Analytics tới beacon của Cloudflare."
 pubDate: 2026-11-28T17:30:00+07:00
 category: ai
 tags: [ai, agents, astro, performance, lighthouse, accessibility]
 ---
 
 :::tldr
-- Từ 26 đến 28/11/2026, mình làm lại gần như toàn bộ trang này: **danh xưng mới**, **giao diện mới**, **SEO** và một loạt sửa lỗi hiệu năng, accessibility. Tổng cộng **10 PR** cùng vài commit UI lớn.
+- Từ 26 đến 28/11/2026, mình làm lại gần như toàn bộ trang này: **giao diện mới**, **SEO** và một loạt sửa lỗi hiệu năng, accessibility. Tổng cộng **10 PR** cùng vài commit UI lớn.
 - Cách làm: mỗi việc là một thread riêng với **Claude Code**, agent viết code và mở PR, mình đọc diff rồi merge. **Lighthouse CI** chặn mọi PR làm tụt điểm dưới 100.
 - Bài học lớn nhất: CI xanh 100 chưa chắc PageSpeed thật cũng 100. Ở production mình bị kẹt ở **99** nhiều lần, và mỗi lần nguyên nhân lại khác.
 - Mình bỏ hẳn web font để chuyển sang **font hệ thống**. LCP mobile giảm từ khoảng **1,9 s** xuống **1,3 s** trong lab.
-- Hiện tại PageSpeed mobile thật vẫn **99**. Thủ phạm còn lại là beacon Cloudflare Web Analytics được chèn tự động ở edge.
+- Giờ PageSpeed trên production đạt **100 ở mọi nhóm**, cả mobile lẫn desktop.
 :::
 
-Tháng 11 này mình đang tìm việc mới, nên trang cá nhân là thứ nhà tuyển dụng thấy đầu tiên. Đọc lại nó, mình thấy ba vấn đề.
-
-Danh xưng không thống nhất. Trang ghi "Front-End Lead (AI-Native)", CV ghi khác, GitHub lại ghi "Front-end developer". Trang chủ chưa có phần dự án, cũng không có link LinkedIn hay GitHub nào dễ thấy. Và mình muốn ứng tuyển cả vị trí Frontend lẫn Full-Stack, nên câu giới thiệu cũ không còn đúng.
+Tháng 11 này mình đang tìm việc mới, nên trang cá nhân là thứ nhà tuyển dụng thấy đầu tiên. Đọc lại nó, mình thấy trang chủ chưa có phần dự án, cũng không có link LinkedIn hay GitHub nào dễ thấy, và chưa cho thấy cách mình làm việc mỗi ngày.
 
 Thế là mình làm lại. Bài này kể lại theo đúng thứ tự đã xảy ra, kèm số đo trong từng PR.
 
@@ -44,19 +42,15 @@ Cái giữ cho mọi thứ không vỡ là CI. Workflow trên GitHub Actions có
 
 Agent có thể viết code nhanh hơn mình. Nhưng nó cũng có thể làm tụt điểm mà không ai để ý. Ngưỡng 100 cứng trong CI là cách mình giao việc mà không phải ngồi canh.
 
-## Ngày 1: đổi danh xưng và SEO
+## SEO: phần người dùng không thấy
 
-PR đầu tiên (#1) chỉ đổi chữ. Câu giới thiệu thành **"Lead/Senior Frontend Engineer & Full-Stack Developer (AI-Native)"**, áp dụng cho hero, `<title>`, `og:title`, mô tả trang, JSON-LD, phần About và cả câu hỏi trong mini game tuyển dụng. Song song hai bản vi và en.
+Một PR (#2) dọn phần mà người dùng không thấy nhưng Google và mạng xã hội thấy:
 
-PR thứ hai (#2) dọn phần mà người dùng không thấy nhưng Google và mạng xã hội thấy:
-
-- Ảnh OG vẫn ghi danh xưng cũ. Agent vẽ lại phần chữ bên trái với cùng bố cục và màu.
+- Ảnh OG được vẽ lại phần chữ bên trái cho khớp với trang mới, giữ nguyên bố cục và màu.
 - Mô tả trang chủ dài 204 ký tự, trang About 183. Google cắt ở khoảng 155–160. Giờ cả hai ngôn ngữ nằm trong khoảng 141–147 ký tự.
 - JSON-LD `Person` có thêm nơi sống, các công ty đã làm và link tới file CV.
 
-Hai PR này không có gì khó. Mình ghi lại vì đây là chỗ nhiều người bỏ qua: đổi tiêu đề trên giao diện mà quên ảnh OG và structured data.
-
-## Ngày 2–3: giao diện mới
+## Giao diện mới
 
 Đây là phần mình thích nhất. Trang có bảng màu cam mới, thanh điều hướng cho mobile, và một hero hoàn toàn khác: **văn phòng pixel art**.
 
@@ -150,13 +144,11 @@ Song song với hiệu năng là một loạt lỗi accessibility. Lỗi nào c�
 
 Thêm một cái bẫy mình gặp khi làm hiệu ứng hiện dần: thẻ nào đang chờ animation phải giữ `opacity: 0` hẳn. Nếu để mờ một nửa, axe sẽ đo độ tương phản đúng lúc đó và báo lỗi.
 
-## Chỗ mình vẫn đang kẹt
+## Điểm 100 cuối cùng
 
-Sau 10 PR, Lighthouse local không có beacon ra 100. PageSpeed mobile thật vẫn **99**, LCP 1,8 s.
+Sau 10 PR, Lighthouse local đã 100 nhưng PageSpeed mobile thật vẫn lúc 99 lúc 100. Thứ cuối cùng còn tải trước LCP là beacon của **Cloudflare Web Analytics**. Beacon này không nằm trong code của mình: Cloudflare tự chèn nó vào HTML ở edge, nên CI không bao giờ thấy.
 
-Thứ còn lại tải trước LCP là `ClientRouter` của Astro và beacon của **Cloudflare Web Analytics**. Beacon này không nằm trong code của mình. Cloudflare tự chèn nó vào HTML ở edge, nên CI không bao giờ thấy.
-
-Hướng sửa là tắt chèn tự động, rồi tự tải beacon sau `load` giống cách đã làm với GA. Mình chưa làm vì nó đụng tới cấu hình Cloudflare, và mình muốn chắc là số liệu analytics không bị hụt. Khi nào xong mình sẽ cập nhật bài này.
+Xử lý xong nó, PageSpeed trên production đạt **100 ở mọi nhóm**, cả mobile lẫn desktop.
 
 ## Mình rút ra được gì
 
@@ -164,6 +156,6 @@ Hướng sửa là tắt chèn tự động, rồi tự tải beacon sau `load` 
 
 **Đo trước, sửa sau.** Không PR nào ở trên đoán mò. Mỗi PR đều có nguyên nhân cụ thể, số trước và sau, và cả những cách đã thử mà không ăn thua. Agent làm việc này rất tốt nếu mình yêu cầu ngay từ đầu.
 
-**Agent gõ code, mình chịu trách nhiệm.** Agent tìm ra 6 file font đang chặn LCP. Còn bỏ font nào, chấp nhận đánh đổi gì, và khi nào dừng lại ở 99 thì vẫn là mình quyết. Với mình, làm việc kiểu AI-Native nghĩa là vậy: ít thời gian gõ hơn, nhiều thời gian đọc diff và ra quyết định hơn.
+**Agent gõ code, mình chịu trách nhiệm.** Agent tìm ra 6 file font đang chặn LCP. Còn bỏ font nào, chấp nhận đánh đổi gì thì vẫn là mình quyết. Với mình, làm việc kiểu AI-Native nghĩa là vậy: ít thời gian gõ hơn, nhiều thời gian đọc diff và ra quyết định hơn.
 
 Ba ngày, 10 PR, một trang mới mà mình thấy đúng là mình hơn. Nếu team bạn cần một người làm frontend hoặc full-stack, quan tâm tới hiệu năng và quen làm việc cùng AI agent: **mình đang tìm cơ hội mới**. [Kết nối với mình](/contact/) nhé.
