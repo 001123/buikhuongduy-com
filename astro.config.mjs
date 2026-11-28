@@ -150,6 +150,11 @@ export default defineConfig({
     }),
   },
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    build: {
+      // Inline the small page scripts (view transitions router, hero, command palette) into the HTML: separate
+      // requests for them compete with the hero image on slow mobile connections. Other assets keep Vite's default.
+      assetsInlineLimit: (filePath, content) => (filePath.endsWith('.js') ? content.length <= 8 * 1024 : undefined),
+    },
   }
 });

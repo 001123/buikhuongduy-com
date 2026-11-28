@@ -592,6 +592,7 @@ const defaultPrompt = isVi
                     data-item-ring-label={ringMeta.label}
                     data-item-trend={item.trend ?? ""}
                     data-item-detail={item.detail[lang]}
+                    data-radar-pos={`${item.pos.x},${item.pos.y}`}
                     aria-pressed="false"
                     class="stack-tile group flex w-full items-center gap-2.5 rounded-lg border border-border/80 bg-surface/65 px-2.5 py-1.5 text-left transition-all duration-150 hover:-translate-y-px hover:border-border-strong hover:bg-surface-elevated hover:shadow-xs focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent aria-pressed:border-fg-muted/50 aria-pressed:bg-surface-elevated aria-pressed:ring-1 aria-pressed:ring-fg-muted/20 aria-pressed:shadow-xs"
                   >
@@ -622,7 +623,7 @@ const defaultPrompt = isVi
                         </span>
                       )}
                       <span class="inline-flex items-center gap-1">
-                        <span aria-hidden="true" class:list={["size-1.5 rounded-full", ringMeta.dotClass]}></span>
+                        <span aria-hidden="true" data-ring-dot class:list={["size-1.5 rounded-full", ringMeta.dotClass]}></span>
                         <span class="sr-only lg:not-sr-only">{ringMeta.label}</span>
                       </span>
                     </span>
@@ -697,52 +698,27 @@ const defaultPrompt = isVi
             </span>
           ))}
 
-          <!-- Interactive Icon Blips -->
-          {allItems.map((item) => {
-            const ringMeta = rings[item.ring];
-            return (
-              <button
-                type="button"
-                data-radar-item
-                data-item-id={item.id}
-                data-item-label={item.label}
-                data-item-group={item.quadrantTitle}
-                data-item-ring={item.ring}
-                data-item-ring-label={ringMeta.label}
-                data-item-trend={item.trend ?? ""}
-                data-item-detail={item.detail[lang]}
-                aria-pressed="false"
-                style={`left: ${item.pos.x}%; top: ${item.pos.y}%;`}
-                class="radar-blip group absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 hover:z-20 focus-visible:z-20 focus-visible:outline-none aria-pressed:z-10"
-              >
-                <span class="relative flex size-7 items-center justify-center rounded-full border border-border-strong bg-surface-elevated shadow-xs transition-all duration-150 group-hover:scale-110 group-hover:border-fg-muted group-hover:shadow-sm group-focus-visible:ring-2 group-focus-visible:ring-accent group-aria-pressed:scale-110 group-aria-pressed:border-fg group-aria-pressed:ring-2 group-aria-pressed:ring-fg/15 sm:size-8">
-                  <TechIcon name={item.icon} class="size-3.5 sm:size-4" />
-                  <span
-                    aria-hidden="true"
-                    class:list={["absolute -right-0.5 -bottom-0.5 size-2 rounded-full ring-2 ring-surface-elevated", ringMeta.dotClass]}
-                  ></span>
-                  {item.trend === "new" && (
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 36 36"
-                      class="pointer-events-none absolute -inset-1 size-[calc(100%+0.5rem)] text-fg-muted/70"
-                    >
-                      <path
-                        d="M 18 2 A 16 16 0 0 1 34 18"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.4"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  )}
-                </span>
-                <span class="rounded bg-surface-elevated/95 px-1 font-mono text-[0.5625rem] font-medium leading-tight text-fg-secondary shadow-2xs group-hover:text-fg group-aria-pressed:font-semibold group-aria-pressed:text-fg sm:text-[0.625rem]">
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
+          <!--
+            Interactive Icon Blips: built from the stack tiles the first time the radar opens (see buildRadarBlips),
+            so the home page HTML does not carry all 28 technologies twice.
+          -->
+          <template data-radar-blip-template>
+            <button type="button" data-radar-item aria-pressed="false" class="radar-blip group absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 hover:z-20 focus-visible:z-20 focus-visible:outline-none aria-pressed:z-10">
+              <span class="relative flex size-7 items-center justify-center rounded-full border border-border-strong bg-surface-elevated shadow-xs transition-all duration-150 group-hover:scale-110 group-hover:border-fg-muted group-hover:shadow-sm group-focus-visible:ring-2 group-focus-visible:ring-accent group-aria-pressed:scale-110 group-aria-pressed:border-fg group-aria-pressed:ring-2 group-aria-pressed:ring-fg/15 sm:size-8">
+                <span aria-hidden="true" data-blip-dot class="absolute -right-0.5 -bottom-0.5 size-2 rounded-full ring-2 ring-surface-elevated"></span>
+                <svg
+                  aria-hidden="true"
+                  data-blip-new
+                  viewBox="0 0 36 36"
+                  class="pointer-events-none absolute -inset-1 size-[calc(100%+0.5rem)] text-fg-muted/70"
+                >
+                  <path d="M 18 2 A 16 16 0 0 1 34 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                </svg>
+              </span>
+              <span data-blip-label class="rounded bg-surface-elevated/95 px-1 font-mono text-[0.5625rem] font-medium leading-tight text-fg-secondary shadow-2xs group-hover:text-fg group-aria-pressed:font-semibold group-aria-pressed:text-fg sm:text-[0.625rem]"></span>
+            </button>
+          </template>
+          <div data-radar-blips class="contents"></div>
         </div>
       </div>
 
@@ -860,8 +836,7 @@ const defaultPrompt = isVi
     card.dataset.stackBound = "1";
 
     const stackItems = card.querySelectorAll<HTMLButtonElement>("[data-stack-item]");
-    const radarItems = card.querySelectorAll<HTMLButtonElement>("[data-radar-item]");
-    const allTechButtons = [...stackItems, ...radarItems];
+    const allTechButtons: HTMLButtonElement[] = [...stackItems];
 
     const ringButtons = card.querySelectorAll<HTMLButtonElement>("[data-ring-filter]");
     const viewButtons = card.querySelectorAll<HTMLButtonElement>("[data-view-toggle]");
@@ -935,7 +910,7 @@ const defaultPrompt = isVi
       renderDetail(findById(id));
     };
 
-    allTechButtons.forEach((btn) => {
+    const bindTech = (btn: HTMLButtonElement) => {
       btn.addEventListener("pointerenter", () => renderDetail(btn));
       btn.addEventListener("focus", () => renderDetail(btn));
       btn.addEventListener("pointerleave", () => renderDetail(findById(pinnedId)));
@@ -944,7 +919,42 @@ const defaultPrompt = isVi
         const id = btn.dataset.itemId ?? null;
         setPinned(pinnedId === id ? null : id);
       });
-    });
+    };
+    allTechButtons.forEach(bindTech);
+
+    // Radar blips are cloned from the stack tiles (data, icon, ring color) on first use.
+    const buildRadarBlips = () => {
+      const template = card.querySelector<HTMLTemplateElement>("[data-radar-blip-template]");
+      const host = card.querySelector<HTMLElement>("[data-radar-blips]");
+      if (!template || !host || host.childElementCount > 0) return;
+      stackItems.forEach((tile) => {
+        const blip = template.content.firstElementChild!.cloneNode(true) as HTMLButtonElement;
+        for (const key of ["itemId", "itemLabel", "itemGroup", "itemRing", "itemRingLabel", "itemTrend", "itemDetail"] as const) {
+          blip.dataset[key] = tile.dataset[key] ?? "";
+        }
+        const [x, y] = (tile.dataset.radarPos ?? "50,50").split(",");
+        blip.style.left = `${x}%`;
+        blip.style.top = `${y}%`;
+        blip.setAttribute("aria-pressed", String(tile.dataset.itemId === pinnedId));
+
+        const icon = tile.querySelector("svg")?.cloneNode(true) as SVGElement | undefined;
+        if (icon) {
+          icon.classList.remove("size-4");
+          icon.classList.add("size-3.5", "sm:size-4");
+          blip.firstElementChild!.prepend(icon);
+        }
+        const dot = blip.querySelector<HTMLElement>("[data-blip-dot]")!;
+        tile.querySelector("[data-ring-dot]")?.classList.forEach((c) => {
+          if (c.startsWith("bg-") || c.startsWith("dark:")) dot.classList.add(c);
+        });
+        if (tile.dataset.itemTrend !== "new") blip.querySelector("[data-blip-new]")?.remove();
+        blip.querySelector("[data-blip-label]")!.textContent = tile.dataset.itemLabel ?? "";
+
+        host.append(blip);
+        allTechButtons.push(blip);
+        bindTech(blip);
+      });
+    };
 
     const setRingFilter = (ring: string) => {
       activeRing = activeRing === ring && ring !== "all" ? "all" : ring;
@@ -966,6 +976,7 @@ const defaultPrompt = isVi
         card.dataset.view = mode;
         viewButtons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
         if (mode === "radar") {
+          buildRadarBlips();
           stackPanel?.classList.add("hidden");
           radarPanel?.classList.remove("hidden");
           radarPanel?.classList.add("grid");
