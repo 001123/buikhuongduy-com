@@ -130,6 +130,21 @@ const labels = {
                       <span class="text-fg-secondary">{job.org}</span>
                     )}
                   </h3>
+                  {job.links && job.links.length > 0 && (
+                    <div class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs">
+                      {job.links.map((link) => (
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener"
+                          class="inline-flex items-center gap-1 text-fg-muted underline decoration-border-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+                        >
+                          <span>{link.label}</span>
+                          <span aria-hidden="true">↗</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div class="flex flex-wrap items-center gap-1.5 font-mono text-[0.6875rem] text-fg-muted">
@@ -298,6 +313,21 @@ const labels = {
                     <span class="text-fg-secondary">{job.org}</span>
                   )}
                 </h3>
+                {job.links && job.links.length > 0 && (
+                  <div class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs">
+                    {job.links.map((link) => (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener"
+                        class="inline-flex items-center gap-1 text-fg-muted underline decoration-border-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+                      >
+                        <span>{link.label}</span>
+                        <span aria-hidden="true">↗</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div class="flex flex-wrap items-center gap-1.5 font-mono text-[0.6875rem] text-fg-muted">

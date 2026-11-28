@@ -100,7 +100,7 @@ const hasHeaderVisual = Astro.slots.has("header-visual");
     class:list={[
       "mx-auto px-5 pt-5 pb-16 sm:px-8 sm:pt-6 sm:pb-24",
       hasAside
-        ? "max-w-[46rem] xl:grid xl:max-w-6xl xl:grid-cols-[minmax(0,46rem)_14.5rem] xl:justify-center xl:gap-12"
+        ? "max-w-[46rem] xl:grid xl:max-w-6xl xl:grid-cols-[14.5rem_minmax(0,46rem)] xl:justify-center xl:gap-12"
         : article
           ? "max-w-[46rem]"
           : wide
@@ -110,6 +110,14 @@ const hasHeaderVisual = Astro.slots.has("header-visual");
     transition:name={containerTransitionName}
     transition:animate={contentAnim}
   >
+    {
+      hasAside && (
+        <aside class="hidden xl:block">
+          <slot name="aside" />
+        </aside>
+      )
+    }
+
     <article class="min-w-0">
       {
         backHref && (
@@ -161,13 +169,5 @@ const hasHeaderVisual = Astro.slots.has("header-visual");
         <slot />
       </div>
     </article>
-
-    {
-      hasAside && (
-        <aside class="hidden xl:block">
-          <slot name="aside" />
-        </aside>
-      )
-    }
   </div>
 </Layout>

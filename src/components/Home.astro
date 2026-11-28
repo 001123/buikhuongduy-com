@@ -7,6 +7,8 @@ import PostList from "./PostList.astro";
 import ProjectCard from "./ProjectCard.astro";
 import ProjectFilter from "./ProjectFilter.astro";
 import SectionPixelDecor from "./SectionPixelDecor.astro";
+import kdCodeGif from "../assets/kd-code-pixel.gif";
+import simpleOtpGif from "../assets/simple-otp-pixel.gif";
 import { experiences } from "../data/experience";
 import { cvUrl, socials } from "../data/profile";
 import { projects } from "../data/projects";
@@ -24,9 +26,13 @@ const topCategories = (await getCategories(lang))
   .slice(0, 6);
 const totalPostsLabel = t("blog.totalPosts").replace("{n}", String(allPosts.length));
 const allProjects = projects[lang];
-const kdCode = allProjects[0];
-const simpleOtp = allProjects[1];
-const otherProjects = allProjects.slice(2);
+const productionProjects = allProjects.filter((p) => p.category === "production");
+const openSourceProjects = allProjects.filter((p) => p.category === "open-source");
+const kdCode = openSourceProjects.find((p) => p.id === "kd-code") ?? openSourceProjects[0];
+const simpleOtp = openSourceProjects.find((p) => p.id === "simple-otp") ?? openSourceProjects[1];
+const otherOpenSourceProjects = openSourceProjects.filter(
+  (p) => p.id !== kdCode.id && p.id !== simpleOtp.id,
+);
 const experienceList = experiences[lang];
 
 const stats = [
@@ -36,35 +42,15 @@ const stats = [
   { num: "10M", suffix: "+", label: t("home.statDownloads"), note: "Mobile · Enterprise" },
 ];
 
-const kdAgents = [
-  {
-    id: "claude",
-    name: "Claude",
-    branch: "wt/claude-ui",
-    diff: "+184 -42",
-    time: "14.2s",
-    status: lang === "vi" ? "Tốt nhất · Best-of-N" : "Selected · Best-of-N",
-    log: "refactor(tokens): unify light & dark surface variables across 12 components",
-  },
-  {
-    id: "codex",
-    name: "Codex",
-    branch: "wt/codex-api",
-    diff: "+129 -31",
-    time: "11.8s",
-    status: lang === "vi" ? "Đã kiểm tra · 0 lỗi" : "Verified · 0 errors",
-    log: "feat(acp): stream tool-call progress over stdio JSON-RPC channel",
-  },
-  {
-    id: "opencode",
-    name: "OpenCode",
-    branch: "wt/opencode-diff",
-    diff: "+96 -19",
-    time: "16.4s",
-    status: lang === "vi" ? "Sẵn sàng merge" : "Ready to merge",
-    log: "test(worktree): isolate git index locks per concurrent coding agent",
-  },
-];
+const kdCodeGifAlt =
+  lang === "vi"
+    ? "Minh họa pixel KD Code: ba coding agent làm việc song song qua Git worktree trên màn hình IDE"
+    : "KD Code pixel illustration: three coding agents working in parallel over Git worktrees on an IDE monitor";
+
+const simpleOtpGifAlt =
+  lang === "vi"
+    ? "Minh họa pixel Simple OTP: ứng dụng 2FA ngoại tuyến với vòng đếm ngược, ổ khóa mã hóa và chìa khóa bảo mật"
+    : "Simple OTP pixel illustration: offline 2FA mobile app with countdown ring, encrypted padlock, and security key";
 ---
 
 <div transition:name="content-home" transition:animate={contentAnim}>
@@ -243,178 +229,162 @@ const kdAgents = [
           </h2>
           <p class="mt-1 text-sm text-fg-secondary">{t("home.projectsDesc")}</p>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2.5">
           <ProjectFilter projects={allProjects} lang={lang} />
           <a
             href={sectionPaths.about[lang]}
-            class="inline-flex items-center gap-1.5 font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            class="group inline-flex h-9 items-center gap-1.5 rounded-full border border-border-strong bg-surface-elevated px-3.5 text-xs font-medium text-fg-secondary shadow-2xs transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             <span>{t("home.allProjects")}</span>
-            <span aria-hidden="true">→</span>
+            <span aria-hidden="true" class="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
           </a>
         </div>
       </div>
 
-      <div class="grid gap-4 lg:grid-cols-12">
-        <!-- Bento 1: KD Code Interactive Agent Switcher -->
-        <article
-          data-reveal="pending"
-          data-project-category={kdCode.category}
-          class="spotlight-card flex flex-col rounded-2xl p-6 lg:col-span-7"
-        >
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="rounded-md border border-accent/25 bg-accent-soft/75 px-2 py-0.5 font-mono text-[0.6875rem] font-medium text-accent">
-                {t("projects.badgeOpenSource")}
-              </span>
-              <span class="font-mono text-[0.6875rem] text-fg-muted">{kdCode.org} · {kdCode.period}</span>
-            </div>
-            <a
-              href={kdCode.href}
-              target="_blank"
-              rel="noopener"
-              class="font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+      <div class="space-y-10">
+        <!-- Group 1: Commercial / Production Projects -->
+        <div data-project-group="production">
+          <div class="mb-4 flex items-center gap-2.5">
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-status-open"></span>
+            <h3 class="text-sm font-semibold tracking-[-0.01em] text-fg">
+              {t("projects.badgeProduction")}
+            </h3>
+            <span class="rounded-full border border-border bg-surface-elevated px-2 py-0.5 font-mono text-[0.6875rem] leading-none tabular-nums text-fg-muted">
+              {productionProjects.length}
+            </span>
+            <span aria-hidden="true" class="h-px flex-1 bg-border"></span>
+          </div>
+
+          <div class="grid gap-4 lg:grid-cols-12">
+            {
+              productionProjects.map((p) => (
+                <ProjectCard project={p} lang={lang} reveal class="lg:col-span-6" />
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Group 2: Open Source Projects -->
+        <div data-project-group="open-source">
+          <div class="mb-4 flex items-center gap-2.5">
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent-vivid"></span>
+            <h3 class="text-sm font-semibold tracking-[-0.01em] text-fg">
+              {t("projects.badgeOpenSource")}
+            </h3>
+            <span class="rounded-full border border-border bg-surface-elevated px-2 py-0.5 font-mono text-[0.6875rem] leading-none tabular-nums text-fg-muted">
+              {openSourceProjects.length}
+            </span>
+            <span aria-hidden="true" class="h-px flex-1 bg-border"></span>
+          </div>
+
+          <div class="grid gap-4 lg:grid-cols-12">
+            <!-- Bento 1: KD Code -->
+            <article
+              data-reveal="pending"
+              data-project-category={kdCode.category}
+              class="spotlight-card flex flex-col rounded-2xl p-6 lg:col-span-7"
             >
-              {t("home.kdCodeMarketplace")}
-            </a>
-          </div>
-
-          <h3 class="mt-3 text-xl font-semibold tracking-[-0.02em] text-fg">{kdCode.name}</h3>
-
-          <p class="mt-2 text-sm leading-relaxed text-fg-secondary">{kdCode.summary}</p>
-
-          <!-- Interactive multi-agent worktree switcher -->
-          <div data-kd-demo class="my-5 rounded-xl border border-border bg-surface p-3.5 font-mono text-xs">
-            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
-              <div role="tablist" aria-label="KD Code agents" class="flex items-center gap-1">
-                {
-                  kdAgents.map((a, idx) => (
-                    <button
-                      type="button"
-                      role="tab"
-                      data-agent-tab={a.id}
-                      data-branch={a.branch}
-                      data-diff={a.diff}
-                      data-time={a.time}
-                      data-status={a.status}
-                      data-log={a.log}
-                      aria-selected={idx === 0 ? "true" : "false"}
-                      class:list={[
-                        "rounded-md px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent",
-                        idx === 0 ? "bg-accent text-accent-fg" : "text-fg-muted hover:bg-surface-elevated hover:text-fg",
-                      ]}
-                    >
-                      {a.name}
-                    </button>
-                  ))
-                }
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent-soft px-2.5 py-1 text-xs font-medium leading-none text-accent">
+                    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-accent-vivid"></span>
+                    <span>{t("projects.badgeOpenSource")}</span>
+                  </span>
+                  <span class="text-xs text-fg-muted tabular-nums">{kdCode.org} · {kdCode.period}</span>
+                </div>
+                <a
+                  href={kdCode.href}
+                  target="_blank"
+                  rel="noopener"
+                  class="font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                >
+                  {t("home.kdCodeMarketplace")}
+                </a>
               </div>
-              <span data-kd-status class="text-[0.6875rem] text-accent">{kdAgents[0].status}</span>
-            </div>
 
-            <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-[0.75rem]">
-              <span data-kd-branch class="font-medium text-fg">{kdAgents[0].branch}</span>
-              <div class="flex items-center gap-3 tabular-nums">
-                <span data-kd-diff class="text-status-open">{kdAgents[0].diff}</span>
-                <span data-kd-time class="text-fg-muted">{kdAgents[0].time}</span>
+              <h4 class="mt-3 text-xl font-semibold tracking-[-0.02em] text-fg">{kdCode.name}</h4>
+
+              <p class="mt-2 text-sm leading-relaxed text-fg-secondary">{kdCode.summary}</p>
+
+              <!-- Pixel illustration: multi-agent worktree orchestration -->
+              <div class="my-5 flex items-center justify-center overflow-hidden rounded-xl border border-border bg-surface px-4 py-3 dark:bg-[#1A1A20]">
+                <img
+                  src={kdCodeGif.src}
+                  width={kdCodeGif.width}
+                  height={kdCodeGif.height}
+                  alt={kdCodeGifAlt}
+                  loading="lazy"
+                  decoding="async"
+                  class="h-32 w-auto max-w-full object-contain sm:h-36 [image-rendering:pixelated]"
+                />
               </div>
-            </div>
-            <p data-kd-log class="mt-2 truncate text-[0.75rem] text-fg-secondary">{kdAgents[0].log}</p>
-          </div>
 
-          <div class="mt-auto flex flex-wrap gap-1.5">
-            {kdCode.tags.map((tag) => (
-              <span class="rounded-md border border-border bg-surface px-2 py-0.5 font-mono text-[0.6875rem] text-fg-muted">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </article>
+              <div class="mt-auto flex flex-wrap gap-1.5">
+                {kdCode.tags.map((tag) => (
+                  <span class="rounded-md border border-border bg-surface px-2 py-0.5 font-mono text-[0.6875rem] text-fg-muted">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </article>
 
-        <!-- Bento 2: Simple OTP Live 2FA Ring & Click-to-Copy -->
-        <article
-          data-reveal="pending"
-          data-project-category={simpleOtp.category}
-          class="spotlight-card flex flex-col rounded-2xl p-6 lg:col-span-5"
-        >
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="rounded-md border border-accent/25 bg-accent-soft/75 px-2 py-0.5 font-mono text-[0.6875rem] font-medium text-accent">
-                {t("projects.badgeOpenSource")}
-              </span>
-              <span class="font-mono text-[0.6875rem] text-fg-muted">{simpleOtp.org} · {simpleOtp.period}</span>
-            </div>
-            <a
-              href={simpleOtp.href}
-              target="_blank"
-              rel="noopener"
-              class="font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            <!-- Bento 2: Simple OTP -->
+            <article
+              data-reveal="pending"
+              data-project-category={simpleOtp.category}
+              class="spotlight-card flex flex-col rounded-2xl p-6 lg:col-span-5"
             >
-              {t("home.simpleOtpGithub")}
-            </a>
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent-soft px-2.5 py-1 text-xs font-medium leading-none text-accent">
+                    <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-accent-vivid"></span>
+                    <span>{t("projects.badgeOpenSource")}</span>
+                  </span>
+                  <span class="text-xs text-fg-muted tabular-nums">{simpleOtp.org} · {simpleOtp.period}</span>
+                </div>
+                <a
+                  href={simpleOtp.href}
+                  target="_blank"
+                  rel="noopener"
+                  class="font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                >
+                  {t("home.simpleOtpGithub")}
+                </a>
+              </div>
+
+              <h4 class="mt-3 text-xl font-semibold tracking-[-0.02em] text-fg">{simpleOtp.name}</h4>
+
+              <p class="mt-2 text-sm leading-relaxed text-fg-secondary">{simpleOtp.summary}</p>
+
+              <!-- Pixel illustration: offline 2FA authenticator -->
+              <div class="my-5 flex items-center justify-center overflow-hidden rounded-xl border border-border bg-surface px-4 py-3 dark:bg-[#1A1A20]">
+                <img
+                  src={simpleOtpGif.src}
+                  width={simpleOtpGif.width}
+                  height={simpleOtpGif.height}
+                  alt={simpleOtpGifAlt}
+                  loading="lazy"
+                  decoding="async"
+                  class="h-32 w-auto max-w-full object-contain sm:h-36 [image-rendering:pixelated]"
+                />
+              </div>
+
+              <div class="mt-auto flex flex-wrap gap-1.5">
+                {simpleOtp.tags.map((tag) => (
+                  <span class="rounded-md border border-border bg-surface px-2 py-0.5 font-mono text-[0.6875rem] text-fg-muted">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </article>
+
+            {
+              otherOpenSourceProjects.map((p) => (
+                <ProjectCard project={p} lang={lang} reveal class="lg:col-span-6" />
+              ))
+            }
           </div>
-
-          <h3 class="mt-3 text-xl font-semibold tracking-[-0.02em] text-fg">{simpleOtp.name}</h3>
-
-          <p class="mt-2 text-sm leading-relaxed text-fg-secondary">{simpleOtp.summary}</p>
-
-          <div data-totp-widget class="my-5 flex items-center justify-between gap-4 rounded-xl border border-border bg-surface p-4">
-            <div>
-              <p class="font-mono text-[0.6875rem] uppercase tracking-wider text-fg-muted">{t("home.otpLabel")}</p>
-              <button
-                type="button"
-                data-totp-copy
-                data-label-idle={t("home.otpCopy")}
-                data-label-copied={t("home.otpCopied")}
-                title={t("home.otpCopy")}
-                class="group mt-1.5 flex items-baseline gap-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-              >
-                <span data-totp-code class="font-mono text-2xl font-medium tracking-[0.18em] text-fg tabular-nums sm:text-[1.75rem]">
-                  482 917
-                </span>
-                <span data-totp-copy-label class="rounded border border-border bg-surface-elevated px-1.5 py-0.5 font-mono text-[0.625rem] text-fg-muted transition-colors group-hover:border-border-strong group-hover:text-fg">
-                  {t("home.otpCopy")}
-                </span>
-              </button>
-            </div>
-
-            <!-- Circular 30s SVG countdown -->
-            <div class="relative grid size-12 shrink-0 place-items-center">
-              <svg viewBox="0 0 36 36" class="size-12 -rotate-90" aria-hidden="true">
-                <circle cx="18" cy="18" r="15" fill="none" stroke="var(--border-strong)" stroke-width="2.5"></circle>
-                <circle
-                  data-totp-ring
-                  cx="18"
-                  cy="18"
-                  r="15"
-                  fill="none"
-                  stroke="var(--accent-vivid)"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-dasharray="94.25"
-                  stroke-dashoffset="18"
-                  class="transition-[stroke-dashoffset] duration-300 ease-linear"
-                ></circle>
-              </svg>
-              <span data-totp-sec class="font-mono text-[0.6875rem] tabular-nums text-fg-secondary">24s</span>
-            </div>
-          </div>
-
-          <div class="mt-auto flex flex-wrap gap-1.5">
-            {simpleOtp.tags.map((tag) => (
-              <span class="rounded-md border border-border bg-surface px-2 py-0.5 font-mono text-[0.6875rem] text-fg-muted">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </article>
-
-        <!-- Real CV Production & Supporting Projects -->
-        {
-          otherProjects.map((p) => (
-            <ProjectCard project={p} lang={lang} reveal class="lg:col-span-6" />
-          ))
-        }
+        </div>
       </div>
     </div>
   </section>
@@ -445,15 +415,6 @@ const kdAgents = [
 </div>
 
 <script>
-  let homeTimer: number | undefined;
-
-  function formatTotp(step: number): string {
-    let h = (step * 2654435761) >>> 0;
-    h = ((h ^ (h >>> 16)) * 0x45d9f3b) >>> 0;
-    const code = String(h % 1_000_000).padStart(6, "0");
-    return `${code.slice(0, 3)} ${code.slice(3)}`;
-  }
-
   function initReveals() {
     const reveals = [...document.querySelectorAll<HTMLElement>("[data-reveal]")];
     if (reveals.length === 0) return;
@@ -500,88 +461,5 @@ const kdAgents = [
     }, 1500);
   }
 
-  function initMotionCraft() {
-    clearInterval(homeTimer);
-
-    const kdDemo = document.querySelector<HTMLElement>("[data-kd-demo]");
-    if (kdDemo && !kdDemo.dataset.bound) {
-      kdDemo.dataset.bound = "1";
-      const tabs = kdDemo.querySelectorAll<HTMLButtonElement>("[data-agent-tab]");
-      const statusEl = kdDemo.querySelector<HTMLElement>("[data-kd-status]")!;
-      const branchEl = kdDemo.querySelector<HTMLElement>("[data-kd-branch]")!;
-      const diffEl = kdDemo.querySelector<HTMLElement>("[data-kd-diff]")!;
-      const timeEl = kdDemo.querySelector<HTMLElement>("[data-kd-time]")!;
-      const logEl = kdDemo.querySelector<HTMLElement>("[data-kd-log]")!;
-
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          tabs.forEach((t) => {
-            const active = t === tab;
-            t.setAttribute("aria-selected", String(active));
-            t.className = active
-              ? "rounded-md bg-accent px-2.5 py-1 text-xs font-medium text-accent-fg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
-              : "rounded-md px-2.5 py-1 text-xs font-medium text-fg-muted transition-colors hover:bg-surface-elevated hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent";
-          });
-          statusEl.textContent = tab.dataset.status ?? "";
-          branchEl.textContent = tab.dataset.branch ?? "";
-          diffEl.textContent = tab.dataset.diff ?? "";
-          timeEl.textContent = tab.dataset.time ?? "";
-          logEl.textContent = tab.dataset.log ?? "";
-        });
-      });
-    }
-
-    const widget = document.querySelector<HTMLElement>("[data-totp-widget]");
-    const codeEl = widget?.querySelector<HTMLElement>("[data-totp-code]");
-    const secEl = widget?.querySelector<HTMLElement>("[data-totp-sec]");
-    const ringEl = widget?.querySelector<SVGCircleElement>("[data-totp-ring]");
-    const copyBtn = widget?.querySelector<HTMLButtonElement>("[data-totp-copy]");
-    const copyLabel = widget?.querySelector<HTMLElement>("[data-totp-copy-label]");
-
-    if (copyBtn && copyLabel && codeEl && !copyBtn.dataset.bound) {
-      copyBtn.dataset.bound = "1";
-      let resetTimer: number | undefined;
-      copyBtn.addEventListener("click", async () => {
-        const raw = (codeEl.textContent ?? "").replace(/\s+/g, "");
-        try {
-          await navigator.clipboard.writeText(raw);
-        } catch {
-          return;
-        }
-        copyLabel.textContent = copyBtn.dataset.labelCopied ?? "Copied";
-        copyLabel.classList.add("text-accent", "border-accent");
-        clearTimeout(resetTimer);
-        resetTimer = window.setTimeout(() => {
-          copyLabel.textContent = copyBtn.dataset.labelIdle ?? "Copy";
-          copyLabel.classList.remove("text-accent", "border-accent");
-        }, 1600);
-      });
-    }
-
-    const CIRC = 2 * Math.PI * 15;
-
-    const tickTotp = () => {
-      if (!widget?.isConnected || !codeEl || !secEl || !ringEl) {
-        clearInterval(homeTimer);
-        return;
-      }
-      const nowSec = Math.floor(Date.now() / 1000);
-      const step = Math.floor(nowSec / 30);
-      const rem = 30 - (nowSec % 30);
-      codeEl.textContent = formatTotp(step);
-      secEl.textContent = `${rem}s`;
-      ringEl.style.strokeDashoffset = String(CIRC * (1 - rem / 30));
-    };
-
-    if (widget) {
-      tickTotp();
-      homeTimer = window.setInterval(tickTotp, 1000);
-    }
-  }
-
-  document.addEventListener("astro:page-load", () => {
-    initReveals();
-    if (typeof requestIdleCallback === "function") requestIdleCallback(initMotionCraft);
-    else requestAnimationFrame(initMotionCraft);
-  });
+  document.addEventListener("astro:page-load", initReveals);
 </script>
