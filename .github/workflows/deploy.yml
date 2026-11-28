@@ -121,7 +121,7 @@ jobs:
                 const bad = c.auditRefs.filter((a) => a.weight > 0 && r.audits[a.id].score !== null && r.audits[a.id].score < 1);
                 console.log(`${r.finalDisplayedUrl} ${cat} ${c.score}`);
                 for (const a of bad) {
-                  const items = (r.audits[a.id].details?.items ?? []).slice(0, 3).map((i) => i.node?.snippet ?? "").filter(Boolean);
+                  const items = (r.audits[a.id].details?.items ?? []).slice(0, 3).map((i) => [i.node?.snippet, i.node?.explanation].filter(Boolean).join(" ")).filter(Boolean);
                   console.log(`  - ${a.id} (${r.audits[a.id].displayValue ?? r.audits[a.id].score}) ${items.join(" | ")}`);
                 }
               }

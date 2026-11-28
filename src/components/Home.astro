@@ -487,8 +487,14 @@ const kdAgents = [
     reveals.forEach((el) => io.observe(el));
     revealVisible();
     window.addEventListener("scroll", revealVisible, { passive: true });
+    // Fallback for cards still offscreen: show them without the fade. Inside a `content-visibility: auto` section the
+    // fade would only start once the section renders, leaving text near-transparent for a moment.
     window.setTimeout(() => {
-      reveals.forEach((el) => (el.dataset.reveal = "visible"));
+      reveals.forEach((el) => {
+        if (el.dataset.reveal === "visible") return;
+        el.style.transition = "none";
+        el.dataset.reveal = "visible";
+      });
       window.removeEventListener("scroll", revealVisible);
       io.disconnect();
     }, 1500);
