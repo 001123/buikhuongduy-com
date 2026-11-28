@@ -577,7 +577,8 @@ const defaultPrompt = isVi
               </span>
             </div>
 
-            <div class="grid grid-cols-2 gap-1.5 lg:grid-cols-1">
+            {/* One column on narrow phones (under 400px), where two columns leave no room for the names. */}
+            <div class="grid grid-cols-1 gap-1.5 min-[400px]:grid-cols-2 lg:grid-cols-1">
               {q.items.map((item) => {
                 const ringMeta = rings[item.ring];
                 return (
@@ -596,24 +597,33 @@ const defaultPrompt = isVi
                   >
                     <span class="relative flex size-7 shrink-0 items-center justify-center rounded-md border border-border/70 bg-surface-elevated shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-transform duration-150 group-hover:scale-105 group-aria-pressed:scale-105">
                       <TechIcon name={item.icon} class="size-4" />
+                      {/* Below lg the NEW chip collapses to this corner dot, so the name keeps the room. */}
+                      {item.trend === "new" && (
+                        <span
+                          aria-hidden="true"
+                          class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-accent-vivid ring-2 ring-surface-elevated lg:hidden"
+                        ></span>
+                      )}
                     </span>
 
-                    <span class="min-w-0 flex-1 truncate font-mono text-xs font-medium text-fg">
+                    {/* Below lg names may wrap to two lines instead of being cut with an ellipsis. */}
+                    <span class="min-w-0 flex-1 font-mono text-xs leading-snug font-medium text-fg max-lg:line-clamp-2 lg:truncate">
                       {item.label}
                     </span>
 
-                    <span class="hidden shrink-0 items-center gap-1.5 font-mono text-[0.625rem] text-fg-muted sm:inline-flex">
+                    {/* Below lg only the ring dot shows (the filter bar is its legend); the words stay for screen readers. */}
+                    <span class="inline-flex shrink-0 items-center gap-1.5 font-mono text-[0.625rem] text-fg-muted">
                       {item.trend === "new" && (
                         <span
                           title={isVi ? "Mới đẩy mạnh gần đây" : "Recent focus"}
-                          class="rounded border border-border-strong px-1 py-px text-[0.5625rem] uppercase leading-none text-fg-secondary"
+                          class="sr-only rounded border border-border-strong px-1 py-px text-[0.5625rem] uppercase leading-none text-fg-secondary lg:not-sr-only"
                         >
                           new
                         </span>
                       )}
                       <span class="inline-flex items-center gap-1">
                         <span aria-hidden="true" class:list={["size-1.5 rounded-full", ringMeta.dotClass]}></span>
-                        <span>{ringMeta.label}</span>
+                        <span class="sr-only lg:not-sr-only">{ringMeta.label}</span>
                       </span>
                     </span>
                   </button>
