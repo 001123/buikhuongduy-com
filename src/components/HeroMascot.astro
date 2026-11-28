@@ -532,7 +532,7 @@ const mobileNavLabel = isVi ? "Chọn trạm AI agent trong văn phòng" : "Sele
       type="button"
       data-office-bubble
       data-station="duy"
-      style="transform: translate3d(-50%, 3.5rem, 0);"
+      style={`top:${initialStation.anchorY}%;transform:translate3d(-50%, calc(-100% - 8px), 0);`}
       class="office-bubble office-theme-duy group pointer-events-auto absolute top-0 left-1/2 z-20 inline-flex w-max max-w-[min(calc(100%-1.25rem),14.5rem)] flex-col items-start gap-1 rounded-xl border border-border-strong bg-surface-elevated/95 px-2.5 py-1.5 text-left shadow-sm transition-colors hover:border-accent/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:max-w-[16rem]"
     >
       <span
@@ -771,6 +771,8 @@ const mobileNavLabel = isVi ? "Chọn trạm AI agent trong văn phòng" : "Sele
       const anchorYPx = (station.anchorY / 100) * viewportH;
       const clampedTop = Math.max(6, anchorYPx - bubbleH - 8);
 
+      // The server-rendered bubble sits at `top: anchorY%` lifted by its own height; from here on JS owns the position.
+      bubble.style.top = "0px";
       bubble.style.transform = `translate3d(calc(-50% + ${offsetFromCenter.toFixed(1)}px), ${clampedTop.toFixed(1)}px, 0)`;
       tail.style.left = `${tailLeft.toFixed(1)}px`;
     };
@@ -942,7 +944,7 @@ const mobileNavLabel = isVi ? "Chọn trạm AI agent trong văn phòng" : "Sele
     const ro =
       "ResizeObserver" in window
         ? new ResizeObserver(() => {
-            if (activeId !== "duy") updateCameraAndBubble(false);
+            updateCameraAndBubble(false);
           })
         : undefined;
     ro?.observe(viewport);
