@@ -29,6 +29,9 @@ const posts = pagePosts(category.posts, page);
   lead={category.intro}
   description={category.description}
   page={page}
+  wide
+  hideHeaderBorder
+  contentTransitionName={`content-blog-cat-${category.slug}`}
   alternates={alternates}
   translations={translations}
   noindex={noindex}

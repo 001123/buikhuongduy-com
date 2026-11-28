@@ -32,6 +32,12 @@ interface Props {
   dates?: PageDates;
   /** Listing page number; pages after the first get it in the document title and description. */
   page?: number;
+  /** Use a wider container for multi-column listing pages. */
+  wide?: boolean;
+  /** Omit the bottom border under the page header (e.g. when a tab bar sits directly below it). */
+  hideHeaderBorder?: boolean;
+  /** Custom view-transition-name for the page container (prevents cross-layout zoom morphs). */
+  contentTransitionName?: string;
 }
 
 const lang = getLang(Astro.currentLocale);
@@ -52,7 +58,12 @@ const {
   itemList,
   dates,
   page = 1,
+  wide = false,
+  hideHeaderBorder = false,
+  contentTransitionName,
 } = Astro.props;
+
+const containerTransitionName = contentTransitionName ?? (article ? "content-blog-post" : `content-${section}`);
 
 const pageLabel = page > 1 ? `${t("blog.page")} ${page}` : "";
 const docTitle = article ? (seoTitle ?? title) : [title, pageLabel, t("site.name")].filter(Boolean).join(" · ");
@@ -66,6 +77,8 @@ const pageTypes: Record<Section, PageType> = {
 };
 
 const kicker = t(`section.${section}Kicker`);
+const hasAside = Astro.slots.has("aside");
+const hasHeaderVisual = Astro.slots.has("header-visual");
 ---
 
 <Layout
@@ -83,46 +96,78 @@ const kicker = t(`section.${section}Kicker`);
 >
   {article && <div aria-hidden="true" class="reading-progress"></div>}
 
-  <article
+  <div
     class:list={[
       "mx-auto px-5 pt-10 pb-16 sm:px-8 sm:pt-14 sm:pb-24",
-      article ? "max-w-[46rem]" : "max-w-[52rem]",
+      hasAside
+        ? "max-w-[46rem] xl:grid xl:max-w-6xl xl:grid-cols-[minmax(0,46rem)_14.5rem] xl:justify-center xl:gap-12"
+        : article
+          ? "max-w-[46rem]"
+          : wide
+            ? "max-w-5xl"
+            : "max-w-[52rem]",
     ]}
-    transition:name={`content-${section}`}
+    transition:name={containerTransitionName}
     transition:animate={contentAnim}
   >
-    {
-      backHref && (
-        <div class="mb-6">
-          <a
-            href={backHref}
-            class="inline-flex items-center gap-1.5 font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          >
-            <span aria-hidden="true">←</span>
-            {backLabel}
-          </a>
-        </div>
-      )
-    }
+    <article class="min-w-0">
+      {
+        backHref && (
+          <div class="mb-6">
+            <a
+              href={backHref}
+              class="inline-flex items-center gap-1.5 font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <span aria-hidden="true">←</span>
+              {backLabel}
+            </a>
+          </div>
+        )
+      }
 
-    <header class="mb-10 flex flex-col items-start gap-3 border-b border-border pb-7">
-      {!article && <p class="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-accent">{kicker}</p>}
-      <h1
+      <header
         class:list={[
-          "font-semibold tracking-[-0.03em] text-pretty text-fg",
-          article
-            ? "text-[clamp(1.625rem,4.5vw,2.375rem)] leading-[1.16]"
-            : "text-[clamp(2rem,5vw,2.75rem)] leading-[1.12]",
+          "flex flex-col items-start gap-2.5",
+          hideHeaderBorder ? "mb-6" : "mb-10 gap-3 border-b border-border pb-7",
         ]}
       >
-        {title}
-      </h1>
-      <p class="text-base leading-relaxed text-pretty text-fg-secondary sm:text-[1.0625rem]">{lead}</p>
-      <slot name="meta" />
-    </header>
+        {
+          hasHeaderVisual && !article ? (
+            <>
+              <slot name="header-visual" />
+              <h1 class="text-base font-normal leading-relaxed text-pretty text-fg-secondary sm:text-[1.0625rem]">{lead}</h1>
+            </>
+          ) : (
+            <>
+              {!article && <p class="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-accent">{kicker}</p>}
+              <h1
+                class:list={[
+                  "font-semibold tracking-[-0.03em] text-pretty text-fg",
+                  article
+                    ? "text-[clamp(1.625rem,4.5vw,2.375rem)] leading-[1.16]"
+                    : "text-[clamp(2rem,5vw,2.75rem)] leading-[1.12]",
+                ]}
+              >
+                {title}
+              </h1>
+              <p class="text-base leading-relaxed text-pretty text-fg-secondary sm:text-[1.0625rem]">{lead}</p>
+            </>
+          )
+        }
+        <slot name="meta" />
+      </header>
 
-    <div class="prose prose-editorial max-w-none">
-      <slot />
-    </div>
-  </article>
+      <div class="prose prose-editorial max-w-none">
+        <slot />
+      </div>
+    </article>
+
+    {
+      hasAside && (
+        <aside class="hidden xl:block">
+          <slot name="aside" />
+        </aside>
+      )
+    }
+  </div>
 </Layout>

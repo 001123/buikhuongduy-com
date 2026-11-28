@@ -1,0 +1,69 @@
+---
+import type { Project } from "../data/projects";
+import { useTranslations, type Lang } from "../i18n/ui";
+
+interface Props {
+  projects: Project[];
+  lang: Lang;
+}
+
+const { projects, lang } = Astro.props;
+const t = useTranslations(lang);
+const prodCount = projects.filter((p) => p.category === "production").length;
+const ossCount = projects.filter((p) => p.category === "open-source").length;
+
+const filters = [
+  { id: "all", label: t("projects.filterAll"), count: projects.length },
+  { id: "production", label: t("projects.filterProduction"), count: prodCount },
+  { id: "open-source", label: t("projects.filterOpenSource"), count: ossCount },
+] as const;
+---
+
+<div
+  role="group"
+  aria-label={t("projects.title")}
+  data-project-filters
+  class="inline-flex flex-wrap items-center rounded-lg border border-border bg-surface-elevated p-0.5 font-mono text-[0.6875rem]"
+>
+  {
+    filters.map((f, idx) => (
+      <button
+        type="button"
+        data-project-filter={f.id}
+        aria-pressed={idx === 0 ? "true" : "false"}
+        class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-fg-muted transition-colors hover:text-fg aria-pressed:bg-surface aria-pressed:font-medium aria-pressed:text-fg aria-pressed:shadow-2xs focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+      >
+        <span>{f.label}</span>
+        <span class="text-fg-muted/80">{f.count}</span>
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  function initProjectFilters() {
+    document.querySelectorAll<HTMLElement>("[data-projects-scope]").forEach((scope) => {
+      if (scope.dataset.filterBound) return;
+      scope.dataset.filterBound = "1";
+      const buttons = scope.querySelectorAll<HTMLButtonElement>("[data-project-filter]");
+      const cards = scope.querySelectorAll<HTMLElement>("[data-project-category]");
+
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.projectFilter ?? "all";
+          buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+          cards.forEach((card) => {
+            const match = target === "all" || card.dataset.projectCategory === target;
+            card.classList.toggle("hidden", !match);
+            if (match && card.dataset.reveal === "pending") {
+              card.dataset.reveal = "visible";
+            }
+          });
+        });
+      });
+    });
+  }
+
+  initProjectFilters();
+  document.addEventListener("astro:page-load", initProjectFilters);
+</script>

@@ -3,6 +3,7 @@ import SectionPage from "../../layouts/SectionPage.astro";
 import CategoryNav from "../CategoryNav.astro";
 import Pagination from "../Pagination.astro";
 import PostList from "../PostList.astro";
+import SectionPixelDecor from "../SectionPixelDecor.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import { blogPageAlternates, getPosts, pageCount, pagePath, pagePosts, postUrl } from "../../lib/blog";
 
@@ -27,18 +28,22 @@ const pageLabel = `${t("blog.page")} ${page}`;
   title={t("blog.title")}
   lead={t("blog.lead")}
   page={page}
+  wide
+  hideHeaderBorder={all.length > 0}
   alternates={page > 1 ? alternates : undefined}
   translations={page > 1 ? translations : undefined}
   breadcrumbs={page > 1 ? [{ name: t("nav.blog"), path: base }, { name: pageLabel, path: pagePath(base, page) }] : undefined}
   itemList={posts.map(postUrl)}
 >
+  <SectionPixelDecor slot="header-visual" variant="writing" />
+
   {
     all.length === 0 ? (
       <p class="text-fg-muted italic">{t("blog.empty")}</p>
     ) : (
       <>
         <CategoryNav />
-        <PostList posts={posts} />
+        <PostList posts={posts} featured={page === 1} />
         <Pagination base={base} current={page} total={total} />
       </>
     )

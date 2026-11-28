@@ -1,12 +1,22 @@
 ---
 import SectionPage from "../../layouts/SectionPage.astro";
+import ExperienceTimeline from "../../components/ExperienceTimeline.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import ProjectFilter from "../../components/ProjectFilter.astro";
+import SectionPixelDecor from "../../components/SectionPixelDecor.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import mascot from "../../assets/mascot-pixel.gif";
+import { awards, certifications, education, experiences } from "../../data/experience";
 import { cvPdfPath, cvUrl, socials } from "../../data/profile";
 import { projects } from "../../data/projects";
 import { gitDates } from "../../lib/git-dates";
 
-const dates = gitDates(["src/components/sections/About.astro", "src/data/profile.ts", "src/data/projects.ts"]);
+const dates = gitDates([
+  "src/components/sections/About.astro",
+  "src/data/profile.ts",
+  "src/data/projects.ts",
+  "src/data/experience.ts",
+]);
 
 const linkedinUrl = socials.find((s) => s.icon === "linkedin")!.href;
 const kdLabsName = "KD Labs";
@@ -39,14 +49,6 @@ const content = {
       "Hiện mình điều hành KD Labs, nơi phát triển các công cụ mã nguồn mở cho lập trình viên như KD Code, một extension VS Code điều phối nhiều coding agent cùng lúc.",
       "Suốt chặng đường đó, trải qua nhiều dự án, nhiều đội nhóm và cả những lúc vấp ngã, mình vẫn luôn cố gắng học hỏi và tối ưu từng ngày. Mình biết ơn tất cả những người đã giúp đỡ, đồng hành và chỉ dạy, cùng những bài học từ cuộc sống đã giúp mình trưởng thành như hôm nay.",
     ],
-    jobs: [
-      { period: "08/2026 – nay", role: "Founder", org: "KD Labs", note: "Xây KD Code (VS Code extension) và Simple OTP (mobile app cho Android và iOS), hai sản phẩm mã nguồn mở (MIT); các dự án khác vẫn đang được phát triển. Nghiên cứu và áp dụng phương pháp AI-native để phát triển phần mềm nhanh hơn, hiệu quả hơn và an toàn hơn." },
-      { period: "04/2025 – 08/2026", role: "Lead Senior Engineer", org: "AFD", note: "Dẫn dắt đội 10 lập trình viên, xây nền tảng multi-tenant trên Contentful, Strapi và Payload CMS phục vụ hàng triệu lượt truy cập mỗi tháng, phát triển mobile app bằng Expo, xây backend Node.js cho AI Content Engine nội bộ và đưa quy trình AI-native thành chuẩn của team." },
-      { period: "08/2021 – 04/2025", role: "Senior Frontend Developer", org: "10X / Saladin", note: "Xây Saladin, nền tảng bảo hiểm một cửa đạt hơn 2 triệu khách hàng; dựng design system từ đầu và tích hợp MoMo, ZaloPay, Payoo, OnePay, Viettel Money." },
-      { period: "01/2020 – 05/2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Chuyển 9 trang sức khoẻ (HelloBacsi, HelloSehat), tổng traffic hơn 30 triệu lượt truy cập mỗi tháng, từ WordPress sang Next.js trong 2 tháng, giảm thời gian tải từ 4–5 giây xuống dưới 2 giây." },
-      { period: "08/2018 – 10/2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Ra mắt 2 ứng dụng mobile cho khách hàng doanh nghiệp, một app đạt hơn 10 triệu lượt tải." },
-      { period: "10/2017 – 08/2018", role: "Junior Web Developer", org: "Maple Studio", note: "Làm hơn 10 theme WordPress, Shopify, Haravan, tất cả đúng tiến độ." },
-    ],
     languages: "Tiếng Việt (bản ngữ) · Tiếng Anh (giao tiếp công việc)",
   },
   en: {
@@ -57,32 +59,20 @@ const content = {
       "I also run KD Labs, where I build open-source developer tools like KD Code, a VS Code extension that orchestrates multiple coding agents.",
       "Over these 9+ years, through many projects, teams and a few stumbles along the way, I keep learning and improving every day. I'm grateful to everyone who has helped, guided and worked alongside me, and to the life lessons that shaped who I am today.",
     ],
-    jobs: [
-      { period: "Aug 2026 – now", role: "Founder", org: "KD Labs", note: "Building KD Code (a VS Code extension) and Simple OTP (a mobile app for Android and iOS), two open-source (MIT) products, with more projects in development. Researching and applying AI-native practices to build software faster, more efficiently and more securely." },
-      { period: "Apr 2025 – Aug 2026", role: "Lead Senior Engineer", org: "AFD", note: "Led a team of 10 developers, built a multi-tenant platform on Contentful, Strapi and Payload CMS serving millions of monthly visits, developed a mobile app with Expo, built the Node.js backend of an internal AI Content Engine and made AI-native development the team standard." },
-      { period: "Aug 2021 – Apr 2025", role: "Senior Frontend Developer", org: "10X / Saladin", note: "Built Saladin, a one-stop insurance platform that grew to 2M+ customers; designed the design system from scratch and integrated MoMo, ZaloPay, Payoo, OnePay and Viettel Money." },
-      { period: "Jan 2020 – May 2021", role: "Senior Web Developer", org: "Hello Health Group", note: "Migrated 9 healthcare sites (HelloBacsi, HelloSehat) serving over 30 million monthly visits from WordPress to Next.js in 2 months, cutting load time from 4–5s to under 2s." },
-      { period: "Aug 2018 – Oct 2019", role: "Senior JavaScript Developer", org: "Sutrix Group", note: "Shipped 2 mobile apps for enterprise clients, one with 10M+ downloads." },
-      { period: "Oct 2017 – Aug 2018", role: "Junior Web Developer", org: "Maple Studio", note: "Delivered 10+ WordPress, Shopify and Haravan themes, all on schedule." },
-    ],
     languages: "Vietnamese (native) · English (working proficiency)",
   },
 }[lang];
 
-function formatMonth(date: Date, l: string) {
-  return l === "vi"
-    ? `${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`
-    : date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
-}
-const now = new Date();
-const buildMonth = {
-  label: formatMonth(now, lang),
-  iso: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`,
-};
+const experienceList = experiences[lang];
 const projectList = projects[lang];
+const certList = certifications[lang];
+const awardList = awards[lang];
+const edu = education[lang];
 ---
 
 <SectionPage section="about" title={t("about.title")} lead={t("about.lead")} dates={dates}>
+  <SectionPixelDecor slot="header-visual" variant="about" />
+
   <div class="flow-root text-base leading-7 text-pretty [&>p]:leading-7 [&>p:first-of-type]:mt-0">
     <div class="not-prose mb-6 flex justify-center sm:float-left sm:mt-1 sm:mr-7 sm:mb-4">
       <a
@@ -132,69 +122,17 @@ const projectList = projects[lang];
     }
   </div>
 
-  <h2>{t("about.experience")}</h2>
-  <ol class="not-prose divide-y divide-border border-y border-border">
-    <li class="grid gap-1.5 py-5 sm:grid-cols-[10.5rem_1fr] sm:gap-x-6">
-      <p class="flex items-center gap-2 self-start pt-0.5 font-mono text-xs tabular-nums text-fg-muted">
-        <span aria-hidden="true" class="size-2 rounded-full bg-status-open"></span>
-        <time data-current-month data-lang={lang} datetime={buildMonth.iso}>{buildMonth.label}</time>
-      </p>
-      <p class="font-medium text-fg">
-        {t("about.hire")}{" "}
-        <a
-          href={sectionPaths.contact[lang]}
-          class="text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-accent"
-        >
-          {t("about.hireLink")} →
-        </a>
-      </p>
-    </li>
-    {
-      content.jobs.map((job) => (
-        <li class="grid gap-1.5 py-5 sm:grid-cols-[10.5rem_1fr] sm:gap-x-6">
-          <p class="pt-0.5 font-mono text-xs tabular-nums text-fg-muted">{job.period}</p>
-          <div>
-            <p class="font-medium text-fg">
-              {job.role} ·{" "}
-              {job.org === kdLabsName ? (
-                <a
-                  href={kdLabsUrl}
-                  target="_blank"
-                  rel="noopener"
-                  class="text-fg-secondary underline decoration-border-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
-                >
-                  {job.org}
-                </a>
-              ) : (
-                <span class="text-fg-secondary">{job.org}</span>
-              )}
-            </p>
-            <p class="mt-1.5 text-sm leading-relaxed text-fg-secondary">{job.note}</p>
-          </div>
-        </li>
-      ))
-    }
-  </ol>
+  <h2 id="experience">{t("about.experience")}</h2>
+  <ExperienceTimeline items={experienceList} lang={lang} variant="timeline" showAvailability={true} />
 
-  <h2>{t("projects.title")}</h2>
-  <div class="not-prose grid gap-4 sm:grid-cols-2">
-    {
-      projectList.map((p) => (
-        <a
-          href={p.href}
-          target="_blank"
-          rel="noopener"
-          class="spotlight-card group flex flex-col rounded-xl p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-          <div class="flex items-baseline justify-between gap-2">
-            <h3 class="text-base font-semibold tracking-tight text-fg transition-colors group-hover:text-accent">{p.name}</h3>
-            <span aria-hidden="true" class="font-mono text-xs text-fg-muted transition-colors group-hover:text-accent">↗</span>
-          </div>
-          <p class="mt-1.5 text-sm leading-relaxed text-fg-secondary">{p.summary}</p>
-          <p class="mt-auto pt-3 font-mono text-[0.75rem] text-fg-muted">{p.tags.join(" · ")}</p>
-        </a>
-      ))
-    }
+  <div data-projects-scope class="mt-12">
+    <div class="not-prose mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <h2 id="projects" class="text-2xl font-semibold tracking-[-0.025em] text-fg">{t("projects.title")}</h2>
+      <ProjectFilter projects={projectList} lang={lang} />
+    </div>
+    <div class="not-prose grid gap-4 sm:grid-cols-2">
+      {projectList.map((p) => <ProjectCard project={p} lang={lang} />)}
+    </div>
   </div>
 
   <h2>{t("projects.skills")}</h2>
@@ -208,6 +146,61 @@ const projectList = projects[lang];
       ))
     }
   </dl>
+
+  <div class="not-prose mt-10 grid gap-6 sm:grid-cols-2">
+    <section aria-labelledby="about-certs" class="spotlight-card rounded-2xl p-5">
+      <h2 id="about-certs" class="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-fg-muted">
+        {t("about.certifications")}
+      </h2>
+      <ul class="mt-3 divide-y divide-border">
+        {
+          certList.map((cert) => (
+            <li class="py-3 first:pt-0 last:pb-0">
+              <a
+                href={cert.href}
+                target="_blank"
+                rel="noopener"
+                class="group flex items-baseline justify-between gap-2 text-sm font-medium text-fg transition-colors hover:text-accent"
+              >
+                <span>{cert.title}</span>
+                <span aria-hidden="true" class="font-mono text-xs text-fg-muted group-hover:text-accent">↗</span>
+              </a>
+              <p class="mt-0.5 font-mono text-[0.6875rem] text-fg-muted">{cert.issuer}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-4 border-t border-border pt-3.5">
+        <h3 class="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-fg-muted">
+          {t("about.education")}
+        </h3>
+        <p class="mt-1.5 text-sm font-medium text-fg">{edu.school}</p>
+        <p class="text-xs text-fg-secondary">
+          {edu.program} · <span class="font-mono text-fg-muted">{edu.period}</span>
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="about-awards" class="spotlight-card rounded-2xl p-5">
+      <h2 id="about-awards" class="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-fg-muted">
+        {t("about.awards")}
+      </h2>
+      <ul class="mt-3 divide-y divide-border">
+        {
+          awardList.map((award) => (
+            <li class="py-3 first:pt-0 last:pb-0">
+              <div class="flex items-baseline justify-between gap-2">
+                <span class="text-sm font-medium text-fg">{award.title}</span>
+                <span class="font-mono text-[0.6875rem] text-fg-muted tabular-nums">{award.period}</span>
+              </div>
+              <p class="mt-0.5 font-mono text-[0.6875rem] text-accent">{award.issuer}</p>
+              {award.note && <p class="mt-1 text-xs leading-relaxed text-fg-secondary">{award.note}</p>}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
 
   <h2>{t("about.languages")}</h2>
   <p class="text-base leading-7">{content.languages}</p>

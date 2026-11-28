@@ -1,0 +1,145 @@
+---
+import type { MarkdownHeading } from "astro";
+import { getLang, useTranslations } from "../i18n/ui";
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const t = useTranslations(getLang(Astro.currentLocale));
+---
+
+<nav
+  aria-label={t("blog.toc")}
+  data-toc
+  class="sticky top-20 max-h-[calc(100dvh-7rem)] overflow-y-auto no-scrollbar pr-1"
+>
+  <p class="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-fg-muted">
+    {t("blog.toc")}
+  </p>
+  <ul class="mt-3 border-l border-border">
+    {
+      headings.map((h) => (
+        <li data-toc-item={h.slug}>
+          <a
+            href={`#${h.slug}`}
+            data-toc-link={h.slug}
+            class:list={[
+              "toc-link -ml-px block border-l-2 border-transparent py-1.5 leading-snug text-fg-muted transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+              h.depth === 3 ? "pl-6 text-xs" : "pl-3.5 text-[0.8125rem]",
+            ]}
+          >
+            {h.text}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .toc-link[aria-current="location"] {
+    border-left-color: var(--accent);
+    color: var(--accent);
+    font-weight: 500;
+  }
+</style>
+
+<script>
+  let cleanup: (() => void) | null = null;
+
+  function initToc() {
+    cleanup?.();
+    cleanup = null;
+
+    const nav = document.querySelector<HTMLElement>("[data-toc]");
+    if (!nav) return;
+
+    const items = Array.from(nav.querySelectorAll<HTMLLIElement>("[data-toc-item]")).map((li) => {
+      const slug = li.dataset.tocItem!;
+      const link = li.querySelector<HTMLAnchorElement>("[data-toc-link]")!;
+      return { li, slug, link, target: document.getElementById(slug) };
+    });
+
+    let visible: typeof items = [];
+    let activeSlug = "";
+    let ticking = false;
+
+    function setActive(slug: string) {
+      if (slug === activeSlug) return;
+      activeSlug = slug;
+      for (const item of items) {
+        if (item.slug === slug) {
+          item.link.setAttribute("aria-current", "location");
+          // Keep the active TOC entry visible if the TOC itself scrolls.
+          const navRect = nav!.getBoundingClientRect();
+          const linkRect = item.link.getBoundingClientRect();
+          if (linkRect.top < navRect.top + 32 || linkRect.bottom > navRect.bottom - 16) {
+            item.link.scrollIntoView({ block: "nearest" });
+          }
+        } else {
+          item.link.removeAttribute("aria-current");
+        }
+      }
+    }
+
+    function updateActive() {
+      ticking = false;
+      if (visible.length === 0) return;
+
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 24;
+      if (atBottom) {
+        setActive(visible[visible.length - 1].slug);
+        return;
+      }
+
+      const threshold = 112;
+      let current = visible[0].slug;
+      for (const item of visible) {
+        if (item.target && item.target.getBoundingClientRect().top <= threshold) {
+          current = item.slug;
+        } else {
+          break;
+        }
+      }
+      setActive(current);
+    }
+
+    function syncVisibility() {
+      visible = [];
+      for (const item of items) {
+        const shown = Boolean(item.target && item.target.offsetParent !== null);
+        item.li.hidden = !shown;
+        if (shown) visible.push(item);
+      }
+      nav!.hidden = visible.length < 2;
+      updateActive();
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateActive);
+    }
+
+    const onModeChange = () => requestAnimationFrame(syncVisibility);
+
+    syncVisibility();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    document.addEventListener("reading-mode-change", onModeChange);
+
+    cleanup = () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      document.removeEventListener("reading-mode-change", onModeChange);
+    };
+  }
+
+  document.addEventListener("astro:page-load", initToc);
+  document.addEventListener("astro:before-swap", () => {
+    cleanup?.();
+    cleanup = null;
+  });
+</script>

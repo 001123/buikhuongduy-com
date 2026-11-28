@@ -1,0 +1,86 @@
+---
+import type { Project } from "../data/projects";
+import { useTranslations, type Lang } from "../i18n/ui";
+
+interface Props {
+  project: Project;
+  lang: Lang;
+  class?: string;
+  reveal?: boolean;
+}
+
+const { project, lang, class: className = "", reveal = false } = Astro.props;
+const t = useTranslations(lang);
+const isProduction = project.category === "production";
+const categoryLabel = isProduction ? t("projects.badgeProduction") : t("projects.badgeOpenSource");
+const Tag = project.href ? "a" : "article";
+const linkProps = project.href ? { href: project.href, target: "_blank", rel: "noopener" } : {};
+---
+
+<Tag
+  {...linkProps}
+  data-project-card
+  data-project-category={project.category}
+  data-reveal={reveal ? "pending" : undefined}
+  class:list={[
+    "spotlight-card flex flex-col rounded-2xl p-6",
+    project.href &&
+      "group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+    className,
+  ]}
+>
+  <div class="flex items-center justify-between gap-3">
+    <div class="flex min-w-0 items-center gap-2 font-mono text-[0.6875rem]">
+      <span
+        class:list={[
+          "shrink-0 rounded-md border px-2 py-0.5 font-medium",
+          isProduction
+            ? "border-border-strong bg-surface text-fg-secondary"
+            : "border-accent/25 bg-accent-soft/75 text-accent",
+        ]}
+      >
+        {categoryLabel}
+      </span>
+      <span class="truncate text-fg-muted">{project.org}</span>
+    </div>
+
+    {project.href ? (
+      <span
+        aria-hidden="true"
+        class="shrink-0 font-mono text-xs text-fg-muted transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent"
+      >
+        {project.linkLabel ?? "↗"}
+      </span>
+    ) : (
+      <span class="shrink-0 font-mono text-[0.6875rem] text-fg-muted tabular-nums">{project.period}</span>
+    )}
+  </div>
+
+  <div class="mt-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+    <h3
+      class:list={[
+        "text-lg font-semibold tracking-[-0.02em] text-fg",
+        project.href && "transition-colors group-hover:text-accent",
+      ]}
+    >
+      {project.name}
+    </h3>
+    {project.impact && (
+      <span class="font-mono text-[0.6875rem] font-medium text-accent">{project.impact}</span>
+    )}
+  </div>
+
+  <p class="mt-1 font-mono text-[0.6875rem] text-fg-muted tabular-nums">
+    {project.role ? `${project.role} · ${project.period}` : project.period}
+  </p>
+
+  <p class="mt-2.5 text-sm leading-relaxed text-fg-secondary">{project.summary}</p>
+
+  <div class="mt-auto flex flex-wrap gap-1.5 pt-4">
+    {project.tags.map((tag) => (
+      <span class="rounded-md border border-border bg-surface px-2 py-0.5 font-mono text-[0.6875rem] text-fg-muted">
+        {tag}
+      </span>
+    ))}
+  </div>
+</Tag>

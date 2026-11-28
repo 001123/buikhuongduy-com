@@ -1,33 +1,39 @@
 ---
-import { getImage } from "astro:assets";
-import heroPixelDark from "../assets/hero-pixel-dark.jpg";
-import heroPixelLight from "../assets/hero-pixel-light.jpg";
+import ContactIcon from "./ContactIcon.astro";
+import ExperienceTimeline from "./ExperienceTimeline.astro";
 import HeroCard from "./HeroCard.astro";
+import HeroMascot from "./HeroMascot.astro";
 import PostList from "./PostList.astro";
+import ProjectCard from "./ProjectCard.astro";
+import ProjectFilter from "./ProjectFilter.astro";
+import SectionPixelDecor from "./SectionPixelDecor.astro";
+import { experiences } from "../data/experience";
+import { cvUrl, socials } from "../data/profile";
 import { projects } from "../data/projects";
 import { getLang, sectionPaths, useTranslations } from "../i18n/ui";
-import { getPosts } from "../lib/blog";
+import { categoryPath, getCategories, getPosts } from "../lib/blog";
 import { contentAnim } from "./transitions";
-
-const lightHeroBg = await getImage({ src: heroPixelLight, width: 1440, format: "webp", quality: 82 });
-const darkHeroBg = await getImage({ src: heroPixelDark, width: 1440, format: "webp", quality: 82 });
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
-const latest = (await getPosts(lang)).slice(0, 5);
+const allPosts = await getPosts(lang);
+const latest = allPosts.slice(0, 5);
+const topCategories = (await getCategories(lang))
+  .slice()
+  .sort((a, b) => b.posts.length - a.posts.length)
+  .slice(0, 6);
+const totalPostsLabel = t("blog.totalPosts").replace("{n}", String(allPosts.length));
 const allProjects = projects[lang];
 const kdCode = allProjects[0];
 const simpleOtp = allProjects[1];
 const otherProjects = allProjects.slice(2);
-
-/** Turn off once employed to hide the "open to work" line. */
-const openToWork = true;
+const experienceList = experiences[lang];
 
 const stats = [
   { num: "9", suffix: "+", label: t("home.statYears"), note: "Full-Stack · AI-Native" },
-  { num: "30M", suffix: "+", label: t("home.statTraffic"), note: "Hello Health Group" },
-  { num: "2M", suffix: "+", label: t("home.statUsers"), note: "Saladin Insurance" },
-  { num: "100", suffix: "×4", label: t("home.statLighthouse"), note: "Perf · A11y · BP · SEO" },
+  { num: "30M", suffix: "+", label: t("home.statTraffic"), note: "Healthcare · Next.js" },
+  { num: "2M", suffix: "+", label: t("home.statUsers"), note: "Insurtech · Design System" },
+  { num: "10M", suffix: "+", label: t("home.statDownloads"), note: "Mobile · Enterprise" },
 ];
 
 const kdAgents = [
@@ -62,135 +68,207 @@ const kdAgents = [
 ---
 
 <div transition:name="content-home" transition:animate={contentAnim}>
-  <!-- Section 1: Pixel-Art HCMC Skyline Hero + Interactive Engineering Card -->
+  <!-- Section 1: Hero + AI-Native Isometric Studio + Impact Metrics + Interactive Profile -->
   <section data-hero-section aria-label={t("site.name")} class="relative overflow-hidden border-b border-border">
-    <div
-      aria-hidden="true"
-      class="hero-pixel-bg pointer-events-none absolute inset-0"
-      style={`--hero-bg-light: url(${lightHeroBg.src}); --hero-bg-dark: url(${darkHeroBg.src});`}
-    ></div>
-    <div
-      aria-hidden="true"
-      class="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg/88 via-bg/35 to-transparent"
-    ></div>
-    <div
-      aria-hidden="true"
-      class="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg via-bg/40 to-transparent"
-    ></div>
+    <div class="relative mx-auto max-w-6xl px-5 pt-5 pb-8 sm:px-8 sm:pt-6 sm:pb-10">
+      <!-- Hero Identity + Primary CTAs -->
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
+        <div class="min-w-0">
+          <p class="inline-flex items-center gap-2 font-mono text-[0.625rem] font-medium uppercase tracking-[0.06em] text-accent sm:text-[0.6875rem] sm:tracking-[0.12em]">
+            <span aria-hidden="true" class="h-px w-4 shrink-0 bg-accent-vivid sm:w-5"></span>
+            <span>{t("home.kicker")}</span>
+          </p>
 
-    <div class="relative mx-auto max-w-6xl px-5 pt-10 pb-12 sm:px-8 sm:pt-14 sm:pb-16">
-      <!-- Live telemetry bar -->
-      <div class="flex flex-wrap items-center justify-between gap-3 font-mono text-xs text-fg-muted">
-        <span class="inline-flex items-center gap-2">
-          <span aria-hidden="true" class="size-1.5 rounded-full bg-accent-vivid"></span>
-          <span>{t("home.edition")}</span>
-          <span aria-hidden="true" class="text-border-strong">·</span>
-          <time data-hcmc-clock class="tabular-nums text-fg-secondary">--:--:-- ICT</time>
-        </span>
-
-        {
-          openToWork && (
-            <a
-              href={sectionPaths.contact[lang]}
-              class="open-status-pill group inline-flex items-center gap-2 rounded-full border border-border bg-surface-elevated/95 px-3 py-1 text-fg-secondary transition-colors hover:border-accent/50 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              <span aria-hidden="true" class="relative flex size-2">
-                <span class="status-ping-ring absolute inline-flex h-full w-full rounded-full bg-status-open opacity-75"></span>
-                <span class="relative inline-flex size-2 rounded-full bg-status-open"></span>
-              </span>
-              <span>{t("hero.status")}</span>
-              <span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-            </a>
-          )
-        }
-      </div>
-
-      <!-- Balanced 2-Column Hero Main Area -->
-      <div class="mt-7 grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_24.5rem] lg:gap-10 xl:grid-cols-[minmax(0,1fr)_26.5rem]">
-        <div>
-          <!-- Monumental Display Title -->
-          <h1 class="text-[clamp(2.5rem,5.2vw,4.35rem)] font-semibold leading-[1.0] tracking-[-0.04em] text-fg">
+          <h1 class="mt-2 text-[clamp(2.25rem,4.4vw,3.75rem)] font-semibold leading-[1.03] tracking-[-0.04em] text-fg">
             {t("site.name")}
           </h1>
 
-          <!-- Positioning Copy -->
-          <p class="mt-4 max-w-xl text-base leading-relaxed text-pretty text-fg-secondary sm:text-lg">
+          <p class="mt-2.5 max-w-2xl text-base leading-relaxed text-pretty text-fg-secondary sm:text-[1.0625rem]">
             {t("home.intro")}
           </p>
         </div>
 
-        <HeroCard />
+        <div class="flex shrink-0 flex-wrap items-center gap-2 lg:flex-col lg:items-end lg:gap-2.5">
+          <div class="flex items-center gap-2">
+            <a
+              href={sectionPaths.contact[lang]}
+              class="inline-flex h-9 items-center gap-2 rounded-full bg-accent px-4 text-xs font-semibold text-accent-fg shadow-xs transition-transform duration-150 hover:-translate-y-0.5 hover:opacity-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <span>{t("nav.contact")}</span>
+              <span aria-hidden="true">→</span>
+            </a>
+            <a
+              href={cvUrl}
+              target="_blank"
+              rel="noopener"
+              class="inline-flex h-9 items-center gap-1.5 rounded-full border border-border-strong bg-surface-elevated px-3.5 font-mono text-xs font-medium text-fg transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <ContactIcon name="cv" class="size-3.5 text-accent" />
+              <span>{t("nav.cv")}</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            {
+              socials.map((s) => (
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener"
+                  aria-label={s.label}
+                  title={s.label}
+                  class="inline-flex size-9 items-center justify-center rounded-full border border-border bg-surface-elevated text-fg-muted transition-colors hover:border-accent/60 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  <ContactIcon name={s.icon} class="size-4" />
+                </a>
+              ))
+            }
+          </div>
+        </div>
       </div>
 
-      <!-- Prominent Impact Metrics Bar directly inside Hero -->
-      <div class="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border-strong bg-border shadow-sm lg:grid-cols-4">
-        {
-          stats.map((s) => (
-            <div class="spotlight-card rounded-none border-0 bg-surface-elevated/95 p-5 sm:p-6">
-              <div aria-hidden="true" class="mb-3 h-1 w-7 rounded-full bg-accent-vivid"></div>
-              <p class="text-3xl font-bold tracking-[-0.04em] text-fg tabular-nums sm:text-4xl lg:text-[2.65rem]">
-                <span>{s.num}</span><span class="text-accent">{s.suffix}</span>
-              </p>
-              <p class="mt-1.5 text-sm font-medium text-fg">{s.label}</p>
-              <p class="mt-0.5 font-mono text-[0.6875rem] text-fg-muted">{s.note}</p>
-            </div>
-          ))
-        }
+      <!-- AI-Native Isometric Pixel Studio seamlessly joined above Impact Metrics Bar -->
+      <div class="mt-4 overflow-hidden rounded-2xl border border-border-strong bg-surface-elevated shadow-sm sm:mt-5">
+        <HeroMascot />
+
+        <div class="grid grid-cols-2 gap-px border-t border-border bg-border lg:grid-cols-4">
+          {
+            stats.map((s) => (
+              <div class="spotlight-card rounded-none border-0 bg-surface-elevated/95 p-4 sm:px-5 sm:py-4.5">
+                <div aria-hidden="true" class="mb-2 h-1 w-7 rounded-full bg-accent-vivid"></div>
+                <p class="text-2xl font-bold tracking-[-0.04em] text-fg tabular-nums sm:text-3xl lg:text-[2.25rem]">
+                  <span>{s.num}</span><span class="text-accent">{s.suffix}</span>
+                </p>
+                <p class="mt-1 text-sm font-medium text-fg">{s.label}</p>
+                <p class="mt-0.5 font-mono text-[0.6875rem] text-fg-muted">{s.note}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Engineering Profile Card (moved below studio & metrics for clear above-the-fold hierarchy) -->
+      <div class="mt-5 sm:mt-6">
+        <HeroCard />
       </div>
     </div>
   </section>
 
-  <!-- Section 01: Latest Writing (Moved above Projects) -->
+  <!-- Section: Latest Writing (Editorial surface on clean bg) -->
   {
     latest.length > 0 && (
-      <section aria-labelledby="latest-posts" class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
-        <div class="grid gap-8 lg:grid-cols-[18rem_1fr] lg:gap-12">
-          <div class="lg:sticky lg:top-24 lg:self-start">
-            <p class="font-mono text-xs font-medium uppercase tracking-[0.12em] text-accent">01</p>
-            <h2 id="latest-posts" class="mt-1 text-2xl font-semibold tracking-[-0.03em] text-fg sm:text-3xl">
-              {t("blog.latest")}
-            </h2>
-            <p class="mt-2 text-sm leading-relaxed text-fg-secondary">{t("home.blogDesc")}</p>
-            <a
-              href={sectionPaths.blog[lang]}
-              class="mt-5 inline-flex items-center gap-1.5 rounded-full border border-border-strong bg-surface-elevated px-4 py-2 text-xs font-medium text-fg transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              <span>{t("blog.back")}</span>
-              <span aria-hidden="true">→</span>
-            </a>
-          </div>
+      <section aria-labelledby="latest-posts" class="bg-bg">
+        <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
+          <div class="grid gap-8 lg:grid-cols-[18.5rem_1fr] lg:gap-12">
+            <div class="lg:sticky lg:top-24 lg:self-start">
+              <SectionPixelDecor variant="writing" class="mb-3" />
 
-          <PostList posts={latest} headingLevel="h3" compact numbered class="border-y border-border" />
+              <p class="inline-flex items-center gap-2 font-mono text-[0.625rem] font-medium uppercase tracking-[0.06em] text-accent sm:text-[0.6875rem] sm:tracking-[0.12em]">
+                <span aria-hidden="true" class="h-px w-4 shrink-0 bg-accent-vivid sm:w-5"></span>
+                <span>{t("section.blogKicker")}</span>
+              </p>
+
+              <div class="mt-2.5 flex flex-wrap items-baseline gap-2.5">
+                <h2 id="latest-posts" class="text-2xl font-semibold tracking-[-0.03em] text-fg sm:text-3xl">
+                  {t("blog.latest")}
+                </h2>
+                <span class="rounded-full border border-border bg-surface px-2.5 py-0.5 font-mono text-[0.6875rem] tabular-nums text-fg-muted">
+                  {totalPostsLabel}
+                </span>
+              </div>
+
+              <p class="mt-2 text-sm leading-relaxed text-fg-secondary">{t("home.blogDesc")}</p>
+
+              <div class="mt-5 flex flex-wrap items-center gap-2">
+                <a
+                  href={sectionPaths.blog[lang]}
+                  class="inline-flex h-9 items-center gap-1.5 rounded-full bg-fg px-4 text-xs font-medium text-bg transition-transform duration-150 hover:-translate-y-0.5 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  <span>{t("blog.back")}</span>
+                  <span aria-hidden="true">→</span>
+                </a>
+
+                <button
+                  type="button"
+                  data-cmd-open
+                  class="inline-flex h-9 items-center gap-2 rounded-full border border-border-strong bg-surface-elevated px-3.5 text-xs font-medium text-fg-secondary transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <path d="m20 20-3.5-3.5"></path>
+                  </svg>
+                  <span>{t("nav.search")}</span>
+                  <kbd class="rounded border border-border bg-surface px-1 font-mono text-[0.625rem] leading-4 text-fg-muted">⌘K</kbd>
+                </button>
+              </div>
+
+              {topCategories.length > 0 && (
+                <div class="mt-6 border-t border-border pt-5">
+                  <p class="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-fg-muted">
+                    {t("blog.topics")}
+                  </p>
+                  <ul class="mt-2.5 flex flex-wrap gap-1.5">
+                    {topCategories.map((c) => (
+                      <li>
+                        <a
+                          href={categoryPath(lang, c.slug)}
+                          class="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-elevated px-2.5 py-1 text-xs font-medium text-fg-secondary transition-colors hover:border-accent/60 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                        >
+                          <span>{c.name}</span>
+                          <span class="font-mono text-[0.6875rem] tabular-nums text-fg-muted">{c.posts.length}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            <PostList posts={latest} headingLevel="h3" compact />
+          </div>
         </div>
       </section>
     )
   }
 
-  <!-- Section 02: Interactive Spotlight Bento Grid -->
-  <section aria-labelledby="home-projects" class="mx-auto max-w-6xl px-5 pb-20 sm:px-8 sm:pb-24">
-    <div class="border-t border-border pt-14">
-      <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+  <!-- Section: Interactive Spotlight Bento Grid (Workshop Stage on matte surface band) -->
+  <section aria-labelledby="home-projects" data-projects-scope class="border-y border-border bg-surface/80 dark:bg-surface/75">
+    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20 [&_.spotlight-card]:shadow-[0_1px_2px_rgba(0,0,0,0.04)] dark:[&_.spotlight-card]:shadow-none">
+      <div class="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p class="font-mono text-xs font-medium uppercase tracking-[0.12em] text-accent">02</p>
-          <h2 id="home-projects" class="mt-1 text-2xl font-semibold tracking-[-0.03em] text-fg sm:text-3xl">
+          <SectionPixelDecor variant="projects" class="mb-3" />
+          <h2 id="home-projects" class="text-2xl font-semibold tracking-[-0.03em] text-fg sm:text-3xl">
             {t("home.projects")}
           </h2>
           <p class="mt-1 text-sm text-fg-secondary">{t("home.projectsDesc")}</p>
         </div>
-        <a
-          href={sectionPaths.about[lang]}
-          class="inline-flex items-center gap-1.5 font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-        >
-          <span>{t("home.allProjects")}</span>
-          <span aria-hidden="true">→</span>
-        </a>
+        <div class="flex flex-wrap items-center gap-3">
+          <ProjectFilter projects={allProjects} lang={lang} />
+          <a
+            href={sectionPaths.about[lang]}
+            class="inline-flex items-center gap-1.5 font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+          >
+            <span>{t("home.allProjects")}</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
       </div>
 
       <div class="grid gap-4 lg:grid-cols-12">
         <!-- Bento 1: KD Code Interactive Agent Switcher -->
-        <article data-reveal="pending" class="spotlight-card flex flex-col rounded-2xl p-6 lg:col-span-7">
-          <div class="flex items-baseline justify-between gap-4">
-            <h3 class="text-xl font-semibold tracking-[-0.02em] text-fg">{kdCode.name}</h3>
+        <article
+          data-reveal="pending"
+          data-project-category={kdCode.category}
+          class="spotlight-card flex flex-col rounded-2xl p-6 lg:col-span-7"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-md border border-accent/25 bg-accent-soft/75 px-2 py-0.5 font-mono text-[0.6875rem] font-medium text-accent">
+                {t("projects.badgeOpenSource")}
+              </span>
+              <span class="font-mono text-[0.6875rem] text-fg-muted">{kdCode.org} · {kdCode.period}</span>
+            </div>
             <a
               href={kdCode.href}
               target="_blank"
@@ -200,6 +278,8 @@ const kdAgents = [
               {t("home.kdCodeMarketplace")}
             </a>
           </div>
+
+          <h3 class="mt-3 text-xl font-semibold tracking-[-0.02em] text-fg">{kdCode.name}</h3>
 
           <p class="mt-2 text-sm leading-relaxed text-fg-secondary">{kdCode.summary}</p>
 
@@ -242,13 +322,28 @@ const kdAgents = [
             <p data-kd-log class="mt-2 truncate text-[0.75rem] text-fg-secondary">{kdAgents[0].log}</p>
           </div>
 
-          <p class="mt-auto font-mono text-[0.75rem] text-fg-muted">{kdCode.tags.join(" · ")}</p>
+          <div class="mt-auto flex flex-wrap gap-1.5">
+            {kdCode.tags.map((tag) => (
+              <span class="rounded-md border border-border bg-surface px-2 py-0.5 font-mono text-[0.6875rem] text-fg-muted">
+                {tag}
+              </span>
+            ))}
+          </div>
         </article>
 
         <!-- Bento 2: Simple OTP Live 2FA Ring & Click-to-Copy -->
-        <article data-reveal="pending" class="spotlight-card flex flex-col rounded-2xl p-6 lg:col-span-5">
-          <div class="flex items-baseline justify-between gap-4">
-            <h3 class="text-xl font-semibold tracking-[-0.02em] text-fg">{simpleOtp.name}</h3>
+        <article
+          data-reveal="pending"
+          data-project-category={simpleOtp.category}
+          class="spotlight-card flex flex-col rounded-2xl p-6 lg:col-span-5"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-md border border-accent/25 bg-accent-soft/75 px-2 py-0.5 font-mono text-[0.6875rem] font-medium text-accent">
+                {t("projects.badgeOpenSource")}
+              </span>
+              <span class="font-mono text-[0.6875rem] text-fg-muted">{simpleOtp.org} · {simpleOtp.period}</span>
+            </div>
             <a
               href={simpleOtp.href}
               target="_blank"
@@ -258,6 +353,8 @@ const kdAgents = [
               {t("home.simpleOtpGithub")}
             </a>
           </div>
+
+          <h3 class="mt-3 text-xl font-semibold tracking-[-0.02em] text-fg">{simpleOtp.name}</h3>
 
           <p class="mt-2 text-sm leading-relaxed text-fg-secondary">{simpleOtp.summary}</p>
 
@@ -303,33 +400,46 @@ const kdAgents = [
             </div>
           </div>
 
-          <p class="mt-auto font-mono text-[0.75rem] text-fg-muted">{simpleOtp.tags.join(" · ")}</p>
+          <div class="mt-auto flex flex-wrap gap-1.5">
+            {simpleOtp.tags.map((tag) => (
+              <span class="rounded-md border border-border bg-surface px-2 py-0.5 font-mono text-[0.6875rem] text-fg-muted">
+                {tag}
+              </span>
+            ))}
+          </div>
         </article>
 
-        <!-- Supporting Projects -->
+        <!-- Real CV Production & Supporting Projects -->
         {
           otherProjects.map((p) => (
-            <a
-              href={p.href}
-              target="_blank"
-              rel="noopener"
-              data-reveal="pending"
-              class="spotlight-card group flex flex-col rounded-2xl p-6 lg:col-span-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              <div class="flex items-baseline justify-between gap-2">
-                <h3 class="text-lg font-semibold tracking-[-0.02em] text-fg transition-colors group-hover:text-accent">
-                  {p.name}
-                </h3>
-                <span aria-hidden="true" class="font-mono text-xs text-fg-muted transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent">
-                  ↗
-                </span>
-              </div>
-              <p class="mt-2 text-sm leading-relaxed text-fg-secondary">{p.summary}</p>
-              <p class="mt-auto pt-4 font-mono text-[0.75rem] text-fg-muted">{p.tags.join(" · ")}</p>
-            </a>
+            <ProjectCard project={p} lang={lang} reveal class="lg:col-span-6" />
           ))
         }
       </div>
+    </div>
+  </section>
+
+  <!-- Section: Interactive Career Experience Explorer (Structured Split-Pane on clean bg) -->
+  <section aria-labelledby="home-experience" class="bg-bg">
+    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+      <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <SectionPixelDecor variant="experience" class="mb-3" />
+          <h2 id="home-experience" class="text-2xl font-semibold tracking-[-0.03em] text-fg sm:text-3xl">
+            {t("home.experience")}
+          </h2>
+          <p class="mt-1 text-sm text-fg-secondary">{t("home.experienceDesc")}</p>
+        </div>
+        <a
+          href={`${sectionPaths.about[lang]}#experience`}
+          class="inline-flex items-center gap-1.5 font-mono text-xs text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          <span>{t("home.experienceAll")}</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <ExperienceTimeline items={experienceList} lang={lang} variant="explorer" />
     </div>
   </section>
 </div>
@@ -387,24 +497,6 @@ const kdAgents = [
   function initMotionCraft() {
     clearInterval(homeTimer);
 
-    const canHover = window.matchMedia("(hover: hover)").matches;
-
-    if (canHover) {
-      document.querySelectorAll<HTMLElement>(".spotlight-card").forEach((card) => {
-        if (card.dataset.spotBound) return;
-        card.dataset.spotBound = "1";
-        card.addEventListener(
-          "pointermove",
-          (e) => {
-            const rect = card.getBoundingClientRect();
-            card.style.setProperty("--mx", `${e.clientX - rect.left}px`);
-            card.style.setProperty("--my", `${e.clientY - rect.top}px`);
-          },
-          { passive: true },
-        );
-      });
-    }
-
     const kdDemo = document.querySelector<HTMLElement>("[data-kd-demo]");
     if (kdDemo && !kdDemo.dataset.bound) {
       kdDemo.dataset.bound = "1";
@@ -433,7 +525,6 @@ const kdAgents = [
       });
     }
 
-    const clockEl = document.querySelector<HTMLElement>("[data-hcmc-clock]");
     const widget = document.querySelector<HTMLElement>("[data-totp-widget]");
     const codeEl = widget?.querySelector<HTMLElement>("[data-totp-code]");
     const secEl = widget?.querySelector<HTMLElement>("[data-totp-sec]");
@@ -461,37 +552,24 @@ const kdAgents = [
       });
     }
 
-    const formatter = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Ho_Chi_Minh",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    });
-
     const CIRC = 2 * Math.PI * 15;
 
-    const tickTelemetry = () => {
-      const now = new Date();
-      if (clockEl && document.contains(clockEl)) {
-        clockEl.textContent = `${formatter.format(now)} ICT`;
-      }
-      if (widget && document.contains(widget) && codeEl && secEl && ringEl) {
-        const nowSec = Math.floor(now.getTime() / 1000);
-        const step = Math.floor(nowSec / 30);
-        const rem = 30 - (nowSec % 30);
-        codeEl.textContent = formatTotp(step);
-        secEl.textContent = `${rem}s`;
-        ringEl.style.strokeDashoffset = String(CIRC * (1 - rem / 30));
-      }
-      if (!clockEl?.isConnected && !widget?.isConnected) {
+    const tickTotp = () => {
+      if (!widget?.isConnected || !codeEl || !secEl || !ringEl) {
         clearInterval(homeTimer);
+        return;
       }
+      const nowSec = Math.floor(Date.now() / 1000);
+      const step = Math.floor(nowSec / 30);
+      const rem = 30 - (nowSec % 30);
+      codeEl.textContent = formatTotp(step);
+      secEl.textContent = `${rem}s`;
+      ringEl.style.strokeDashoffset = String(CIRC * (1 - rem / 30));
     };
 
-    if (clockEl || widget) {
-      tickTelemetry();
-      homeTimer = window.setInterval(tickTelemetry, 1000);
+    if (widget) {
+      tickTotp();
+      homeTimer = window.setInterval(tickTotp, 1000);
     }
   }
 

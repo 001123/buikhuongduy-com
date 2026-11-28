@@ -1,6 +1,8 @@
 ---
 import SectionPage from "../../layouts/SectionPage.astro";
 import ContactIcon, { type IconName } from "../ContactIcon.astro";
+import HireFitGame from "../HireFitGame.astro";
+import SectionPixelDecor from "../SectionPixelDecor.astro";
 import { getLang, useTranslations } from "../../i18n/ui";
 import { cvPdfPath, cvUrl, email, socials } from "../../data/profile";
 
@@ -13,7 +15,11 @@ const links: { label: string; icon: IconName; value: string; href: string }[] = 
 ];
 ---
 
-<SectionPage section="contact" title={t("contact.title")} lead={t("contact.lead")}>
+<SectionPage section="contact" title={t("contact.title")} lead={t("contact.lead")} hideHeaderBorder>
+  <SectionPixelDecor slot="header-visual" variant="contact" />
+
+  <HireFitGame lang={lang} />
+
   <div class="not-prose rounded-2xl border border-border bg-surface-elevated p-5 sm:p-7">
     <div class="mb-3 flex items-center justify-between border-b border-border pb-3 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-fg-muted">
       <span class="inline-flex items-center gap-2 text-fg-secondary">
