@@ -273,9 +273,7 @@ const stageLabel = isVi
   ? "Văn phòng AI-Native của Bùi Khương Duy điều phối 4 agent: Claude, Codex, Antigravity và OpenCode"
   : "Bui Khuong Duy's AI-Native studio orchestrating 4 agents: Claude, Codex, Antigravity, and OpenCode";
 
-const bubbleAria = isVi
-  ? "Nhật ký điều phối AI agent, bấm để chuyển sang trạm tiếp theo"
-  : "AI agent orchestration bubble, click to switch to the next station";
+const bubbleHint = isVi ? "Bấm để chuyển sang trạm tiếp theo" : "Click to switch to the next station";
 
 const mobileNavLabel = isVi ? "Chọn trạm AI agent trong văn phòng" : "Select an AI agent station in the studio";
 ---
@@ -534,7 +532,6 @@ const mobileNavLabel = isVi ? "Chọn trạm AI agent trong văn phòng" : "Sele
       type="button"
       data-office-bubble
       data-station="duy"
-      aria-label={bubbleAria}
       style="transform: translate3d(-50%, 3.5rem, 0);"
       class="office-bubble office-theme-duy group pointer-events-auto absolute top-0 left-1/2 z-20 inline-flex w-max max-w-[min(calc(100%-1.25rem),14.5rem)] flex-col items-start gap-1 rounded-xl border border-border-strong bg-surface-elevated/95 px-2.5 py-1.5 text-left shadow-sm transition-colors hover:border-accent/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:max-w-[16rem]"
     >
@@ -551,6 +548,8 @@ const mobileNavLabel = isVi ? "Chọn trạm AI agent trong văn phòng" : "Sele
       >
         {initialStation.quotes[0]}
       </span>
+      {/* Hint kept after the visible text, so the button's accessible name still contains what it shows. */}
+      <span class="sr-only">{bubbleHint}</span>
       <span
         data-office-tail
         aria-hidden="true"

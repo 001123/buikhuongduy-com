@@ -16,12 +16,12 @@
   --fg-muted: #6E6A63;
   --border: #E7E3DC;
   --border-strong: #D6D1C7;
-  --accent: #C84300;
+  --accent: #BD3F00; /* 4.5:1+ on --accent-soft and --surface for small text */
   --accent-hover: #A83700;
   --accent-vivid: #FF5500;
   --accent-soft: #FFF1E8;
   --accent-fg: #FFFFFF;
-  --status-open: #16A34A;
+  --status-open: #157A3A; /* readable as small text on light surfaces */
 }
 
 html.dark {
@@ -1097,6 +1097,12 @@ html.dark .prose-editorial pre.astro-code span {
   color: var(--shiki-dark) !important;
   background-color: transparent !important;
 }
+
+/* github-light tokens below 4.5:1 on the warm page background, darkened just enough for WCAG AA. */
+html:not(.dark) .prose-editorial pre.astro-code span[style*="--shiki-light:#22863A" i] { color: #1F7A35 !important; }
+html:not(.dark) .prose-editorial pre.astro-code span[style*="--shiki-light:#D73A49" i] { color: #C5303F !important; }
+html:not(.dark) .prose-editorial pre.astro-code span[style*="--shiki-light:#E36209" i] { color: #B84D00 !important; }
+html:not(.dark) .prose-editorial pre.astro-code span[style*="--shiki-light:#6A737D" i] { color: #5C636D !important; }
 
 .code-block {
   position: relative;
