@@ -911,8 +911,9 @@ html.dark [data-office-motion="1"][data-active-station="duy"] .office-route-puls
     transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Fully transparent (not 0.01) while pending: accessibility checks then treat it as hidden instead of as unreadable text. */
 html.reveal-ready [data-reveal="pending"] {
-  opacity: 0.01;
+  opacity: 0;
   transform: translateY(10px);
 }
 
