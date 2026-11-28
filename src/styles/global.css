@@ -4,6 +4,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /* System font stacks: no web font files, so nothing competes with the hero image (LCP). */
+  --font-system-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
+  --font-system-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "Roboto Mono", monospace;
   --bg: #FCFBF9;
   --bg-nav: #F7F5F2;
   --surface: #F4F1EC;
@@ -13,12 +16,12 @@
   --fg-muted: #6E6A63;
   --border: #E7E3DC;
   --border-strong: #D6D1C7;
-  --accent: #C84300;
+  --accent: #BD3F00; /* 4.5:1+ on --accent-soft and --surface for small text */
   --accent-hover: #A83700;
   --accent-vivid: #FF5500;
   --accent-soft: #FFF1E8;
   --accent-fg: #FFFFFF;
-  --status-open: #16A34A;
+  --status-open: #157A3A; /* readable as small text on light surfaces */
 }
 
 html.dark {
@@ -40,10 +43,10 @@ html.dark {
 }
 
 @theme inline {
-  --font-sans: var(--font-be-vietnam-pro);
-  --font-display: var(--font-be-vietnam-pro);
-  --font-serif: var(--font-be-vietnam-pro);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-sans: var(--font-system-sans);
+  --font-display: var(--font-system-sans);
+  --font-serif: var(--font-system-sans);
+  --font-mono: var(--font-system-mono);
 
   --color-bg: var(--bg);
   --color-nav: var(--bg-nav);
@@ -908,8 +911,9 @@ html.dark [data-office-motion="1"][data-active-station="duy"] .office-route-puls
     transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Fully transparent (not 0.01) while pending: accessibility checks then treat it as hidden instead of as unreadable text. */
 html.reveal-ready [data-reveal="pending"] {
-  opacity: 0.01;
+  opacity: 0;
   transform: translateY(10px);
 }
 
@@ -1094,6 +1098,12 @@ html.dark .prose-editorial pre.astro-code span {
   color: var(--shiki-dark) !important;
   background-color: transparent !important;
 }
+
+/* github-light tokens below 4.5:1 on the warm page background, darkened just enough for WCAG AA. */
+html:not(.dark) .prose-editorial pre.astro-code span[style*="--shiki-light:#22863A" i] { color: #1F7A35 !important; }
+html:not(.dark) .prose-editorial pre.astro-code span[style*="--shiki-light:#D73A49" i] { color: #C5303F !important; }
+html:not(.dark) .prose-editorial pre.astro-code span[style*="--shiki-light:#E36209" i] { color: #B84D00 !important; }
+html:not(.dark) .prose-editorial pre.astro-code span[style*="--shiki-light:#6A737D" i] { color: #5C636D !important; }
 
 .code-block {
   position: relative;
@@ -1482,4 +1492,10 @@ html.dark .site-footer-scene {
 
 html.dark .site-footer-moon-cut {
   fill: var(--scene-sky-mid);
+}
+
+/* Below-the-fold home sections: skip style/layout/paint until near the viewport (keeps mobile TBT/LCP low). */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }

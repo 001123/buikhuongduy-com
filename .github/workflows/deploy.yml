@@ -108,6 +108,25 @@ jobs:
 
       - run: pnpm lighthouse
 
+      # Name each failing audit in the log, so a red run is readable without downloading the reports.
+      - name: List failing Lighthouse audits
+        if: failure()
+        run: |
+          node -e '
+            const fs = require("fs"), dir = ".lighthouseci/reports";
+            for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(".report.json"))) {
+              const r = JSON.parse(fs.readFileSync(`${dir}/${f}`, "utf8"));
+              for (const [cat, c] of Object.entries(r.categories)) {
+                if (c.score === 1) continue;
+                const bad = c.auditRefs.filter((a) => a.weight > 0 && r.audits[a.id].score !== null && r.audits[a.id].score < 1);
+                console.log(`${r.finalDisplayedUrl} ${cat} ${c.score}`);
+                for (const a of bad) {
+                  const items = (r.audits[a.id].details?.items ?? []).slice(0, 3).map((i) => [i.node?.snippet, i.node?.explanation].filter(Boolean).join(" ")).filter(Boolean);
+                  console.log(`  - ${a.id} (${r.audits[a.id].displayValue ?? r.audits[a.id].score}) ${items.join(" | ")}`);
+                }
+              }
+            }'
+
       - name: Upload Lighthouse reports
         if: failure()
         uses: actions/upload-artifact@v7

@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
@@ -91,28 +91,6 @@ function lastmodFor(path) {
 // https://astro.build/config
 export default defineConfig({
   site: SITE,
-  // Self-hosted fonts with preloads and metric-matched fallbacks, so the swap causes no layout shift.
-  fonts: [
-    {
-      provider: fontProviders.fontsource(),
-      name: 'Be Vietnam Pro',
-      cssVariable: '--font-be-vietnam-pro',
-      // Two weights and no latin-ext keep the home page at Lighthouse 100: every extra file loads before the hero
-      // image paints (Vietnamese text pulls latin + vietnamese per weight). 500 falls back to 400, 700 to 600.
-      weights: [400, 600],
-      subsets: ['latin', 'vietnamese'],
-      fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
-    },
-    {
-      provider: fontProviders.fontsource(),
-      name: 'JetBrains Mono',
-      cssVariable: '--font-jetbrains-mono',
-      // Mono labels fill the home page too, so the same budget applies: one weight (500 falls back to 400).
-      weights: [400],
-      subsets: ['latin', 'vietnamese'],
-      fallbacks: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
-    },
-  ],
   // The site CSS is small; inlining it removes the render-blocking request.
   build: {
     inlineStylesheets: 'always',
