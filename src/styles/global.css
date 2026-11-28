@@ -1492,3 +1492,9 @@ html.dark .site-footer-scene {
 html.dark .site-footer-moon-cut {
   fill: var(--scene-sky-mid);
 }
+
+/* Below-the-fold home sections: skip style/layout/paint until near the viewport (keeps mobile TBT/LCP low). */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
