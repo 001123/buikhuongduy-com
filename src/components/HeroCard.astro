@@ -1,560 +1,930 @@
 ---
-import { cvUrl, email } from "../data/profile";
 import { getLang, type Lang } from "../i18n/ui";
+import TechIcon, { type TechIconName } from "./TechIcon.astro";
 
 const lang: Lang = getLang(Astro.currentLocale);
 const isVi = lang === "vi";
 
-const tabs = [
-  { id: "stack", label: "Stack", cmd: "duy --inspect stack", badge: "4 layers" },
-  { id: "impact", label: isVi ? "Hệ thống" : "Impact", cmd: "duy --metrics prod", badge: "production" },
-  { id: "now", label: isVi ? "Hiện tại" : "Now", cmd: "duy --status availability", badge: "UTC+7 · HCMC" },
-] as const;
+type RingId = "adopt" | "trial" | "assess";
+type QuadrantId = "techniques" | "protocols" | "platforms" | "languages";
 
-const stackRows = [
+interface StackItem {
+  id: string;
+  label: string;
+  icon: TechIconName;
+  ring: RingId;
+  trend?: "new";
+  /** Position (%) on the 520x520 SVG radar canvas */
+  pos: { x: number; y: number };
+  detail: { vi: string; en: string };
+}
+
+interface Quadrant {
+  id: QuadrantId;
+  title: string;
+  shortTitle: string;
+  cornerClass: string;
+  items: StackItem[];
+}
+
+const rings: Record<
+  RingId,
   {
-    group: "Frontend",
+    label: string;
+    dotClass: string;
+    badgeClass: string;
+    desc: { vi: string; en: string };
+  }
+> = {
+  adopt: {
+    label: "Adopt",
+    dotClass: "bg-emerald-500 dark:bg-emerald-400",
+    badgeClass: "text-emerald-700 dark:text-emerald-300 border-emerald-500/25 bg-emerald-500/8",
+    desc: {
+      vi: "Dùng mặc định cho mọi dự án production.",
+      en: "Default choice for production projects.",
+    },
+  },
+  trial: {
+    label: "Trial",
+    dotClass: "bg-sky-500 dark:bg-sky-400",
+    badgeClass: "text-sky-700 dark:text-sky-300 border-sky-500/25 bg-sky-500/8",
+    desc: {
+      vi: "Đã chạy thực tế ở các hệ thống phù hợp.",
+      en: "Proven in production for specific workloads.",
+    },
+  },
+  assess: {
+    label: "Assess",
+    dotClass: "bg-violet-500 dark:bg-violet-400",
+    badgeClass: "text-violet-700 dark:text-violet-300 border-violet-500/25 bg-violet-500/8",
+    desc: {
+      vi: "Đang nghiên cứu sâu & chuẩn hoá quy trình.",
+      en: "Actively exploring and standardizing.",
+    },
+  },
+};
+
+const quadrants: Quadrant[] = [
+  {
+    id: "languages",
+    title: "Languages & Frameworks",
+    shortTitle: "Languages",
+    cornerClass: "bottom-2 right-2 text-right",
     items: [
-      { label: "React", accent: true },
-      { label: "Next.js", accent: false },
-      { label: "Astro", accent: true },
-      { label: "TypeScript", accent: false },
+      {
+        id: "typescript",
+        label: "TypeScript",
+        icon: "typescript",
+        ring: "adopt",
+        pos: { x: 55.5, y: 56.5 },
+        detail: {
+          vi: "Ngôn ngữ chính xuyên suốt từ frontend, dịch vụ Node.js đến extension VS Code.",
+          en: "Primary language across frontend apps, Node.js services, and VS Code extensions.",
+        },
+      },
+      {
+        id: "react",
+        label: "React",
+        icon: "react",
+        ring: "adopt",
+        pos: { x: 55.5, y: 72.5 },
+        detail: {
+          vi: "Xây dựng design system và giao diện web tương tác cao cho hàng triệu người dùng.",
+          en: "Design systems and interactive web UIs serving millions of monthly users.",
+        },
+      },
+      {
+        id: "nextjs",
+        label: "Next.js",
+        icon: "nextjs",
+        ring: "adopt",
+        pos: { x: 66.5, y: 67.0 },
+        detail: {
+          vi: "Chuyển đổi 9 trang sức khoẻ (30M+ lượt xem/tháng) sang Next.js, tải dưới 2 giây.",
+          en: "Migrated 9 healthcare sites (30M+ monthly views) to Next.js under 2s load time.",
+        },
+      },
+      {
+        id: "astro",
+        label: "Astro",
+        icon: "astro",
+        ring: "adopt",
+        trend: "new",
+        pos: { x: 73.5, y: 56.0 },
+        detail: {
+          vi: "Nền tảng static-first vận hành chính website này với điểm Lighthouse 100×4.",
+          en: "Static-first framework powering this site with 100×4 Lighthouse scores.",
+        },
+      },
+      {
+        id: "react-native",
+        label: "React Native",
+        icon: "react-native",
+        ring: "trial",
+        pos: { x: 57.0, y: 84.0 },
+        detail: {
+          vi: "Phát triển ứng dụng mobile đa nền tảng iOS và Android đạt hơn 10 triệu lượt tải.",
+          en: "Cross-platform iOS and Android mobile apps shipped to 10M+ downloads.",
+        },
+      },
+      {
+        id: "expo",
+        label: "Expo",
+        icon: "expo",
+        ring: "trial",
+        pos: { x: 83.0, y: 60.5 },
+        detail: {
+          vi: "Dựng nhanh bản build, OTA update và luồng native cho app mobile production.",
+          en: "Managed builds, OTA updates, and native workflows for production mobile apps.",
+        },
+      },
+      {
+        id: "vue",
+        label: "Vue / Nuxt",
+        icon: "vue",
+        ring: "trial",
+        pos: { x: 75.5, y: 78.5 },
+        detail: {
+          vi: "Phát triển ứng dụng web reactive và SSR với Vue cùng Nuxt cho các dự án sản phẩm.",
+          en: "Reactive web interfaces and SSR apps shipped with Vue and Nuxt.",
+        },
+      },
     ],
   },
   {
-    group: "Backend",
+    id: "platforms",
+    title: "Platforms & Data",
+    shortTitle: "Platforms",
+    cornerClass: "bottom-2 left-2 text-left",
     items: [
-      { label: "Node.js", accent: false },
-      { label: "GraphQL", accent: false },
-      { label: "PostgreSQL", accent: false },
+      {
+        id: "nodejs",
+        label: "Node.js",
+        icon: "nodejs",
+        ring: "adopt",
+        pos: { x: 41.0, y: 56.5 },
+        detail: {
+          vi: "Xây API dịch vụ, tích hợp thanh toán và backend cho AI Content Engine nội bộ.",
+          en: "Service APIs, payment integrations, and the backend for an internal AI Content Engine.",
+        },
+      },
+      {
+        id: "cloudflare",
+        label: "Cloudflare",
+        icon: "cloudflare",
+        ring: "adopt",
+        pos: { x: 41.5, y: 71.5 },
+        detail: {
+          vi: "Edge CDN, DNS, Pages và tối ưu hiệu năng toàn cầu ở lớp biên.",
+          en: "Global edge CDN, DNS, Pages hosting, and network performance optimization.",
+        },
+      },
+      {
+        id: "docker",
+        label: "Docker",
+        icon: "docker",
+        ring: "adopt",
+        pos: { x: 28.5, y: 60.5 },
+        detail: {
+          vi: "Đóng gói môi trường đồng nhất từ local dev đến dịch vụ backend trên production.",
+          en: "Consistent container packaging from local development to production services.",
+        },
+      },
+      {
+        id: "postgresql",
+        label: "PostgreSQL",
+        icon: "postgresql",
+        ring: "trial",
+        pos: { x: 15.5, y: 57.5 },
+        detail: {
+          vi: "Mô hình hoá dữ liệu quan hệ, tối ưu truy vấn và độ tin cậy ở tầng lưu trữ.",
+          en: "Relational data modeling, query tuning, and reliable production storage.",
+        },
+      },
+      {
+        id: "mongodb",
+        label: "MongoDB",
+        icon: "mongodb",
+        ring: "trial",
+        pos: { x: 19.0, y: 71.0 },
+        detail: {
+          vi: "Lưu trữ document linh hoạt cho Payload CMS và các dịch vụ backend Node.js.",
+          en: "Flexible document storage backing Payload CMS and Node.js backend services.",
+        },
+      },
+      {
+        id: "aws",
+        label: "AWS",
+        icon: "aws",
+        ring: "trial",
+        pos: { x: 29.5, y: 79.5 },
+        detail: {
+          vi: "Triển khai dịch vụ backend, lưu trữ media và hạ tầng đám mây chịu tải cao.",
+          en: "Cloud compute, media storage, and high-traffic backend infrastructure.",
+        },
+      },
+      {
+        id: "kubernetes",
+        label: "Kubernetes",
+        icon: "kubernetes",
+        ring: "trial",
+        pos: { x: 41.0, y: 84.5 },
+        detail: {
+          vi: "Đóng gói Docker và vận hành workload container ổn định trên cluster.",
+          en: "Containerized deployments and reliable cluster workload orchestration.",
+        },
+      },
     ],
   },
   {
-    group: "AI-Native",
+    id: "protocols",
+    title: "Tools & Protocols",
+    shortTitle: "Protocols",
+    cornerClass: "top-2 right-2 text-right",
     items: [
-      { label: "AI Agents", accent: true },
-      { label: "ACP", accent: false },
-      { label: "MCP", accent: false },
-      { label: "Eval", accent: false },
+      {
+        id: "claude-code",
+        label: "Claude Code",
+        icon: "claude-code",
+        ring: "adopt",
+        pos: { x: 57.5, y: 32.0 },
+        detail: {
+          vi: "Coding agent chủ lực trong terminal, chuẩn hoá quy trình làm việc cho cả team.",
+          en: "Primary terminal coding agent, standardized into everyday team workflows.",
+        },
+      },
+      {
+        id: "codex",
+        label: "Codex",
+        icon: "codex",
+        ring: "adopt",
+        pos: { x: 70.5, y: 41.0 },
+        detail: {
+          vi: "Chạy song song tác vụ backend, migration và unit test trên git worktree riêng.",
+          en: "Parallel backend, migration, and unit-test runs in isolated git worktrees.",
+        },
+      },
+      {
+        id: "antigravity",
+        label: "Antigravity",
+        icon: "antigravity",
+        ring: "trial",
+        trend: "new",
+        pos: { x: 77.5, y: 29.0 },
+        detail: {
+          vi: "Điều phối workflow đa agent, kiểm thử trình duyệt E2E và tối ưu giao diện.",
+          en: "Multi-agent workflow orchestration, live browser E2E checks, and UI verification.",
+        },
+      },
+      {
+        id: "opencode",
+        label: "OpenCode",
+        icon: "opencode",
+        ring: "assess",
+        trend: "new",
+        pos: { x: 57.5, y: 8.5 },
+        detail: {
+          vi: "Coding agent mã nguồn mở trên terminal, kết nối ACP để đổi model và rà diff.",
+          en: "Open-source terminal coding agent wired via ACP for model switching and diff review.",
+        },
+      },
+      {
+        id: "graphql",
+        label: "GraphQL",
+        icon: "graphql",
+        ring: "trial",
+        pos: { x: 82.5, y: 40.0 },
+        detail: {
+          vi: "Thiết kế schema API typed cho các nền tảng CMS multi-tenant lưu lượng lớn.",
+          en: "Typed API schemas for high-traffic multi-tenant CMS platforms.",
+        },
+      },
+      {
+        id: "mcp",
+        label: "MCP",
+        icon: "mcp",
+        ring: "trial",
+        trend: "new",
+        pos: { x: 66.0, y: 20.5 },
+        detail: {
+          vi: "Model Context Protocol kết nối agent với công cụ, dữ liệu và quy trình team.",
+          en: "Model Context Protocol connecting coding agents with tools, data, and workflows.",
+        },
+      },
+      {
+        id: "acp",
+        label: "ACP",
+        icon: "acp",
+        ring: "assess",
+        trend: "new",
+        pos: { x: 76.5, y: 14.5 },
+        detail: {
+          vi: "Agent Client Protocol truyền tiến trình tool-call qua JSON-RPC stdio.",
+          en: "Agent Client Protocol streaming tool-call progress over JSON-RPC stdio.",
+        },
+      },
     ],
   },
   {
-    group: "Platform",
+    id: "techniques",
+    title: "Techniques & Ops",
+    shortTitle: "Techniques",
+    cornerClass: "top-2 left-2 text-left",
     items: [
-      { label: "Kubernetes", accent: false },
-      { label: "Cloudflare", accent: false },
-      { label: "CI/CD", accent: false },
+      {
+        id: "ai-agents",
+        label: "AI Agents",
+        icon: "ai-agents",
+        ring: "adopt",
+        pos: { x: 41.0, y: 42.0 },
+        detail: {
+          vi: "Điều phối nhiều coding agent song song trên git worktree trong KD Code.",
+          en: "Parallel coding-agent orchestration across isolated git worktrees in KD Code.",
+        },
+      },
+      {
+        id: "cicd",
+        label: "CI/CD",
+        icon: "cicd",
+        ring: "adopt",
+        pos: { x: 28.5, y: 42.0 },
+        detail: {
+          vi: "Tự động kiểm tra kiểu, test, build và triển khai không gián đoạn.",
+          en: "Automated type-checking, testing, builds, and continuous delivery pipelines.",
+        },
+      },
+      {
+        id: "design-system",
+        label: "Design System",
+        icon: "design-system",
+        ring: "adopt",
+        pos: { x: 38.0, y: 31.0 },
+        detail: {
+          vi: "Xây hệ thống token, component truy cập tốt và UI nhất quán ở quy mô lớn.",
+          en: "Design tokens, accessible components, and consistent UI architecture at scale.",
+        },
+      },
+      {
+        id: "terraform",
+        label: "Terraform",
+        icon: "terraform",
+        ring: "trial",
+        pos: { x: 27.5, y: 20.0 },
+        detail: {
+          vi: "Quản lý hạ tầng AWS và Cloudflare dạng code, có thể tái lập và review qua PR.",
+          en: "Infrastructure as Code for AWS and Cloudflare, versioned and reviewed in PRs.",
+        },
+      },
+      {
+        id: "micro-frontends",
+        label: "Micro-frontends",
+        icon: "micro-frontends",
+        ring: "trial",
+        pos: { x: 17.5, y: 30.5 },
+        detail: {
+          vi: "Tách ứng dụng frontend lớn thành module độc lập theo domain và đội phát triển.",
+          en: "Composing large web apps into independent domain-aligned frontend modules.",
+        },
+      },
+      {
+        id: "eval",
+        label: "Eval",
+        icon: "eval",
+        ring: "assess",
+        trend: "new",
+        pos: { x: 16.0, y: 20.0 },
+        detail: {
+          vi: "Kiểm thử tự động với Vitest, Playwright và vòng lặp đánh giá đầu ra của agent.",
+          en: "Automated verification with Vitest, Playwright, and agent output evaluation loops.",
+        },
+      },
+      {
+        id: "opentelemetry",
+        label: "Telemetry",
+        icon: "opentelemetry",
+        ring: "assess",
+        trend: "new",
+        pos: { x: 39.5, y: 9.5 },
+        detail: {
+          vi: "OpenTelemetry đo token, chi phí, độ trễ và tỉ lệ lỗi tool của từng agent trong KD Code.",
+          en: "OpenTelemetry tracking token usage, cost, latency, and tool error rates in KD Code.",
+        },
+      },
     ],
   },
 ];
 
-const impactRows = [
-  {
-    org: "Hello Health Group",
-    metric: "30M+ / mo",
-    desc: isVi ? "Nền tảng web đa thị trường" : "Multi-market web platform",
-    fill: "96%",
-  },
-  {
-    org: "Saladin Insurance",
-    metric: "2M+ users",
-    desc: isVi ? "Web & mobile bảo hiểm số" : "Insurtech web & mobile",
-    fill: "82%",
-  },
-  {
-    org: "KD Code",
-    metric: "VS Code · ACP",
-    desc: isVi ? "Extension điều phối multi-agent" : "Multi-agent coding extension",
-    fill: "74%",
-  },
-  {
-    org: "buikhuongduy.com",
-    metric: "100×4 · <30s",
-    desc: isVi ? "Astro tĩnh & CI dưới 30 giây" : "Static Astro & fast CI",
-    fill: "100%",
-  },
-];
+const allItems = quadrants.flatMap((q) => q.items.map((item) => ({ ...item, quadrantTitle: q.title })));
+const ringCounts: Record<RingId, number> = {
+  adopt: allItems.filter((i) => i.ring === "adopt").length,
+  trial: allItems.filter((i) => i.ring === "trial").length,
+  assess: allItems.filter((i) => i.ring === "assess").length,
+};
 
-const nowRows = [
-  {
-    icon: "role" as const,
-    label: isVi ? "Vai trò" : "Role",
-    value: "Lead / Senior FE · Full-Stack (AI-Native)",
-  },
-  {
-    icon: "focus" as const,
-    label: isVi ? "Trọng tâm" : "Focus",
-    value: isVi
-      ? "Quy trình AI agent, design system, hiệu năng web"
-      : "AI agent workflows, design systems, web perf",
-  },
-  {
-    icon: "location" as const,
-    label: isVi ? "Địa điểm" : "Location",
-    value: isVi ? "TP. Hồ Chí Minh · Remote / Hybrid" : "Ho Chi Minh City · Remote / Hybrid",
-  },
-];
+const defaultPrompt = isVi
+  ? "Lọc theo vòng Tech Radar hoặc chọn công nghệ để xem chi tiết"
+  : "Filter by Tech Radar ring or select any technology to inspect";
 ---
 
 <aside
   data-hero-card
-  data-tilt-card
-  aria-label={isVi ? "Hồ sơ kỹ thuật nhanh" : "Engineering snapshot"}
-  class="hero-card-shell shadow-[0_14px_42px_-18px_rgba(0,0,0,0.16)] dark:shadow-[0_18px_52px_-20px_rgba(0,0,0,0.72)]"
+  data-default-prompt={defaultPrompt}
+  data-active-ring="all"
+  data-view="stack"
+  aria-label={isVi ? "Tech Radar & Stack" : "Tech Radar & Stack"}
+  class="hero-card-shell shadow-[0_14px_42px_-18px_rgba(0,0,0,0.14)] dark:shadow-[0_18px_52px_-20px_rgba(0,0,0,0.68)]"
 >
-  <div class="spotlight-card relative z-10 rounded-[calc(1rem-1px)] border-0 bg-surface-elevated">
-    <!-- Header Chrome with sliding tab indicator & auto-cycle progress hairline -->
-    <div class="relative flex flex-wrap items-center justify-between gap-2 border-b border-border bg-surface/80 px-4 py-2.5">
+  <div class="spotlight-card relative z-10 overflow-hidden rounded-[calc(1rem-1px)] border-0 bg-surface-elevated">
+    <!-- Top Chrome: Title + Ring Filter + Stack/Radar Switch -->
+    <div class="flex flex-wrap items-center justify-between gap-2.5 border-b border-border bg-surface/80 px-4 py-2.5 sm:px-5">
       <div class="flex items-center gap-2">
         <span aria-hidden="true" class="relative flex size-2">
           <span class="status-ping-ring absolute inline-flex h-full w-full rounded-[2px] bg-accent-vivid opacity-75"></span>
           <span class="relative inline-flex size-2 rounded-[2px] bg-accent-vivid"></span>
         </span>
-        <span class="font-mono text-xs font-medium text-fg-secondary">duy.profile.ts</span>
+        <span class="font-mono text-xs font-medium text-fg-secondary">duy.stack.ts</span>
+        <span class="hidden font-mono text-[0.6875rem] text-fg-muted md:inline">
+          · {allItems.length} {isVi ? "công nghệ" : "tools"}
+        </span>
       </div>
 
-      <div
-        role="tablist"
-        aria-label={isVi ? "Chuyển mục hồ sơ" : "Profile sections"}
-        class="hero-card-tablist relative flex items-center gap-0.5 rounded-lg border border-border/80 bg-surface-elevated/70 p-0.5"
-      >
-        <span
-          data-hero-tab-pill
-          aria-hidden="true"
-          class="pointer-events-none absolute inset-y-0.5 left-0 rounded-md bg-accent transition-[transform,width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
-        ></span>
-        {
-          tabs.map((tab, idx) => (
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Ring Filters (All / Adopt / Trial / Assess) -->
+        <div
+          role="group"
+          aria-label={isVi ? "Lọc theo vòng Tech Radar" : "Filter by Tech Radar ring"}
+          class="inline-flex items-center rounded-lg border border-border bg-surface-elevated p-0.5 font-mono text-[0.6875rem]"
+        >
+          <button
+            type="button"
+            data-ring-filter="all"
+            aria-pressed="true"
+            class="rounded-md px-2 py-1 text-fg transition-colors hover:text-fg aria-pressed:bg-surface aria-pressed:font-medium aria-pressed:shadow-2xs focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+          >
+            All <span class="text-fg-muted">{allItems.length}</span>
+          </button>
+          {(["adopt", "trial", "assess"] as RingId[]).map((ringId) => (
             <button
               type="button"
-              role="tab"
-              id={`hero-tab-${tab.id}`}
-              aria-controls={`hero-panel-${tab.id}`}
-              aria-selected={idx === 0 ? "true" : "false"}
-              data-hero-tab={tab.id}
-              data-hero-cmd-text={tab.cmd}
-              data-hero-badge-text={tab.badge}
-              class:list={[
-                "relative z-10 rounded-md px-2.5 py-1 font-mono text-[0.6875rem] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent",
-                idx === 0 ? "bg-accent text-accent-fg" : "text-fg-muted hover:text-fg",
-              ]}
+              data-ring-filter={ringId}
+              aria-pressed="false"
+              class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-fg-muted transition-colors hover:text-fg aria-pressed:bg-surface aria-pressed:font-medium aria-pressed:text-fg aria-pressed:shadow-2xs focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
             >
-              {tab.label}
+              <span aria-hidden="true" class:list={["size-1.5 rounded-full", rings[ringId].dotClass]}></span>
+              <span>{rings[ringId].label}</span>
+              <span class="hidden text-fg-muted/80 sm:inline">{ringCounts[ringId]}</span>
             </button>
-          ))
-        }
-      </div>
+          ))}
+        </div>
 
-      <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] overflow-hidden">
-        <span data-hero-progress class="hero-tab-progress block h-full origin-left bg-accent-vivid/80"></span>
+        <!-- View Mode Toggle: Stack Grid vs Radar -->
+        <div
+          role="group"
+          aria-label={isVi ? "Chế độ hiển thị" : "Display mode"}
+          class="inline-flex items-center rounded-lg border border-border bg-surface-elevated p-0.5 font-mono text-[0.6875rem]"
+        >
+          <button
+            type="button"
+            data-view-toggle="stack"
+            aria-pressed="true"
+            class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-fg-muted transition-colors hover:text-fg aria-pressed:bg-surface aria-pressed:font-medium aria-pressed:text-fg aria-pressed:shadow-2xs focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+          >
+            <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" class="size-3">
+              <rect x="2" y="2.5" width="5" height="4.5" rx="1" />
+              <rect x="9" y="2.5" width="5" height="4.5" rx="1" />
+              <rect x="2" y="9" width="5" height="4.5" rx="1" />
+              <rect x="9" y="9" width="5" height="4.5" rx="1" />
+            </svg>
+            <span>Stack</span>
+          </button>
+          <button
+            type="button"
+            data-view-toggle="radar"
+            aria-pressed="false"
+            class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-fg-muted transition-colors hover:text-fg aria-pressed:bg-surface aria-pressed:font-medium aria-pressed:text-fg aria-pressed:shadow-2xs focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
+          >
+            <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" class="size-3">
+              <circle cx="8" cy="8" r="6" />
+              <circle cx="8" cy="8" r="2.75" />
+              <circle cx="10.2" cy="5.8" r="0.8" fill="currentColor" stroke="none" />
+            </svg>
+            <span>Radar</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Body -->
-    <div class="p-4 sm:p-5">
-      <!-- Live Mini Command Strip -->
-      <div class="mb-3.5 flex items-center justify-between gap-2 rounded-lg border border-border/80 bg-surface/80 px-3 py-1.5 font-mono text-[0.6875rem]">
-        <span class="min-w-0 truncate">
-          <span class="text-accent">$</span>
-          <span data-hero-cmd class="ml-1.5 text-fg-secondary">{tabs[0].cmd}</span><span
-            aria-hidden="true"
-            class="hero-cursor ml-0.5 inline-block h-3 w-1.5 translate-y-0.5 bg-accent-vivid"
-          ></span>
-        </span>
-        <span data-hero-badge class="shrink-0 text-fg-muted">{tabs[0].badge}</span>
-      </div>
-
-      <!-- Shared grid cell locks all tabs to equal height across viewports -->
-      <div class="grid grid-cols-1">
-        <!-- Stack Panel: Step-by-step Pipeline Nodes -->
-        <div
-          id="hero-panel-stack"
-          role="tabpanel"
-          aria-labelledby="hero-tab-stack"
-          data-hero-panel="stack"
-          data-active="true"
-          aria-hidden="false"
-          class="relative col-start-1 row-start-1 flex h-full flex-col justify-between pl-4"
-        >
-          <div aria-hidden="true" class="pointer-events-none absolute top-3 bottom-3 left-[4.5px] w-px bg-border"></div>
-
-          {
-            stackRows.map((row, rIdx) => (
-              <div
-                style={`--row-i: ${rIdx}`}
-                class="hero-row relative flex flex-1 flex-wrap items-center justify-between gap-2 border-b border-border/70 py-2 first:pt-0 last:border-b-0 last:pb-0"
-              >
-                <span class="relative flex items-center font-mono text-[0.6875rem] text-fg-muted">
-                  <span
-                    aria-hidden="true"
-                    class="pointer-events-none absolute -left-[15px] top-1/2 flex size-2 -translate-y-1/2 items-center justify-center"
-                  >
-                    <span class="size-2 rounded-full border border-border-strong bg-surface-elevated"></span>
-                    <span class="hero-step-ring absolute inset-0 rounded-full bg-accent-vivid opacity-0"></span>
-                    <span class="hero-step-active absolute inset-0 rounded-full bg-accent-vivid opacity-0"></span>
-                  </span>
-                  {row.group}
+    <!-- VIEW 1: 4-Quadrant Structured Stack Grid -->
+    <div data-panel="stack" class="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
+      {
+        quadrants.map((q, qIdx) => (
+          <section
+            aria-label={q.title}
+            style={`--row-i: ${qIdx}`}
+            class="flex flex-col gap-3 bg-surface-elevated p-4 transition-colors duration-200"
+          >
+            <div class="flex items-center justify-between gap-2 px-0.5">
+              <h2 class="flex min-w-0 items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.05em] text-fg">
+                <span aria-hidden="true" class="relative flex size-2 shrink-0 items-center justify-center">
+                  <span class="size-2 rounded-full border border-border-strong bg-surface-elevated"></span>
+                  <span class="hero-step-ring absolute inset-0 rounded-full bg-accent-vivid opacity-0"></span>
+                  <span class="hero-step-active absolute inset-0 rounded-full bg-accent-vivid opacity-0"></span>
                 </span>
-                <div class="flex flex-wrap justify-end gap-1.5">
-                  {row.items.map((item) => (
-                    <span
-                      class:list={[
-                        "rounded-md border px-2 py-0.5 font-mono text-[0.6875rem] transition-all duration-150 hover:-translate-y-0.5 hover:border-accent/60 hover:text-accent",
-                        item.accent
-                          ? "border-accent/35 bg-accent-soft text-accent"
-                          : "border-border bg-surface text-fg-secondary",
-                      ]}
-                    >
+                <span class="truncate" title={q.title}>{q.title}</span>
+              </h2>
+              <span class="shrink-0 font-mono text-[0.6875rem] tabular-nums text-fg-muted/70">
+                {String(qIdx + 1).padStart(2, "0")}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-1.5 lg:grid-cols-1">
+              {q.items.map((item) => {
+                const ringMeta = rings[item.ring];
+                return (
+                  <button
+                    type="button"
+                    data-stack-item
+                    data-item-id={item.id}
+                    data-item-label={item.label}
+                    data-item-group={q.title}
+                    data-item-ring={item.ring}
+                    data-item-ring-label={ringMeta.label}
+                    data-item-trend={item.trend ?? ""}
+                    data-item-detail={item.detail[lang]}
+                    aria-pressed="false"
+                    class="stack-tile group flex w-full items-center gap-2.5 rounded-lg border border-border/80 bg-surface/65 px-2.5 py-1.5 text-left transition-all duration-150 hover:-translate-y-px hover:border-border-strong hover:bg-surface-elevated hover:shadow-xs focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent aria-pressed:border-fg-muted/50 aria-pressed:bg-surface-elevated aria-pressed:ring-1 aria-pressed:ring-fg-muted/20 aria-pressed:shadow-xs"
+                  >
+                    <span class="relative flex size-7 shrink-0 items-center justify-center rounded-md border border-border/70 bg-surface-elevated shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-transform duration-150 group-hover:scale-105 group-aria-pressed:scale-105">
+                      <TechIcon name={item.icon} class="size-4" />
+                    </span>
+
+                    <span class="min-w-0 flex-1 truncate font-mono text-xs font-medium text-fg">
                       {item.label}
                     </span>
-                  ))}
-                </div>
-              </div>
-            ))
-          }
-        </div>
 
-        <!-- Impact Panel: Staggered Scale Bars -->
-        <div
-          id="hero-panel-impact"
-          role="tabpanel"
-          aria-labelledby="hero-tab-impact"
-          data-hero-panel="impact"
-          data-active="false"
-          aria-hidden="true"
-          inert
-          class="col-start-1 row-start-1 flex h-full flex-col justify-between gap-2"
-        >
-          {
-            impactRows.map((item, rIdx) => (
-              <div
-                style={`--row-i: ${rIdx}`}
-                class="hero-row border-b border-border/70 pb-2 last:border-b-0 last:pb-0"
+                    <span class="hidden shrink-0 items-center gap-1.5 font-mono text-[0.625rem] text-fg-muted sm:inline-flex">
+                      {item.trend === "new" && (
+                        <span
+                          title={isVi ? "Mới đẩy mạnh gần đây" : "Recent focus"}
+                          class="rounded border border-border-strong px-1 py-px text-[0.5625rem] uppercase leading-none text-fg-secondary"
+                        >
+                          new
+                        </span>
+                      )}
+                      <span class="inline-flex items-center gap-1">
+                        <span aria-hidden="true" class:list={["size-1.5 rounded-full", ringMeta.dotClass]}></span>
+                        <span>{ringMeta.label}</span>
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+
+    <!-- VIEW 2: Interactive Tech Radar (4 Quadrants x 3 Concentric Rings) -->
+    <div data-panel="radar" class="hidden grid-cols-1 gap-px bg-border lg:grid-cols-[1.15fr_0.85fr]">
+      <!-- Left: SVG Radar + Interactive Icon Blips -->
+      <div class="flex items-center justify-center bg-surface-elevated p-4 sm:p-6">
+        <div class="relative aspect-square w-full max-w-[460px]">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 520 520"
+            class="size-full select-none"
+          >
+            <!-- Concentric Rings (Assess -> Trial -> Adopt) -->
+            <circle
+              cx="260"
+              cy="260"
+              r="244"
+              data-radar-ring="assess"
+              class="fill-surface/35 stroke-border-strong transition-opacity duration-200"
+              stroke-width="1"
+            />
+            <circle
+              cx="260"
+              cy="260"
+              r="200"
+              data-radar-ring="trial"
+              class="fill-surface/55 stroke-border-strong transition-opacity duration-200"
+              stroke-width="1"
+            />
+            <circle
+              cx="260"
+              cy="260"
+              r="152"
+              data-radar-ring="adopt"
+              class="fill-surface-elevated stroke-border-strong transition-opacity duration-200"
+              stroke-width="1"
+            />
+
+            <!-- Quadrant Crosshairs -->
+            <line x1="16" y1="260" x2="504" y2="260" stroke="var(--border-strong)" stroke-width="1" />
+            <line x1="260" y1="16" x2="260" y2="504" stroke="var(--border-strong)" stroke-width="1" />
+
+            <!-- Ring Labels along Horizontal Axis -->
+            <g class="fill-fg-muted font-mono text-[8.5px] font-medium uppercase tracking-wider">
+              <text x="260" y="254" text-anchor="middle">Adopt</text>
+              <text x="84" y="254" text-anchor="middle">Trial</text>
+              <text x="436" y="254" text-anchor="middle">Trial</text>
+              <text x="38" y="254" text-anchor="middle">Assess</text>
+              <text x="482" y="254" text-anchor="middle">Assess</text>
+            </g>
+          </svg>
+
+          <!-- 4 Quadrant Corner Labels -->
+          {quadrants.map((q) => (
+            <span
+              class:list={[
+                "pointer-events-none absolute font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-fg-muted",
+                q.cornerClass,
+              ]}
+            >
+              {q.shortTitle}
+            </span>
+          ))}
+
+          <!-- Interactive Icon Blips -->
+          {allItems.map((item) => {
+            const ringMeta = rings[item.ring];
+            return (
+              <button
+                type="button"
+                data-radar-item
+                data-item-id={item.id}
+                data-item-label={item.label}
+                data-item-group={item.quadrantTitle}
+                data-item-ring={item.ring}
+                data-item-ring-label={ringMeta.label}
+                data-item-trend={item.trend ?? ""}
+                data-item-detail={item.detail[lang]}
+                aria-pressed="false"
+                style={`left: ${item.pos.x}%; top: ${item.pos.y}%;`}
+                class="radar-blip group absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 hover:z-20 focus-visible:z-20 focus-visible:outline-none aria-pressed:z-10"
               >
-                <div class="flex items-baseline justify-between gap-3">
-                  <div class="min-w-0">
-                    <p class="truncate text-sm font-medium text-fg">{item.org}</p>
-                    <p class="truncate text-xs text-fg-muted">{item.desc}</p>
-                  </div>
-                  <span class="shrink-0 font-mono text-xs font-medium tabular-nums text-accent">{item.metric}</span>
-                </div>
-                <div aria-hidden="true" class="mt-1.5 h-1 overflow-hidden rounded-full bg-border/80">
-                  <div class="hero-impact-bar h-full rounded-full bg-accent-vivid/85" style={`width: ${item.fill}`}></div>
-                </div>
-              </div>
-            ))
-          }
-        </div>
-
-        <!-- Now Panel: Crisp Iconography, Single Live Badge & Quick Actions -->
-        <div
-          id="hero-panel-now"
-          role="tabpanel"
-          aria-labelledby="hero-tab-now"
-          data-hero-panel="now"
-          data-active="false"
-          aria-hidden="true"
-          inert
-          class="col-start-1 row-start-1 flex h-full flex-col justify-between gap-2"
-        >
-          {
-            nowRows.map((row, rIdx) => (
-              <div style={`--row-i: ${rIdx}`} class="hero-row flex items-center gap-3 border-b border-border/70 pb-2">
-                <span
-                  aria-hidden="true"
-                  class:list={[
-                    "grid size-7 shrink-0 place-items-center rounded-lg border",
-                    row.icon === "role"
-                      ? "border-accent/25 bg-accent-soft/60 text-accent"
-                      : "border-border bg-surface text-fg-muted",
-                  ]}
-                >
-                  {row.icon === "role" && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
-                      <rect x="3" y="7" width="18" height="13" rx="2"></rect>
-                      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
-                  )}
-                  {row.icon === "focus" && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
-                      <path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Z"></path>
-                      <path d="m4 12 8 4.5 8-4.5"></path>
-                      <path d="m4 16.5 8 4.5 8-4.5"></path>
-                    </svg>
-                  )}
-                  {row.icon === "location" && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
-                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
+                <span class="relative flex size-7 items-center justify-center rounded-full border border-border-strong bg-surface-elevated shadow-xs transition-all duration-150 group-hover:scale-110 group-hover:border-fg-muted group-hover:shadow-sm group-focus-visible:ring-2 group-focus-visible:ring-accent group-aria-pressed:scale-110 group-aria-pressed:border-fg group-aria-pressed:ring-2 group-aria-pressed:ring-fg/15 sm:size-8">
+                  <TechIcon name={item.icon} class="size-3.5 sm:size-4" />
+                  <span
+                    aria-hidden="true"
+                    class:list={["absolute -right-0.5 -bottom-0.5 size-2 rounded-full ring-2 ring-surface-elevated", ringMeta.dotClass]}
+                  ></span>
+                  {item.trend === "new" && (
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 36 36"
+                      class="pointer-events-none absolute -inset-1 size-[calc(100%+0.5rem)] text-fg-muted/70"
+                    >
+                      <path
+                        d="M 18 2 A 16 16 0 0 1 34 18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.4"
+                        stroke-linecap="round"
+                      />
                     </svg>
                   )}
                 </span>
+                <span class="rounded bg-surface-elevated/95 px-1 font-mono text-[0.5625rem] font-medium leading-tight text-fg-secondary shadow-2xs group-hover:text-fg group-aria-pressed:font-semibold group-aria-pressed:text-fg sm:text-[0.625rem]">
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-                <div class="min-w-0 flex-1">
-                  <p class="font-mono text-[0.6875rem] text-fg-muted">{row.label}</p>
-                  <p class="mt-0.5 truncate text-sm font-medium text-fg">{row.value}</p>
-                </div>
-              </div>
-            ))
-          }
+      <!-- Right: Radar Guide, Ring Breakdown & Live Detail Card -->
+      <div class="flex flex-col justify-between gap-4 bg-surface-elevated p-4 sm:p-5">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="font-mono text-xs font-semibold uppercase tracking-[0.06em] text-fg">
+              {isVi ? "Phân tầng Tech Radar" : "Radar Rings"}
+            </h3>
+            <span class="inline-flex items-center gap-1.5 font-mono text-[0.625rem] text-fg-muted">
+              <svg aria-hidden="true" viewBox="0 0 14 14" class="size-3 text-fg-muted">
+                <path d="M7 1.5 A5.5 5.5 0 0 1 12.5 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                <circle cx="7" cy="7" r="2.5" fill="currentColor" opacity="0.35" />
+              </svg>
+              <span>{isVi ? "Vòng cung = Mới đẩy mạnh" : "Arc = Recent focus"}</span>
+            </span>
+          </div>
 
-          <div style="--row-i: 3" class="hero-row flex items-center justify-between gap-2.5 pt-0.5">
-            <div class="flex min-w-0 items-center gap-3">
-              <span aria-hidden="true" class="grid size-7 shrink-0 place-items-center rounded-lg border border-border bg-surface text-fg-muted">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
-                  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                  <path d="m3 7 9 6 9-6"></path>
-                </svg>
-              </span>
-              <div class="min-w-0">
-                <p class="font-mono text-[0.6875rem] text-fg-muted">Email</p>
-                <p class="truncate font-mono text-xs text-fg-secondary">{email}</p>
-              </div>
-            </div>
-            <div class="flex shrink-0 items-center gap-1.5">
+          <div class="space-y-2">
+            {(["adopt", "trial", "assess"] as RingId[]).map((ringId) => (
               <button
                 type="button"
-                data-hero-copy-email={email}
-                data-label-idle={isVi ? "Chép" : "Copy"}
-                data-label-copied={isVi ? "Đã chép" : "Copied"}
-                aria-label={isVi ? "Sao chép địa chỉ email" : "Copy email address"}
-                class="inline-flex items-center gap-1.5 rounded-lg border border-border-strong bg-surface px-2.5 py-1.5 font-mono text-[0.6875rem] font-medium text-fg transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                data-ring-filter={ringId}
+                aria-pressed="false"
+                class="flex w-full items-start gap-2.5 rounded-lg border border-border/80 bg-surface/55 px-3 py-2 text-left transition-colors hover:border-border-strong hover:bg-surface aria-pressed:border-fg-muted/50 aria-pressed:bg-surface"
               >
-                <svg data-copy-icon aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
-                  <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                <svg data-check-icon aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden size-3.5 text-status-open">
-                  <path d="M20 6 9 17l-5-5"></path>
-                </svg>
-                <span data-copy-text>{isVi ? "Chép" : "Copy"}</span>
+                <span aria-hidden="true" class:list={["mt-1.5 size-2 shrink-0 rounded-full", rings[ringId].dotClass]}></span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-mono text-xs font-semibold text-fg">{rings[ringId].label}</span>
+                    <span class="font-mono text-[0.625rem] text-fg-muted">{ringCounts[ringId]}</span>
+                  </div>
+                  <p class="mt-0.5 text-xs leading-relaxed text-fg-secondary">{rings[ringId].desc[lang]}</p>
+                </div>
               </button>
-              <a
-                href={cvUrl}
-                target="_blank"
-                rel="noopener"
-                class="inline-flex items-center gap-1 rounded-lg border border-accent/35 bg-accent-soft/70 px-2.5 py-1.5 font-mono text-[0.6875rem] font-medium text-accent transition-colors hover:bg-accent hover:text-accent-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-              >
-                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="size-3.5">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path>
-                  <path d="M14 2v6h6"></path>
-                </svg>
-                <span>CV</span>
-                <span aria-hidden="true">↗</span>
-              </a>
-            </div>
+            ))}
           </div>
+        </div>
+
+        <!-- Radar Active Tech Card -->
+        <div
+          data-radar-detail
+          class="rounded-xl border border-border bg-surface/70 p-3.5"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <span data-radar-detail-name class="font-mono text-xs font-semibold text-fg">
+              {isVi ? "Chọn một biểu tượng trên radar" : "Select an icon on the radar"}
+            </span>
+            <span
+              data-radar-detail-ring
+              class="hidden rounded border border-border-strong bg-surface-elevated px-1.5 py-0.5 font-mono text-[0.625rem] text-fg-secondary"
+            ></span>
+          </div>
+          <p data-radar-detail-text class="mt-1.5 text-xs leading-relaxed text-fg-muted">
+            {isVi
+              ? "Di chuột hoặc chạm vào từng icon để xem tầng kiến trúc, mức độ áp dụng và ngữ cảnh dùng thực tế."
+              : "Hover or tap any icon to inspect its quadrant, adoption ring, and real-world usage."}
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- Footer Telemetry Strip -->
-    <div class="flex items-center justify-between gap-2 border-t border-border bg-surface/60 px-4 py-2 font-mono text-[0.6875rem] text-fg-muted">
-      <span>Astro 7 · TypeScript · Tailwind</span>
-      <span class="whitespace-nowrap font-medium text-accent">Lighthouse 100×4</span>
+    <!-- Bottom Inspector Status Bar -->
+    <div
+      data-stack-inspector
+      aria-live="polite"
+      class="flex min-h-9 flex-wrap items-center justify-between gap-2 border-t border-border bg-surface/70 px-4 py-2 text-xs sm:px-5"
+    >
+      <div class="flex min-w-0 flex-1 items-center gap-2">
+        <span
+          data-inspector-badge
+          class="hidden shrink-0 rounded border border-border-strong bg-surface-elevated px-1.5 py-0.5 font-mono text-[0.625rem] font-medium text-fg"
+        ></span>
+        <span data-inspector-text class="line-clamp-2 leading-snug text-fg-muted sm:truncate">
+          {defaultPrompt}
+        </span>
+      </div>
+
+      <span data-inspector-meta class="hidden shrink-0 font-mono text-[0.625rem] text-fg-muted sm:inline">
+        4 Quadrants · 3 Rings
+      </span>
     </div>
   </div>
 </aside>
 
-<script>
-  let heroCardTimer: number | undefined;
-  let heroCmdTimer: number | undefined;
-  let heroDelayTimer: number | undefined;
-
-  function placeHeroTabPill(card: HTMLElement) {
-    const tablist = card.querySelector<HTMLElement>("[role='tablist']");
-    const pill = card.querySelector<HTMLElement>("[data-hero-tab-pill]");
-    const active = card.querySelector<HTMLElement>("[role='tab'][aria-selected='true']");
-    if (!tablist || !pill || !active) return;
-
-    tablist.dataset.pillReady = "1";
-    pill.style.width = `${active.offsetWidth}px`;
-    pill.style.transform = `translateX(${active.offsetLeft}px)`;
+<style>
+  [data-hero-card][data-active-ring="adopt"] [data-item-ring]:not([data-item-ring="adopt"]),
+  [data-hero-card][data-active-ring="trial"] [data-item-ring]:not([data-item-ring="trial"]),
+  [data-hero-card][data-active-ring="assess"] [data-item-ring]:not([data-item-ring="assess"]) {
+    opacity: 0.28;
   }
 
-  function initHeroCard() {
-    clearInterval(heroCardTimer);
-    clearInterval(heroCmdTimer);
-    clearTimeout(heroDelayTimer);
+  [data-hero-card][data-active-ring="adopt"] [data-radar-ring]:not([data-radar-ring="adopt"]),
+  [data-hero-card][data-active-ring="trial"] [data-radar-ring]:not([data-radar-ring="trial"]),
+  [data-hero-card][data-active-ring="assess"] [data-radar-ring]:not([data-radar-ring="assess"]) {
+    opacity: 0.45;
+  }
+</style>
 
-    const cards = document.querySelectorAll<HTMLElement>("[data-hero-card]");
-    if (cards.length === 0) return;
+<script>
+  function initHeroStack() {
+    const card = document.querySelector<HTMLElement>("[data-hero-card]");
+    if (!card || card.dataset.stackBound) return;
+    card.dataset.stackBound = "1";
 
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const canHover = window.matchMedia("(hover: hover)").matches;
+    const stackItems = card.querySelectorAll<HTMLButtonElement>("[data-stack-item]");
+    const radarItems = card.querySelectorAll<HTMLButtonElement>("[data-radar-item]");
+    const allTechButtons = [...stackItems, ...radarItems];
 
-    cards.forEach((card) => {
-      const tabs = [...card.querySelectorAll<HTMLButtonElement>("[data-hero-tab]")];
-      const panels = [...card.querySelectorAll<HTMLElement>("[data-hero-panel]")];
-      const cmdEl = card.querySelector<HTMLElement>("[data-hero-cmd]");
-      const badgeEl = card.querySelector<HTMLElement>("[data-hero-badge]");
-      const progressEl = card.querySelector<HTMLElement>("[data-hero-progress]");
+    const ringButtons = card.querySelectorAll<HTMLButtonElement>("[data-ring-filter]");
+    const viewButtons = card.querySelectorAll<HTMLButtonElement>("[data-view-toggle]");
+    const stackPanel = card.querySelector<HTMLElement>('[data-panel="stack"]');
+    const radarPanel = card.querySelector<HTMLElement>('[data-panel="radar"]');
 
-      const restartProgress = () => {
-        if (!progressEl || reduceMotion) return;
-        progressEl.classList.remove("is-running");
-        requestAnimationFrame(() => {
-          progressEl.classList.add("is-running");
-        });
-      };
+    const badgeEl = card.querySelector<HTMLElement>("[data-inspector-badge]");
+    const textEl = card.querySelector<HTMLElement>("[data-inspector-text]");
+    const metaEl = card.querySelector<HTMLElement>("[data-inspector-meta]");
 
-      const setCommand = (text: string, badge: string, animate: boolean) => {
-        clearInterval(heroCmdTimer);
-        if (badgeEl) badgeEl.textContent = badge;
-        if (!cmdEl) return;
-        if (!animate || reduceMotion) {
-          cmdEl.textContent = text;
-          return;
+    const radarDetailName = card.querySelector<HTMLElement>("[data-radar-detail-name]");
+    const radarDetailRing = card.querySelector<HTMLElement>("[data-radar-detail-ring]");
+    const radarDetailText = card.querySelector<HTMLElement>("[data-radar-detail-text]");
+
+    const defaultPrompt = card.dataset.defaultPrompt ?? "";
+    const defaultMeta = metaEl?.textContent ?? "";
+    const defaultRadarTitle = radarDetailName?.textContent ?? "";
+    const defaultRadarText = radarDetailText?.textContent ?? "";
+
+    let pinnedId: string | null = null;
+    let activeRing = "all";
+
+    const findById = (id: string | null) =>
+      id ? allTechButtons.find((el) => el.dataset.itemId === id) ?? null : null;
+
+    const renderDetail = (btn: HTMLButtonElement | null) => {
+      if (badgeEl && textEl && metaEl) {
+        if (!btn) {
+          badgeEl.classList.add("hidden");
+          badgeEl.textContent = "";
+          textEl.textContent = defaultPrompt;
+          textEl.classList.remove("text-fg-secondary");
+          textEl.classList.add("text-fg-muted");
+          metaEl.textContent = defaultMeta;
+        } else {
+          const ringLabel = btn.dataset.itemRingLabel ?? "";
+          badgeEl.textContent = btn.dataset.itemLabel ?? "";
+          badgeEl.classList.remove("hidden");
+          textEl.textContent = btn.dataset.itemDetail ?? "";
+          textEl.classList.remove("text-fg-muted");
+          textEl.classList.add("text-fg-secondary");
+          metaEl.textContent = `${btn.dataset.itemGroup ?? ""} · ${ringLabel}`;
         }
-        let i = 0;
-        cmdEl.textContent = "";
-        heroCmdTimer = window.setInterval(() => {
-          i += 1;
-          cmdEl.textContent = text.slice(0, i);
-          if (i >= text.length) clearInterval(heroCmdTimer);
-        }, 14);
-      };
+      }
 
-      let roBound = false;
-      const enablePillTracker = () => {
-        if (roBound || !card.isConnected) return;
-        roBound = true;
-        placeHeroTabPill(card);
-        if ("ResizeObserver" in window) {
-          new ResizeObserver(() => placeHeroTabPill(card)).observe(card);
+      if (radarDetailName && radarDetailRing && radarDetailText) {
+        if (!btn) {
+          radarDetailName.textContent = defaultRadarTitle;
+          radarDetailRing.classList.add("hidden");
+          radarDetailRing.textContent = "";
+          radarDetailText.textContent = defaultRadarText;
+          radarDetailText.classList.remove("text-fg-secondary");
+          radarDetailText.classList.add("text-fg-muted");
+        } else {
+          const trend = btn.dataset.itemTrend === "new" ? " · new" : "";
+          radarDetailName.textContent = `${btn.dataset.itemLabel ?? ""} — ${btn.dataset.itemGroup ?? ""}`;
+          radarDetailRing.textContent = `${btn.dataset.itemRingLabel ?? ""}${trend}`;
+          radarDetailRing.classList.remove("hidden");
+          radarDetailText.textContent = btn.dataset.itemDetail ?? "";
+          radarDetailText.classList.remove("text-fg-muted");
+          radarDetailText.classList.add("text-fg-secondary");
         }
-      };
+      }
+    };
 
-      const activateTab = (targetTab: HTMLButtonElement, animateCmd = true) => {
-        enablePillTracker();
-        card.dataset.tabSwitched = "1";
-        const targetId = targetTab.dataset.heroTab;
-        tabs.forEach((t) => {
-          const active = t === targetTab;
-          t.setAttribute("aria-selected", String(active));
-          t.className = active
-            ? "relative z-10 rounded-md px-2.5 py-1 font-mono text-[0.6875rem] font-medium text-accent-fg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
-            : "relative z-10 rounded-md px-2.5 py-1 font-mono text-[0.6875rem] font-medium text-fg-muted transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent";
-        });
+    const setPinned = (id: string | null) => {
+      pinnedId = id;
+      allTechButtons.forEach((el) => {
+        el.setAttribute("aria-pressed", String(el.dataset.itemId === id));
+      });
+      renderDetail(findById(id));
+    };
 
-        panels.forEach((panel) => {
-          const match = panel.dataset.heroPanel === targetId;
-          panel.dataset.active = String(match);
-          panel.setAttribute("aria-hidden", String(!match));
-          panel.toggleAttribute("inert", !match);
-        });
+    allTechButtons.forEach((btn) => {
+      btn.addEventListener("pointerenter", () => renderDetail(btn));
+      btn.addEventListener("focus", () => renderDetail(btn));
+      btn.addEventListener("pointerleave", () => renderDetail(findById(pinnedId)));
+      btn.addEventListener("blur", () => renderDetail(findById(pinnedId)));
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.itemId ?? null;
+        setPinned(pinnedId === id ? null : id);
+      });
+    });
 
-        requestAnimationFrame(() => placeHeroTabPill(card));
-        setCommand(
-          targetTab.dataset.heroCmdText ?? "",
-          targetTab.dataset.heroBadgeText ?? "",
-          animateCmd,
-        );
-        restartProgress();
-      };
+    const setRingFilter = (ring: string) => {
+      activeRing = activeRing === ring && ring !== "all" ? "all" : ring;
+      card.dataset.activeRing = activeRing;
+      ringButtons.forEach((btn) => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.ringFilter === activeRing));
+      });
+    };
 
-      heroDelayTimer = window.setTimeout(() => {
-        enablePillTracker();
-        if (card.isConnected && !card.dataset.paused) restartProgress();
-      }, 1200);
+    ringButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setRingFilter(btn.dataset.ringFilter ?? "all");
+      });
+    });
 
-      if (!card.dataset.bound) {
-        card.dataset.bound = "1";
-        let manuallyPinned = false;
-        let hoveredOrFocused = false;
-
-        tabs.forEach((tab) => {
-          tab.addEventListener("click", () => {
-            manuallyPinned = true;
-            card.dataset.paused = "true";
-            clearInterval(heroCardTimer);
-            activateTab(tab, true);
-          });
-        });
-
-        card.addEventListener("pointerenter", () => {
-          hoveredOrFocused = true;
-          card.dataset.paused = "true";
-        });
-        card.addEventListener("pointerleave", () => {
-          hoveredOrFocused = false;
-          if (!manuallyPinned) delete card.dataset.paused;
-        });
-        card.addEventListener("focusin", () => {
-          hoveredOrFocused = true;
-          card.dataset.paused = "true";
-        });
-        card.addEventListener("focusout", () => {
-          hoveredOrFocused = false;
-          if (!manuallyPinned) delete card.dataset.paused;
-        });
-
-        const copyBtn = card.querySelector<HTMLButtonElement>("[data-hero-copy-email]");
-        if (copyBtn) {
-          const copyText = copyBtn.querySelector<HTMLElement>("[data-copy-text]");
-          const copyIcon = copyBtn.querySelector<HTMLElement>("[data-copy-icon]");
-          const checkIcon = copyBtn.querySelector<HTMLElement>("[data-check-icon]");
-          let timer: number | undefined;
-          copyBtn.addEventListener("click", async () => {
-            const addr = copyBtn.dataset.heroCopyEmail;
-            if (!addr) return;
-            try {
-              await navigator.clipboard.writeText(addr);
-            } catch {
-              return;
-            }
-            if (copyText) copyText.textContent = copyBtn.dataset.labelCopied ?? "Copied";
-            copyIcon?.classList.add("hidden");
-            checkIcon?.classList.remove("hidden");
-            copyBtn.dataset.copied = "true";
-            copyBtn.classList.add("border-accent", "text-accent");
-            clearTimeout(timer);
-            timer = window.setTimeout(() => {
-              if (copyText) copyText.textContent = copyBtn.dataset.labelIdle ?? "Copy";
-              copyIcon?.classList.remove("hidden");
-              checkIcon?.classList.add("hidden");
-              delete copyBtn.dataset.copied;
-              copyBtn.classList.remove("border-accent", "text-accent");
-            }, 1600);
-          });
+    viewButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const mode = btn.dataset.viewToggle ?? "stack";
+        card.dataset.view = mode;
+        viewButtons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+        if (mode === "radar") {
+          stackPanel?.classList.add("hidden");
+          radarPanel?.classList.remove("hidden");
+          radarPanel?.classList.add("grid");
+        } else {
+          radarPanel?.classList.add("hidden");
+          radarPanel?.classList.remove("grid");
+          stackPanel?.classList.remove("hidden");
         }
+      });
+    });
 
-        if (canHover && !reduceMotion && card.hasAttribute("data-tilt-card")) {
-          card.addEventListener(
-            "pointermove",
-            (e) => {
-              const rect = card.getBoundingClientRect();
-              const nx = (e.clientX - rect.left) / rect.width - 0.5;
-              const ny = (e.clientY - rect.top) / rect.height - 0.5;
-              const rx = (-ny * 5.2).toFixed(2);
-              const ry = (nx * 5.2).toFixed(2);
-              card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
-            },
-            { passive: true },
-          );
-          card.addEventListener("pointerleave", () => {
-            card.style.transform = "";
-          });
-        }
-
-        if (!reduceMotion && tabs.length > 1) {
-          heroCardTimer = window.setInterval(() => {
-            if (!card.isConnected) {
-              clearInterval(heroCardTimer);
-              return;
-            }
-            if (manuallyPinned || hoveredOrFocused || document.hidden) return;
-            const currentIdx = tabs.findIndex((t) => t.getAttribute("aria-selected") === "true");
-            const nextTab = tabs[(currentIdx + 1) % tabs.length];
-            if (nextTab) activateTab(nextTab, true);
-          }, 6500);
-        }
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (pinnedId) setPinned(null);
+        else if (activeRing !== "all") setRingFilter("all");
       }
     });
   }
 
-  document.addEventListener("astro:page-load", () => {
-    if (typeof requestIdleCallback === "function") requestIdleCallback(initHeroCard);
-    else requestAnimationFrame(initHeroCard);
-  });
+  document.addEventListener("astro:page-load", initHeroStack);
 </script>

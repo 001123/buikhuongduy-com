@@ -19,17 +19,15 @@ const isHome = currentPath === homePath[lang];
 const navItems = [
   {
     section: "home",
-    num: "01",
     label: t("nav.home"),
     href: homePath[lang],
     active: isHome,
   },
-  ...(["about", "blog", "contact"] as const).map((s, idx) => {
+  ...(["about", "blog", "contact"] as const).map((s) => {
     const href = sectionPaths[s][lang];
     const active = s === "blog" ? currentPath.startsWith(href) : currentPath === href;
     return {
       section: s,
-      num: `0${idx + 2}`,
       label: t(`nav.${s}`),
       href,
       active,
@@ -40,10 +38,10 @@ const navItems = [
 const activeLabel = navItems.find((item) => item.active)?.label ?? t("nav.home");
 ---
 
-<header class="sticky top-0 z-40 border-b border-border/80 bg-bg/85 backdrop-blur-md">
-  <div class="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
+<header class="sticky top-0 z-40 border-b border-border/80 bg-nav/85 backdrop-blur-md">
+  <div class="mx-auto flex h-11 max-w-6xl items-center justify-between gap-4 px-5 sm:px-8">
     <!-- Mobile Hamburger Trigger + Active Route Label -->
-    <div class="flex min-w-0 items-center gap-2.5 sm:hidden">
+    <div class="flex min-w-0 items-center gap-2 sm:hidden">
       <button
         type="button"
         data-menu-toggle
@@ -52,7 +50,7 @@ const activeLabel = navItems.find((item) => item.active)?.label ?? t("nav.home")
         aria-label={t("nav.menuOpen")}
         data-label-open={t("nav.menuOpen")}
         data-label-close={t("nav.menuClose")}
-        class="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-fg transition-colors hover:border-border-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        class="inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-fg transition-colors hover:border-border-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         <span aria-hidden="true" class="relative block h-3.5 w-4">
           <span class="hamburger-line hamburger-line-1"></span>
@@ -60,17 +58,17 @@ const activeLabel = navItems.find((item) => item.active)?.label ?? t("nav.home")
           <span class="hamburger-line hamburger-line-3"></span>
         </span>
       </button>
-      <span class="truncate text-sm font-medium text-fg">{activeLabel}</span>
+      <span class="truncate text-[0.8125rem] font-medium text-fg">{activeLabel}</span>
     </div>
 
-    <!-- Desktop Nav: Minimal Developer Path / Numbered Nav -->
+    <!-- Desktop Nav -->
     <nav aria-label={t("nav.label")} class="hidden sm:block">
-      <ul class="flex items-center gap-1 text-[0.8125rem]">
+      <ul class="flex items-center gap-0.5 text-[0.8125rem]">
         {
-          navItems.map(({ num, label, href, active }, idx) => (
-            <li class="flex items-center gap-1">
+          navItems.map(({ label, href, active }, idx) => (
+            <li class="flex items-center gap-0.5">
               {idx > 0 && (
-                <span aria-hidden="true" class="hidden select-none font-mono text-[0.6875rem] text-border-strong md:inline">
+                <span aria-hidden="true" class="hidden select-none px-0.5 font-mono text-[0.6875rem] text-border-strong/80 md:inline">
                   /
                 </span>
               )}
@@ -78,21 +76,12 @@ const activeLabel = navItems.find((item) => item.active)?.label ?? t("nav.home")
                 href={href}
                 aria-current={active ? "page" : undefined}
                 class:list={[
-                  "group relative inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                  "inline-flex items-center whitespace-nowrap rounded-md px-2.5 py-1 font-medium leading-5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
                   active
-                    ? "bg-accent-soft text-accent after:pointer-events-none after:absolute after:inset-x-2.5 after:-bottom-[12px] after:h-[1.5px] after:rounded-full after:bg-accent-vivid"
+                    ? "bg-accent-soft text-accent"
                     : "text-fg-secondary hover:bg-surface/80 hover:text-fg",
                 ]}
               >
-                <span
-                  aria-hidden="true"
-                  class:list={[
-                    "font-mono text-[0.6875rem] tabular-nums transition-colors",
-                    active ? "text-accent" : "text-fg-muted/80 group-hover:text-accent",
-                  ]}
-                >
-                  {num}
-                </span>
                 <span>{label}</span>
               </a>
             </li>
@@ -102,10 +91,13 @@ const activeLabel = navItems.find((item) => item.active)?.label ?? t("nav.home")
     </nav>
 
     <!-- Right Utilities -->
-    <div class="flex shrink-0 items-center gap-1.5">
+    <div class="flex shrink-0 items-center gap-2">
       <SearchBox lang={lang} />
-      <LanguageSwitcher lang={lang} links={links} />
-      <ThemeToggle />
+      <span aria-hidden="true" class="hidden h-3.5 w-px bg-border sm:inline-block"></span>
+      <div class="flex items-center gap-1">
+        <LanguageSwitcher lang={lang} links={links} />
+        <ThemeToggle />
+      </div>
     </div>
   </div>
 </header>
@@ -117,7 +109,7 @@ const activeLabel = navItems.find((item) => item.active)?.label ?? t("nav.home")
   data-open="false"
   aria-hidden="true"
   inert
-  class="fixed inset-0 top-14 z-30 sm:hidden"
+  class="fixed inset-0 top-11 z-30 sm:hidden"
 >
   <button
     type="button"
@@ -139,7 +131,7 @@ const activeLabel = navItems.find((item) => item.active)?.label ?? t("nav.home")
     <nav aria-label={t("nav.label")}>
       <ul class="space-y-1">
         {
-          navItems.map(({ num, label, href, active }) => (
+          navItems.map(({ label, href, active }) => (
             <li>
               <a
                 href={href}
@@ -152,17 +144,7 @@ const activeLabel = navItems.find((item) => item.active)?.label ?? t("nav.home")
                     : "border-transparent text-fg hover:border-border hover:bg-surface",
                 ]}
               >
-                <span class="flex items-center gap-3">
-                  <span
-                    class:list={[
-                      "font-mono text-[0.6875rem] tabular-nums",
-                      active ? "text-accent" : "text-fg-muted",
-                    ]}
-                  >
-                    {num}
-                  </span>
-                  <span>{label}</span>
-                </span>
+                <span>{label}</span>
                 {active ? (
                   <span aria-hidden="true" class="size-2 rounded-full bg-accent-vivid"></span>
                 ) : (

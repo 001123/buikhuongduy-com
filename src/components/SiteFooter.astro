@@ -1,6 +1,8 @@
 ---
-import { socials } from "../data/profile";
-import { homePath, useTranslations, type Lang } from "../i18n/ui";
+import ContactIcon from "./ContactIcon.astro";
+import SectionPixelDecor from "./SectionPixelDecor.astro";
+import { cvUrl, email, socials } from "../data/profile";
+import { homePath, sectionPaths, useTranslations, type Lang } from "../i18n/ui";
 
 interface Props {
   lang: Lang;
@@ -9,49 +11,372 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const year = new Date().getFullYear();
+
+const exploreLinks = [
+  { label: t("nav.home"), href: homePath[lang] },
+  { label: t("nav.about"), href: sectionPaths.about[lang] },
+  { label: t("nav.blog"), href: sectionPaths.blog[lang] },
+  { label: t("nav.contact"), href: sectionPaths.contact[lang] },
+  { label: t("nav.search"), href: sectionPaths.search[lang] },
+];
 ---
 
-<footer class="mt-auto border-t border-border">
-  <div class="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-7 text-xs text-fg-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
-    <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono">
-      <span>© {year} {t("site.name")}</span>
-    </div>
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-      {
-        socials.map((s) => (
-          <a
-            href={s.href}
-            target="_blank"
-            rel="noopener me"
-            class="transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          >
-            {s.label}
-          </a>
-        ))
-      }
-      <a
-        href={`${homePath[lang]}rss.xml`}
-        class="font-mono transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-      >
-        {t("footer.rss")}
-      </a>
-      <button
-        type="button"
-        data-back-to-top
-        class="inline-flex items-center gap-1 font-mono transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-      >
-        <span aria-hidden="true">↑</span>
-        {t("footer.top")}
-      </button>
+<footer class="site-footer-scene relative mt-auto overflow-hidden border-t border-border">
+  <!-- Main Content in Clean Upper Sky Zone -->
+  <div class="relative z-10 mx-auto max-w-6xl px-5 pt-14 pb-44 sm:px-8 sm:pt-16 sm:pb-48">
+    <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+      <!-- Identity, Contact & Copyright -->
+      <div class="space-y-4 sm:col-span-2 lg:col-span-6">
+        <a
+          href={homePath[lang]}
+          aria-label={t("site.name")}
+          class="inline-flex rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        >
+          <SectionPixelDecor variant="footer" />
+        </a>
+
+        <p class="max-w-md text-sm leading-relaxed text-pretty text-fg-secondary">
+          {t("home.intro")}
+        </p>
+
+        <div class="pt-1 font-mono text-xs text-fg-muted">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span>{t("home.edition")}</span>
+            <span aria-hidden="true" class="text-border-strong">·</span>
+            <a
+              href={`mailto:${email}`}
+              class="inline-flex items-center gap-1.5 text-fg-secondary transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <ContactIcon name="email" class="size-3.5 text-accent" />
+              <span>{email}</span>
+            </a>
+          </div>
+          <p class="mt-5">© {year} {t("site.name")}</p>
+        </div>
+      </div>
+
+      <!-- Site Navigation -->
+      <nav aria-label={t("footer.explore")} class="space-y-3 lg:col-span-3">
+        <h2 class="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-fg-muted">
+          {t("footer.explore")}
+        </h2>
+        <ul class="space-y-2 text-sm">
+          {
+            exploreLinks.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="inline-flex items-center gap-1.5 text-fg-secondary transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <!-- Connect & Resources -->
+      <div class="space-y-3 lg:col-span-3">
+        <h2 class="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-fg-muted">
+          {t("footer.connect")}
+        </h2>
+        <ul class="space-y-2 text-sm">
+          {
+            socials.map((s) => (
+              <li>
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener me"
+                  class="inline-flex items-center gap-2 text-fg-secondary transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  <ContactIcon name={s.icon} class="size-3.5 shrink-0 opacity-80" />
+                  <span>{s.label}</span>
+                  <span aria-hidden="true" class="font-mono text-[0.6875rem] text-fg-muted">↗</span>
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a
+              href={cvUrl}
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 text-fg-secondary transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <ContactIcon name="cv" class="size-3.5 shrink-0 opacity-80" />
+              <span>{t("nav.cv")}</span>
+              <span aria-hidden="true" class="font-mono text-[0.6875rem] text-fg-muted">↗</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href={`${homePath[lang]}rss.xml`}
+              class="inline-flex items-center gap-2 font-mono text-xs text-fg-secondary transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <span aria-hidden="true" class="inline-block size-2 rounded-[1px] bg-accent-vivid"></span>
+              <span>{t("footer.rss")}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
+
+  <!-- Pixel-Art Nha Trang Beach Scene (Hon Tre Island, Sea Cable Car, Tram Huong Tower, Turquoise Sea & Coconut Palms) -->
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 1440 200"
+    preserveAspectRatio="xMidYMax slice"
+    shape-rendering="crispEdges"
+    class="pointer-events-none absolute inset-x-0 bottom-0 h-[190px] w-full select-none sm:h-[220px]"
+  >
+    <!-- Night Stars (dark mode only) -->
+    <g fill="var(--scene-star)">
+      <rect x="92" y="42" width="4" height="4" />
+      <rect x="240" y="54" width="4" height="4" />
+      <rect x="412" y="38" width="4" height="4" />
+      <rect x="580" y="48" width="4" height="4" />
+      <rect x="744" y="40" width="4" height="4" />
+      <rect x="916" y="52" width="4" height="4" />
+      <rect x="1072" y="42" width="4" height="4" />
+      <rect x="1332" y="46" width="4" height="4" />
+    </g>
+
+    <!-- Round Pixel Sun (light) / Crescent Moon (dark) -->
+    <g>
+      <!-- Stepped circular glow -->
+      <rect x="1164" y="36" width="24" height="4" fill="var(--scene-celestial-glow)" />
+      <rect x="1156" y="40" width="40" height="4" fill="var(--scene-celestial-glow)" />
+      <rect x="1152" y="44" width="48" height="32" fill="var(--scene-celestial-glow)" />
+      <rect x="1156" y="76" width="40" height="4" fill="var(--scene-celestial-glow)" />
+      <rect x="1164" y="80" width="24" height="4" fill="var(--scene-celestial-glow)" />
+      <!-- Round 10x10 pixel sun disc -->
+      <rect x="1168" y="40" width="16" height="4" fill="var(--scene-celestial)" />
+      <rect x="1164" y="44" width="24" height="4" fill="var(--scene-celestial)" />
+      <rect x="1160" y="48" width="32" height="4" fill="var(--scene-celestial)" />
+      <rect x="1156" y="52" width="40" height="16" fill="var(--scene-celestial)" />
+      <rect x="1160" y="68" width="32" height="4" fill="var(--scene-celestial)" />
+      <rect x="1164" y="72" width="24" height="4" fill="var(--scene-celestial)" />
+      <rect x="1168" y="76" width="16" height="4" fill="var(--scene-celestial)" />
+      <!-- Stepped crescent cutout (dark mode only) -->
+      <rect x="1176" y="40" width="16" height="4" class="site-footer-moon-cut" />
+      <rect x="1172" y="44" width="24" height="16" class="site-footer-moon-cut" />
+      <rect x="1176" y="60" width="20" height="4" class="site-footer-moon-cut" />
+      <rect x="1180" y="64" width="12" height="4" class="site-footer-moon-cut" />
+    </g>
+
+    <!-- Soft Pixel Clouds -->
+    <g>
+      <rect x="164" y="54" width="68" height="12" fill="var(--scene-cloud)" />
+      <rect x="180" y="46" width="36" height="8" fill="var(--scene-cloud)" />
+      <rect x="152" y="62" width="92" height="8" fill="var(--scene-cloud)" />
+      <rect x="164" y="66" width="68" height="4" fill="var(--scene-cloud-shade)" />
+
+      <rect x="780" y="48" width="80" height="12" fill="var(--scene-cloud)" />
+      <rect x="796" y="40" width="44" height="8" fill="var(--scene-cloud)" />
+      <rect x="768" y="56" width="104" height="8" fill="var(--scene-cloud)" />
+      <rect x="780" y="60" width="80" height="4" fill="var(--scene-cloud-shade)" />
+    </g>
+
+    <!-- Distant Nha Trang Bay Islands (Hon Tre & Hon Mieu) -->
+    <path
+      fill="var(--scene-island)"
+      d="
+        M0 104 H44 V96 H88 V88 H140 V82 H204 V88 H252 V96 H308 V104 H560 V96 H616 V86 H680 V78 H768 V86 H840 V94 H904 V104 H1072 V96 H1128 V88 H1216 V78 H1304 V86 H1372 V96 H1440 V112 H0 Z
+      "
+    />
+    <path
+      fill="var(--scene-island-shade)"
+      d="
+        M88 104 H140 V96 H196 V104 H640 V96 H740 V104 H1160 V96 H1280 V104 H1440 V112 H0 V104 Z
+      "
+    />
+
+    <!-- Iconic Nha Trang Sea-Crossing Cable Car Pylons & Cabins -->
+    <g>
+      <path d="M510 68 Q660 78 810 66 Q960 78 1110 68" fill="none" stroke="var(--scene-cable)" stroke-width="2" />
+      <!-- Pylon 1 -->
+      <rect x="506" y="66" width="8" height="4" fill="var(--scene-pylon)" />
+      <rect x="508" y="70" width="4" height="38" fill="var(--scene-pylon)" />
+      <rect x="504" y="100" width="12" height="8" fill="var(--scene-pylon)" />
+      <rect x="508" y="62" width="4" height="4" fill="var(--scene-beacon)" />
+      <!-- Pylon 2 -->
+      <rect x="806" y="64" width="8" height="4" fill="var(--scene-pylon)" />
+      <rect x="808" y="68" width="4" height="40" fill="var(--scene-pylon)" />
+      <rect x="804" y="100" width="12" height="8" fill="var(--scene-pylon)" />
+      <rect x="808" y="60" width="4" height="4" fill="var(--scene-beacon)" />
+      <!-- Pylon 3 -->
+      <rect x="1106" y="66" width="8" height="4" fill="var(--scene-pylon)" />
+      <rect x="1108" y="70" width="4" height="38" fill="var(--scene-pylon)" />
+      <rect x="1104" y="100" width="12" height="8" fill="var(--scene-pylon)" />
+      <rect x="1108" y="62" width="4" height="4" fill="var(--scene-beacon)" />
+      <!-- Cable cabins -->
+      <rect x="652" y="72" width="10" height="6" fill="var(--scene-beacon)" />
+      <rect x="954" y="72" width="10" height="6" fill="var(--scene-beacon)" />
+    </g>
+
+    <!-- Turquoise Nha Trang Ocean Layers -->
+    <rect x="0" y="108" width="1440" height="18" fill="var(--scene-sea-far)" />
+    <rect x="0" y="126" width="1440" height="20" fill="var(--scene-sea-mid)" />
+    <rect x="0" y="146" width="1440" height="16" fill="var(--scene-sea-near)" />
+
+    <!-- Pixel Sun/Moon Shimmer & Gentle Wave Highlights on the Water -->
+    <g fill="var(--scene-shimmer)">
+      <rect x="1152" y="112" width="48" height="4" />
+      <rect x="1160" y="120" width="32" height="4" />
+      <rect x="1148" y="132" width="56" height="4" />
+      <rect x="1164" y="142" width="24" height="4" />
+      <rect x="1156" y="152" width="40" height="4" />
+      <rect x="140" y="120" width="28" height="4" opacity="0.55" />
+      <rect x="332" y="136" width="36" height="4" opacity="0.6" />
+      <rect x="520" y="124" width="24" height="4" opacity="0.5" />
+      <rect x="696" y="142" width="44" height="4" opacity="0.6" />
+      <rect x="908" y="128" width="32" height="4" opacity="0.55" />
+      <rect x="1312" y="138" width="36" height="4" opacity="0.55" />
+    </g>
+
+    <!-- Small Pixel Fishing Boat on Nha Trang Bay -->
+    <g>
+      <rect x="404" y="128" width="32" height="6" fill="var(--scene-boat)" />
+      <rect x="408" y="134" width="24" height="4" fill="var(--scene-boat)" />
+      <rect x="418" y="112" width="4" height="16" fill="var(--scene-boat)" />
+      <rect x="422" y="114" width="12" height="4" fill="var(--scene-sail)" />
+      <rect x="422" y="118" width="16" height="6" fill="var(--scene-sail)" />
+    </g>
+
+    <!-- Stepped White Pixel Wave Foam along Shoreline -->
+    <path
+      fill="var(--scene-foam)"
+      d="
+        M0 160 H96 V156 H184 V160 H288 V156 H404 V160 H528 V156 H648 V160 H776 V156 H896 V160 H1024 V156 H1148 V160 H1272 V156 H1376 V160 H1440 V168 H0 Z
+      "
+    />
+
+    <!-- Golden Nha Trang Sandy Beach -->
+    <path
+      fill="var(--scene-sand)"
+      d="
+        M0 166 H120 V162 H240 V166 H420 V164 H620 V168 H840 V164 H1040 V166 H1240 V162 H1360 V166 H1440 V200 H0 Z
+      "
+    />
+    <rect x="0" y="182" width="1440" height="18" fill="var(--scene-sand-shade)" />
+
+    <!-- Iconic Thap Tram Huong (Tram Huong Lotus Tower) on Tran Phu Beachfront -->
+    <g>
+      <rect x="976" y="160" width="44" height="12" fill="var(--scene-tower-base)" />
+      <rect x="982" y="148" width="32" height="12" fill="var(--scene-tower-base)" />
+      <rect x="986" y="124" width="24" height="24" fill="var(--scene-tower-lotus)" />
+      <rect x="982" y="130" width="4" height="14" fill="var(--scene-tower-lotus)" />
+      <rect x="1010" y="130" width="4" height="14" fill="var(--scene-tower-lotus)" />
+      <rect x="990" y="112" width="16" height="12" fill="var(--scene-tower-lotus)" />
+      <rect x="994" y="116" width="8" height="8" fill="var(--scene-tower-glow)" />
+      <rect x="994" y="102" width="8" height="10" fill="var(--scene-tower-lotus)" />
+      <rect x="996" y="96" width="4" height="6" fill="var(--scene-tower-glow)" />
+    </g>
+
+    <!-- Coconut Palm Tree (Left Beachfront) -->
+    <g>
+      <rect x="86" y="172" width="10" height="14" fill="var(--scene-trunk)" />
+      <rect x="88" y="156" width="8" height="16" fill="var(--scene-trunk)" />
+      <rect x="92" y="140" width="8" height="16" fill="var(--scene-trunk)" />
+      <rect x="96" y="124" width="8" height="16" fill="var(--scene-trunk)" />
+      <rect x="100" y="110" width="8" height="14" fill="var(--scene-trunk)" />
+      <rect x="76" y="102" width="24" height="8" fill="var(--scene-palm)" />
+      <rect x="64" y="108" width="16" height="6" fill="var(--scene-palm-dark)" />
+      <rect x="104" y="98" width="28" height="8" fill="var(--scene-palm)" />
+      <rect x="128" y="104" width="16" height="6" fill="var(--scene-palm-dark)" />
+      <rect x="88" y="92" width="24" height="8" fill="var(--scene-palm)" />
+      <rect x="108" y="108" width="22" height="6" fill="var(--scene-palm-dark)" />
+      <rect x="78" y="112" width="18" height="6" fill="var(--scene-palm-dark)" />
+    </g>
+
+    <!-- Second Smaller Coconut Palm (Left-Inner) -->
+    <g>
+      <rect x="150" y="176" width="8" height="10" fill="var(--scene-trunk)" />
+      <rect x="148" y="164" width="8" height="12" fill="var(--scene-trunk)" />
+      <rect x="144" y="152" width="8" height="12" fill="var(--scene-trunk)" />
+      <rect x="140" y="140" width="8" height="12" fill="var(--scene-trunk)" />
+      <rect x="122" y="134" width="20" height="6" fill="var(--scene-palm)" />
+      <rect x="144" y="132" width="22" height="6" fill="var(--scene-palm)" />
+      <rect x="132" y="126" width="18" height="6" fill="var(--scene-palm)" />
+      <rect x="116" y="140" width="12" height="4" fill="var(--scene-palm-dark)" />
+      <rect x="160" y="138" width="12" height="4" fill="var(--scene-palm-dark)" />
+    </g>
+
+    <!-- Coconut Palm Tree (Right Beachfront) -->
+    <g>
+      <rect x="1336" y="172" width="10" height="14" fill="var(--scene-trunk)" />
+      <rect x="1334" y="156" width="8" height="16" fill="var(--scene-trunk)" />
+      <rect x="1330" y="140" width="8" height="16" fill="var(--scene-trunk)" />
+      <rect x="1326" y="124" width="8" height="16" fill="var(--scene-trunk)" />
+      <rect x="1322" y="110" width="8" height="14" fill="var(--scene-trunk)" />
+      <rect x="1328" y="102" width="26" height="8" fill="var(--scene-palm)" />
+      <rect x="1350" y="108" width="16" height="6" fill="var(--scene-palm-dark)" />
+      <rect x="1296" y="98" width="28" height="8" fill="var(--scene-palm)" />
+      <rect x="1284" y="104" width="16" height="6" fill="var(--scene-palm-dark)" />
+      <rect x="1312" y="92" width="24" height="8" fill="var(--scene-palm)" />
+      <rect x="1298" y="108" width="22" height="6" fill="var(--scene-palm-dark)" />
+      <rect x="1332" y="112" width="18" height="6" fill="var(--scene-palm-dark)" />
+    </g>
+  </svg>
 </footer>
 
+<!-- Floating Back-to-Top Button -->
+<button
+  type="button"
+  data-back-to-top
+  data-visible="false"
+  aria-label={t("footer.top")}
+  title={t("footer.top")}
+  aria-hidden="true"
+  tabindex="-1"
+  class="fixed right-5 bottom-[max(1.25rem,env(safe-area-inset-bottom))] z-30 inline-flex size-10 items-center justify-center rounded-full border border-border-strong bg-surface-elevated/90 text-fg-secondary shadow-[0_8px_24px_-8px_rgba(0,0,0,0.22)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent data-[visible=false]:pointer-events-none data-[visible=false]:translate-y-2 data-[visible=false]:opacity-0 data-[visible=true]:pointer-events-auto data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100 motion-reduce:transition-none sm:right-6 sm:bottom-6 dark:shadow-[0_10px_28px_-8px_rgba(0,0,0,0.7)]"
+>
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class="size-4"
+  >
+    <path d="M12 19V5" />
+    <path d="m5 12 7-7 7 7" />
+  </svg>
+</button>
+
 <script>
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  document.addEventListener("click", (e) => {
-    if (!(e.target instanceof Element)) return;
-    if (!e.target.closest("[data-back-to-top]")) return;
-    window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
-  });
+  const SHOW_AFTER_PX = 320;
+  let bound = false;
+
+  function syncBackToTop() {
+    const btn = document.querySelector<HTMLButtonElement>("[data-back-to-top]");
+    if (!btn) return;
+    const visible = window.scrollY > SHOW_AFTER_PX;
+    btn.dataset.visible = String(visible);
+    btn.setAttribute("aria-hidden", String(!visible));
+    btn.tabIndex = visible ? 0 : -1;
+  }
+
+  function initBackToTop() {
+    syncBackToTop();
+    if (bound) return;
+    bound = true;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    window.addEventListener("scroll", syncBackToTop, { passive: true });
+    document.addEventListener("click", (e) => {
+      if (!(e.target instanceof Element)) return;
+      if (!e.target.closest("[data-back-to-top]")) return;
+      window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
+    });
+  }
+
+  initBackToTop();
+  document.addEventListener("astro:page-load", initBackToTop);
 </script>

@@ -1,0 +1,967 @@
+---
+import chibiAntigravity from "../assets/chibi-antigravity-sheet.webp";
+import chibiClaude from "../assets/chibi-claude-sheet.webp";
+import chibiCodex from "../assets/chibi-codex-sheet.webp";
+import chibiDuy from "../assets/chibi-duy-sheet.webp";
+import chibiOpencode from "../assets/chibi-opencode-sheet.webp";
+import officeDark from "../assets/mascot-office-dark.webp";
+import officeDarkSm from "../assets/mascot-office-dark-sm.webp";
+import officeDesksDark from "../assets/mascot-office-desks-dark.webp";
+import officeDesksLight from "../assets/mascot-office-desks-light.webp";
+import officeLight from "../assets/mascot-office-light.webp";
+import officeLightSm from "../assets/mascot-office-light-sm.webp";
+import posterDark from "../assets/mascot-office-poster-dark.webp";
+import posterDarkSm from "../assets/mascot-office-poster-dark-sm.webp";
+import posterLight from "../assets/mascot-office-poster-light.webp";
+import posterLightSm from "../assets/mascot-office-poster-light-sm.webp";
+import { getLang, type Lang } from "../i18n/ui";
+
+const lang: Lang = getLang(Astro.currentLocale);
+const isVi = lang === "vi";
+
+type StationId = "duy" | "claude" | "codex" | "antigravity" | "opencode";
+
+interface StationConfig {
+  id: StationId;
+  name: string;
+  tag: string;
+  ariaLabel: string;
+  /** Center X (%) of the character head for bubble & mobile camera targeting */
+  anchorX: number;
+  /** Top Y (%) of the mascot/logo where the speech bubble tail should point */
+  anchorY: number;
+  /** Animated 4-frame sprite sheet & exact placement (%) inside 960x306 isometric canvas */
+  sprite: {
+    src: string;
+    kind: "chibi" | "logo";
+    sheetW: number;
+    sheetH: number;
+    layer: "back" | "front";
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  };
+  /** Clickable desk/character hotspot box (%) in 1280x408 canvas space */
+  box: { left: number; top: number; width: number; height: number };
+  /** Floor spotlight center in 1280x408 SVG coords */
+  spot: { cx: number; cy: number; rx: number; ry: number };
+  /** Ambient monitor/lamp glow point in 1280x408 SVG coords */
+  glow: { cx: number; cy: number; r: number };
+  /** SVG signal path from Duy's Lead Desk to this agent (omitted for Duy) */
+  route?: string;
+  quotes: string[];
+}
+
+const stations: StationConfig[] = [
+  {
+    id: "claude",
+    name: "Claude",
+    tag: "Claude · UI",
+    ariaLabel: isVi
+      ? "Trạm Claude: Kiến trúc, React, Astro và Refactor UI. Bấm để xem nhiệm vụ."
+      : "Claude station: Architecture, React, Astro and UI refactoring. Click to inspect.",
+    anchorX: 14.2,
+    anchorY: 40,
+    sprite: {
+      src: chibiClaude.src,
+      kind: "chibi",
+      sheetW: 1024,
+      sheetH: 256,
+      layer: "front",
+      left: 6.88,
+      top: 37.58,
+      width: 15.42,
+      height: 48.37,
+    },
+    box: { left: 2, top: 38, width: 18.5, height: 55 },
+    spot: { cx: 148, cy: 332, rx: 105, ry: 34 },
+    glow: { cx: 136, cy: 198, r: 44 },
+    route: "M 546 292 C 425 344, 286 336, 206 278",
+    quotes: isVi
+      ? [
+          "Tách component React/Astro gọn, giữ token light/dark đồng nhất.",
+          "Dựng layout mới xong, kiểm đủ a11y và bàn phím mọi state.",
+          "Refactor luồng state phức tạp, cắt 40% code lặp.",
+        ]
+      : [
+          "Split React & Astro UI with unified light/dark tokens.",
+          "Shipped the layout with full keyboard and ARIA states.",
+          "Refactored UI state and cut 40% redundant code.",
+        ],
+  },
+  {
+    id: "codex",
+    name: "Codex",
+    tag: "Codex · API",
+    ariaLabel: isVi
+      ? "Trạm Codex: Backend Node.js, GraphQL, PostgreSQL và viết Test song song. Bấm để xem nhiệm vụ."
+      : "Codex station: Node.js backend, GraphQL, PostgreSQL and parallel tests. Click to inspect.",
+    anchorX: 27.6,
+    anchorY: 28,
+    sprite: {
+      src: chibiCodex.src,
+      kind: "chibi",
+      sheetW: 1024,
+      sheetH: 256,
+      layer: "back",
+      left: 22.4,
+      top: 26.8,
+      width: 10.47,
+      height: 32.84,
+    },
+    box: { left: 21, top: 31, width: 18.5, height: 57 },
+    spot: { cx: 388, cy: 294, rx: 104, ry: 34 },
+    glow: { cx: 416, cy: 168, r: 44 },
+    route: "M 548 272 C 488 268, 446 254, 404 238",
+    quotes: isVi
+      ? [
+          "Xong schema GraphQL + Postgres, 42 unit test xanh hết.",
+          "Chạy CLI trên worktree riêng, không đụng git index.",
+          "Tối ưu query BFF Node.js, p95 giảm còn 34ms.",
+        ]
+      : [
+          "GraphQL & Postgres migration done; 42 unit tests green.",
+          "CLI task finished in an isolated git worktree.",
+          "Tuned Node.js BFF queries; p95 dropped to 34ms.",
+        ],
+  },
+  {
+    id: "duy",
+    name: "Duy",
+    tag: isVi ? "Duy · Điều phối" : "Duy · Lead",
+    ariaLabel: isVi
+      ? "Bàn chỉ huy của Bùi Khương Duy: điều phối song song 4 AI agent. Bấm để xem quy trình."
+      : "Bui Khuong Duy Lead Desk: orchestrating 4 AI agents in parallel. Click to inspect.",
+    anchorX: 50.4,
+    anchorY: 44,
+    sprite: {
+      src: chibiDuy.src,
+      kind: "chibi",
+      sheetW: 1024,
+      sheetH: 256,
+      layer: "back",
+      left: 45.16,
+      top: 41.67,
+      width: 10.47,
+      height: 32.84,
+    },
+    box: { left: 40, top: 38, width: 20.5, height: 61 },
+    spot: { cx: 642, cy: 334, rx: 132, ry: 38 },
+    glow: { cx: 726, cy: 222, r: 54 },
+    quotes: isVi
+      ? [
+          "Chia spec, đẩy 4 agent chạy song song trên git worktree.",
+          "Review diff, chạy eval rồi mới chốt merge vào main.",
+          "UI, API, E2E với diff CLI chạy cùng lúc trong 1 sprint.",
+        ]
+      : [
+          "Split the spec; run 4 agents across git worktrees.",
+          "Review diffs, check evals, then merge the best PR.",
+          "UI, API, E2E, and CLI diffs run in parallel.",
+        ],
+  },
+  {
+    id: "antigravity",
+    name: "Antigravity",
+    tag: "Antigravity · QA",
+    ariaLabel: isVi
+      ? "Trạm Antigravity: Điều phối workflow, kiểm thử trình duyệt E2E và Lighthouse CI. Bấm để xem nhiệm vụ."
+      : "Antigravity station: Workflow orchestration, browser E2E and Lighthouse CI. Click to inspect.",
+    anchorX: 69.0,
+    anchorY: 36,
+    sprite: {
+      src: chibiAntigravity.src,
+      kind: "chibi",
+      sheetW: 1024,
+      sheetH: 256,
+      layer: "front",
+      left: 61.15,
+      top: 33.99,
+      width: 15.63,
+      height: 49.02,
+    },
+    box: { left: 61.5, top: 31, width: 18.5, height: 57 },
+    spot: { cx: 896, cy: 300, rx: 108, ry: 35 },
+    glow: { cx: 886, cy: 306, r: 44 },
+    route: "M 736 272 C 796 268, 838 254, 880 238",
+    quotes: isVi
+      ? [
+          "So ảnh desktop + mobile xong, Lighthouse CI đạt 100×4.",
+          "Chạy đủ luồng E2E trên browser thật, 0 lỗi console.",
+          "Nối MCP kiểm build & preview gọn dưới 30 giây.",
+        ]
+      : [
+          "Verified desktop & mobile; Lighthouse CI hits 100×4.",
+          "Ran full browser E2E flows with zero console errors.",
+          "Wired MCP checks to build and verify in under 30s.",
+        ],
+  },
+  {
+    id: "opencode",
+    name: "OpenCode",
+    tag: "OpenCode · CLI",
+    ariaLabel: isVi
+      ? "Trạm OpenCode: Coding agent mã nguồn mở trên terminal, kết nối ACP và review diff. Bấm để xem nhiệm vụ."
+      : "OpenCode station: Open-source terminal coding agent, ACP wiring and diff review. Click to inspect.",
+    anchorX: 90.6,
+    anchorY: 35,
+    sprite: {
+      src: chibiOpencode.src,
+      kind: "chibi",
+      sheetW: 1024,
+      sheetH: 256,
+      layer: "back",
+      left: 85.4,
+      top: 33.5,
+      width: 10.47,
+      height: 32.84,
+    },
+    box: { left: 80.5, top: 35, width: 18, height: 58 },
+    spot: { cx: 1138, cy: 326, rx: 106, ry: 34 },
+    glow: { cx: 1110, cy: 192, r: 44 },
+    route: "M 738 292 C 858 344, 996 336, 1076 278",
+    quotes: isVi
+      ? [
+          "Đổi model nhanh qua ACP, rà diff toàn bộ PR trên terminal.",
+          "Quét codebase bằng LSP, gom đủ edge-case trước khi mở PR.",
+          "Tách worktree chạy patch song song, không đụng nhánh chính.",
+        ]
+      : [
+          "Switched models over ACP; reviewed the full PR diff in TUI.",
+          "Scanned the codebase via LSP and caught edge cases early.",
+          "Ran parallel patches in a worktree without touching main.",
+        ],
+  },
+];
+
+const backChibis = stations.filter((s) => s.sprite.layer === "back");
+const frontChibis = stations.filter((s) => s.sprite.layer === "front");
+
+const cycleOrder: StationId[] = ["duy", "claude", "codex", "antigravity", "opencode"];
+const mobileOrder: StationId[] = ["duy", "claude", "codex", "antigravity", "opencode"];
+
+const initialStation = stations.find((s) => s.id === "duy")!;
+const stationById = Object.fromEntries(stations.map((s) => [s.id, s])) as Record<StationId, StationConfig>;
+
+const stageData = stations.map((s) => ({
+  id: s.id,
+  tag: s.tag,
+  anchorX: s.anchorX,
+  anchorY: s.anchorY,
+  quotes: s.quotes,
+}));
+
+const assetUrls = {
+  posterLight: posterLight.src,
+  posterLightSm: posterLightSm.src,
+  posterDark: posterDark.src,
+  posterDarkSm: posterDarkSm.src,
+  emptyLight: officeLight.src,
+  emptyLightSm: officeLightSm.src,
+  emptyDark: officeDark.src,
+  emptyDarkSm: officeDarkSm.src,
+  desksLight: officeDesksLight.src,
+  desksDark: officeDesksDark.src,
+};
+
+const posterSizes = "(max-width: 767px) 480px, 1088px";
+const posterLightSrcset = `${posterLightSm.src} 960w, ${posterLight.src} 1376w`;
+const posterDarkSrcset = `${posterDarkSm.src} 960w, ${posterDark.src} 1376w`;
+
+const stageLabel = isVi
+  ? "Văn phòng AI-Native của Bùi Khương Duy điều phối 4 agent: Claude, Codex, Antigravity và OpenCode"
+  : "Bui Khuong Duy's AI-Native studio orchestrating 4 agents: Claude, Codex, Antigravity, and OpenCode";
+
+const bubbleAria = isVi
+  ? "Nhật ký điều phối AI agent, bấm để chuyển sang trạm tiếp theo"
+  : "AI agent orchestration bubble, click to switch to the next station";
+
+const mobileNavLabel = isVi ? "Chọn trạm AI agent trong văn phòng" : "Select an AI agent station in the studio";
+---
+
+<div
+  data-hero-mascot
+  data-active-station="duy"
+  data-stations={JSON.stringify(stageData)}
+  data-cycle={JSON.stringify(cycleOrder)}
+  data-assets={JSON.stringify(assetUrls)}
+  role="region"
+  aria-label={stageLabel}
+  class="office-root relative w-full select-none bg-bg"
+>
+  <!-- Isometric 2.5D Pixel Art Studio Viewport -->
+  <div
+    data-office-viewport
+    class="office-viewport relative h-[14.25rem] w-full overflow-hidden sm:h-[16.5rem] lg:h-auto lg:aspect-[1280/408]"
+  >
+    <!-- Pure-CSS centered 1280:408 Isometric Canvas (zero JS layout writes; pans cleanly via transform on mobile) -->
+    <div
+      data-office-canvas
+      class="office-canvas relative left-1/2 h-full w-[calc(14.25rem*1280/408)] sm:w-[calc(16.5rem*1280/408)] lg:w-full"
+    >
+      <!-- Instant Frame-1 Static Poster (single high-priority LCP image; sync decode paints with FCP) -->
+      <picture data-office-poster-wrap class="office-poster pointer-events-none absolute inset-0 z-[1] block size-full">
+        <source data-office-poster-source media="(prefers-color-scheme: dark)" srcset={posterDarkSrcset} sizes={posterSizes} />
+        <img
+          data-office-poster
+          src={posterLight.src}
+          srcset={posterLightSrcset}
+          sizes={posterSizes}
+          alt=""
+          width="1376"
+          height="438"
+          decoding="sync"
+          fetchpriority="high"
+          aria-hidden="true"
+          class="block size-full object-fill"
+        />
+      </picture>
+
+      <!-- Live Animated Scene Layers (populated after page idle & pre-decoded in memory for zero-flicker swap) -->
+      <div data-office-live-layers aria-hidden="true" class="office-live-layers pointer-events-none absolute inset-0 z-[2]">
+        <!-- Empty Room Background -->
+        <img
+          data-office-empty
+          alt=""
+          width="1376"
+          height="438"
+          decoding="async"
+          class="pointer-events-none absolute inset-0 size-full object-fill"
+        />
+
+        <!-- Animated Chibi Mascots seated BEHIND desks (Codex, Duy, OpenCode) -->
+        {
+          backChibis.map((s) => (
+            <div
+              data-office-chibi={s.id}
+              data-sprite-kind={s.sprite.kind}
+              data-sprite-src={s.sprite.src}
+              style={`left:${s.sprite.left}%;top:${s.sprite.top}%;width:${s.sprite.width}%;height:${s.sprite.height}%;`}
+              class={`office-chibi office-chibi-${s.id} office-kind-${s.sprite.kind} pointer-events-none absolute z-[2]`}
+            >
+              <span class="office-chibi-frame block size-full overflow-hidden">
+                <img
+                  data-chibi-img
+                  alt=""
+                  width={s.sprite.sheetW}
+                  height={s.sprite.sheetH}
+                  decoding="async"
+                  class="office-chibi-strip block h-full w-[400%] max-w-none"
+                />
+              </span>
+            </div>
+          ))
+        }
+
+        <!-- Foreground Desk & Monitor Occlusion Cutouts (bottom 58.90% band only) -->
+        <img
+          data-office-desks
+          alt=""
+          width="1376"
+          height="258"
+          decoding="async"
+          class="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[58.9041%] w-full object-fill"
+        />
+
+        <!-- Animated Chibi Mascots seated IN FRONT of desks (Claude, Antigravity) -->
+        {
+          frontChibis.map((s) => (
+            <div
+              data-office-chibi={s.id}
+              data-sprite-kind={s.sprite.kind}
+              data-sprite-src={s.sprite.src}
+              style={`left:${s.sprite.left}%;top:${s.sprite.top}%;width:${s.sprite.width}%;height:${s.sprite.height}%;`}
+              class={`office-chibi office-chibi-${s.id} office-kind-${s.sprite.kind} pointer-events-none absolute z-[4]`}
+            >
+              <span class="office-chibi-frame block size-full overflow-hidden">
+                <img
+                  data-chibi-img
+                  alt=""
+                  width={s.sprite.sheetW}
+                  height={s.sprite.sheetH}
+                  decoding="async"
+                  class="office-chibi-strip block h-full w-[400%] max-w-none"
+                />
+              </span>
+            </div>
+          ))
+        }
+      </div>
+
+      <!-- Subtle rising coffee steam above Duy's mug -->
+      <div aria-hidden="true" class="office-steam pointer-events-none absolute left-[47.1%] top-[61%] z-[5] h-5 w-3">
+        <span class="office-steam-wisp office-steam-1"></span>
+        <span class="office-steam-wisp office-steam-2"></span>
+      </div>
+
+      <!-- Coordinate-Aligned SVG Orchestration Layer (Zero-filter GPU gradients & crisp signal routes) -->
+      <svg
+        viewBox="0 0 1280 408"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        class="office-svg pointer-events-none absolute inset-0 z-[5] size-full"
+      >
+        <defs>
+          <radialGradient id="office-grad-duy">
+            <stop offset="0%" stop-color="var(--accent-vivid)" stop-opacity="0.7" />
+            <stop offset="100%" stop-color="var(--accent-vivid)" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="office-grad-claude">
+            <stop offset="0%" stop-color="#D97757" stop-opacity="0.7" />
+            <stop offset="100%" stop-color="#D97757" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="office-grad-codex">
+            <stop offset="0%" stop-color="#10B981" stop-opacity="0.7" />
+            <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="office-grad-antigravity">
+            <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.75" />
+            <stop offset="100%" stop-color="#6366F1" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="office-grad-opencode">
+            <stop offset="0%" stop-color="#A1A1AA" stop-opacity="0.65" />
+            <stop offset="100%" stop-color="#A1A1AA" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+
+        <!-- Soft floor spotlight beneath each station -->
+        {
+          stations.map((s) => (
+            <ellipse
+              data-office-spot={s.id}
+              cx={s.spot.cx}
+              cy={s.spot.cy}
+              rx={s.spot.rx}
+              ry={s.spot.ry}
+              fill={`url(#office-grad-${s.id})`}
+              class="office-spot"
+            />
+          ))
+        }
+
+        <!-- Orchestration signal routes connecting Duy's Lead Desk to each of the 4 AI agents -->
+        {
+          stations
+            .filter((s) => Boolean(s.route))
+            .map((s) => (
+              <g data-office-route={s.id} class={`office-route office-theme-${s.id}`}>
+                <path
+                  d={s.route}
+                  fill="none"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-dasharray="4 6"
+                  class="office-route-base"
+                />
+                <path
+                  d={s.route}
+                  fill="none"
+                  stroke-width="4.5"
+                  stroke-linecap="round"
+                  class="office-route-glow"
+                />
+                <path
+                  d={s.route}
+                  fill="none"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  class="office-route-active"
+                />
+                <path
+                  d={s.route}
+                  pathLength="100"
+                  fill="none"
+                  stroke-width="6"
+                  stroke-linecap="round"
+                  stroke-dasharray="16 110"
+                  class="office-route-pulse-glow"
+                />
+                <path
+                  d={s.route}
+                  pathLength="100"
+                  fill="none"
+                  stroke-width="2.75"
+                  stroke-linecap="round"
+                  stroke-dasharray="16 110"
+                  class="office-route-pulse"
+                />
+              </g>
+            ))
+        }
+
+        <!-- Central Hub Node at Duy's Lead Desk -->
+        <circle cx="642" cy="282" r="4" class="office-hub-node" />
+      </svg>
+
+      <!-- Interactive Station Hotspots with Integrated Crisp Desk Nameplates -->
+      {
+        stations.map((s) => {
+          const isInitial = s.id === "duy";
+          return (
+            <button
+              type="button"
+              data-office-station={s.id}
+              aria-label={s.ariaLabel}
+              aria-pressed={isInitial ? "true" : "false"}
+              style={`left:${s.box.left}%;top:${s.box.top}%;width:${s.box.width}%;height:${s.box.height}%;`}
+              class={`office-hotspot office-theme-${s.id} group absolute z-10 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent`}
+            >
+              <span
+                aria-hidden="true"
+                class="office-badge pointer-events-none absolute bottom-1.5 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border px-2 py-0.5 font-mono text-[0.625rem] font-medium shadow-xs transition-colors duration-200 sm:bottom-2 sm:px-2.5 sm:text-[0.6875rem]"
+              >
+                <span class="office-badge-dot relative flex size-1.5 shrink-0">
+                  <span class="office-badge-ping absolute inline-flex h-full w-full rounded-full opacity-0"></span>
+                  <span class="office-badge-core relative inline-flex size-1.5 rounded-full"></span>
+                </span>
+                <span>{s.name}</span>
+              </span>
+            </button>
+          );
+        })
+      }
+    </div>
+
+    <!-- Subtle top vignette so floating speech bubble stays legible over bright daylight sky -->
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 top-0 z-10 h-14 bg-gradient-to-b from-bg/50 to-transparent"
+    ></div>
+
+    <!-- Single Active Speech Bubble (anchored at left: 50%; pure transform positioning for 0 CLS) -->
+    <button
+      type="button"
+      data-office-bubble
+      data-station="duy"
+      aria-label={bubbleAria}
+      style="transform: translate3d(-50%, 3.5rem, 0);"
+      class="office-bubble office-theme-duy group pointer-events-auto absolute top-0 left-1/2 z-20 inline-flex w-max max-w-[min(calc(100%-1.25rem),14.5rem)] flex-col items-start gap-1 rounded-xl border border-border-strong bg-surface-elevated/95 px-2.5 py-1.5 text-left shadow-sm transition-colors hover:border-accent/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:max-w-[16rem]"
+    >
+      <span
+        data-office-tag
+        class="office-bubble-tag shrink-0 rounded-md px-1.5 py-0.5 font-mono text-[0.625rem] font-semibold sm:text-[0.6875rem]"
+      >
+        {initialStation.tag}
+      </span>
+      <span
+        data-office-text
+        aria-live="polite"
+        class="text-pretty font-mono text-[0.6875rem] leading-snug text-fg-secondary sm:text-xs"
+      >
+        {initialStation.quotes[0]}
+      </span>
+      <span
+        data-office-tail
+        aria-hidden="true"
+        class="office-bubble-tail pointer-events-none absolute -bottom-[5px] left-1/2 size-2.5 -translate-x-1/2 rotate-45 border-r border-b border-border-strong bg-surface-elevated transition-colors group-hover:border-accent/60"
+      ></span>
+    </button>
+  </div>
+
+  <!-- Mobile / Compact Viewport Quick-Select Bar (single clean row, hidden on md+ where full panorama fits) -->
+  <div
+    role="group"
+    aria-label={mobileNavLabel}
+    class="flex flex-nowrap items-center justify-between gap-1 overflow-x-auto border-t border-border bg-surface/85 px-2 py-2 sm:justify-center sm:gap-2 sm:px-3 md:hidden"
+  >
+    {
+      mobileOrder.map((id) => {
+        const s = stationById[id];
+        const isInitial = id === "duy";
+        return (
+          <button
+            type="button"
+            data-office-pill={s.id}
+            aria-pressed={isInitial ? "true" : "false"}
+            class={`office-pill office-theme-${s.id} inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 font-mono text-[0.625rem] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:gap-1.5 sm:px-2.5 sm:text-[0.6875rem]`}
+          >
+            <span aria-hidden="true" class="office-pill-dot size-1.5 shrink-0 rounded-full"></span>
+            <span>{s.name}</span>
+          </button>
+        );
+      })
+    }
+  </div>
+</div>
+
+<script>
+  type StationId = "duy" | "claude" | "codex" | "antigravity" | "opencode";
+  type StationPayload = {
+    id: StationId;
+    tag: string;
+    anchorX: number;
+    anchorY: number;
+    quotes: string[];
+  };
+  type OfficeAssets = {
+    posterLight: string;
+    posterLightSm: string;
+    posterDark: string;
+    posterDarkSm: string;
+    emptyLight: string;
+    emptyLightSm: string;
+    emptyDark: string;
+    emptyDarkSm: string;
+    desksLight: string;
+    desksDark: string;
+  };
+
+  let officeCleanup: (() => void) | undefined;
+
+  function preloadImage(src: string): Promise<void> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.onload = () => {
+        if (typeof img.decode === "function") img.decode().catch(() => {}).finally(resolve);
+        else resolve();
+      };
+      img.onerror = () => resolve();
+      img.src = src;
+    });
+  }
+
+  function initHeroOffice() {
+    officeCleanup?.();
+    officeCleanup = undefined;
+
+    const root = document.querySelector<HTMLElement>("[data-hero-mascot]");
+    if (!root) return;
+
+    const viewport = root.querySelector<HTMLElement>("[data-office-viewport]");
+    const canvas = root.querySelector<HTMLElement>("[data-office-canvas]");
+    const bubble = root.querySelector<HTMLButtonElement>("[data-office-bubble]");
+    const tail = root.querySelector<HTMLElement>("[data-office-tail]");
+    const tagEl = root.querySelector<HTMLElement>("[data-office-tag]");
+    const textEl = root.querySelector<HTMLElement>("[data-office-text]");
+    const posterImg = root.querySelector<HTMLImageElement>("[data-office-poster]");
+    const posterSource = root.querySelector<HTMLSourceElement>("[data-office-poster-source]");
+    const emptyImg = root.querySelector<HTMLImageElement>("[data-office-empty]");
+    const desksImg = root.querySelector<HTMLImageElement>("[data-office-desks]");
+    if (!viewport || !canvas || !bubble || !tail || !tagEl || !textEl) return;
+
+    let stations: StationPayload[] = [];
+    let cycle: StationId[] = [];
+    let assets: OfficeAssets | undefined;
+    try {
+      stations = JSON.parse(root.dataset.stations ?? "[]");
+      cycle = JSON.parse(root.dataset.cycle ?? "[]");
+      assets = JSON.parse(root.dataset.assets ?? "{}");
+    } catch {
+      return;
+    }
+    if (stations.length === 0 || cycle.length === 0 || !assets) return;
+
+    const stationMap = new Map<StationId, StationPayload>(stations.map((s) => [s.id, s]));
+    const quoteCursor = new Map<StationId, number>(stations.map((s) => [s.id, 0]));
+
+    const hotspots = [...root.querySelectorAll<HTMLButtonElement>("[data-office-station]")];
+    const pills = [...root.querySelectorAll<HTMLButtonElement>("[data-office-pill]")];
+    const chibiNodes = [...root.querySelectorAll<HTMLElement>("[data-office-chibi]")];
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const canHover = window.matchMedia("(hover: hover)").matches;
+
+    let activeId: StationId = "duy";
+    let viewportW = viewport.clientWidth || 360;
+    let canvasW = canvas.clientWidth || viewportW;
+    let panDelta = 0;
+    let hovered = false;
+    let focusedInside = false;
+    let liveReady = false;
+    let liveLoading = false;
+    let autoTimer: number | undefined;
+    let resumeTimer: number | undefined;
+    let liveTimer: number | undefined;
+
+    const isDarkTheme = () => document.documentElement.classList.contains("dark");
+    const useHiResEmpty = () => window.innerWidth >= 768;
+
+    const getEmptyUrl = (dark: boolean) => {
+      if (!assets) return "";
+      if (dark) return useHiResEmpty() ? assets.emptyDark : assets.emptyDarkSm;
+      return useHiResEmpty() ? assets.emptyLight : assets.emptyLightSm;
+    };
+
+    const syncThemeImages = () => {
+      if (!assets) return;
+      const dark = isDarkTheme();
+      const targetPoster = dark ? assets.posterDark : assets.posterLight;
+      const targetPosterSm = dark ? assets.posterDarkSm : assets.posterLightSm;
+      const targetSrcset = `${targetPosterSm} 960w, ${targetPoster} 1376w`;
+      // Check currentSrc so <picture><source media="(prefers-color-scheme: dark)"> is never needlessly re-painted (preserves LCP)
+      if (posterImg && !posterImg.currentSrc.endsWith(targetPoster) && !posterImg.currentSrc.endsWith(targetPosterSm)) {
+        if (posterSource) posterSource.srcset = targetSrcset;
+        posterImg.srcset = targetSrcset;
+        posterImg.src = targetPoster;
+      }
+      if (liveReady) {
+        const targetEmpty = getEmptyUrl(dark);
+        const targetDesks = dark ? assets.desksDark : assets.desksLight;
+        if (emptyImg && emptyImg.getAttribute("src") !== targetEmpty) emptyImg.src = targetEmpty;
+        if (desksImg && desksImg.getAttribute("src") !== targetDesks) desksImg.src = targetDesks;
+      }
+    };
+
+    // Keep poster aligned with manual Light/Dark theme overrides immediately
+    syncThemeImages();
+
+    const activateLiveSprites = () => {
+      if (reduceMotion || liveReady || liveLoading || !assets || !root.isConnected) return;
+      liveLoading = true;
+
+      const dark = isDarkTheme();
+      const emptyUrl = getEmptyUrl(dark);
+      const desksUrl = dark ? assets.desksDark : assets.desksLight;
+      const spriteUrls = chibiNodes.map((n) => n.dataset.spriteSrc).filter(Boolean) as string[];
+
+      Promise.all([preloadImage(emptyUrl), preloadImage(desksUrl), ...spriteUrls.map(preloadImage)]).then(() => {
+        if (!root.isConnected) return;
+        const nowDark = isDarkTheme();
+        if (emptyImg) emptyImg.src = getEmptyUrl(nowDark);
+        if (desksImg) desksImg.src = nowDark ? assets!.desksDark : assets!.desksLight;
+        chibiNodes.forEach((node) => {
+          const img = node.querySelector<HTMLImageElement>("[data-chibi-img]");
+          const src = node.dataset.spriteSrc;
+          if (img && src) img.src = src;
+        });
+
+        liveReady = true;
+        requestAnimationFrame(() => {
+          if (!root.isConnected) return;
+          root.dataset.officeLive = "1";
+          root.dataset.officeMotion = "1";
+        });
+      });
+    };
+
+    const readGeometry = () => {
+      viewportW = viewport.clientWidth || 360;
+      canvasW = canvas.clientWidth || viewportW;
+    };
+
+    const updateCameraAndBubble = (enableMotion = true) => {
+      const station = stationMap.get(activeId);
+      if (!station) return;
+
+      readGeometry();
+
+      const maxPan = Math.max(0, (canvasW - viewportW) / 2);
+      if (maxPan > 1) {
+        const desiredDelta = (0.5 - station.anchorX / 100) * canvasW;
+        panDelta = Math.max(-maxPan, Math.min(maxPan, desiredDelta));
+      } else {
+        panDelta = 0;
+      }
+
+      if (enableMotion && !reduceMotion && !root.dataset.officeMotion) {
+        root.dataset.officeMotion = "1";
+      }
+
+      canvas.style.transform = `translate3d(calc(-50% + ${panDelta.toFixed(1)}px), 0, 0)`;
+
+      const viewportH = viewport.clientHeight || 228;
+      const onScreenX = viewportW / 2 + (station.anchorX / 100 - 0.5) * canvasW + panDelta;
+      const bubbleW = bubble.offsetWidth || 220;
+      const bubbleH = bubble.offsetHeight || 56;
+      const pad = 10;
+      const clampedLeft = Math.max(pad, Math.min(viewportW - bubbleW - pad, onScreenX - bubbleW / 2));
+      const offsetFromCenter = clampedLeft + bubbleW / 2 - viewportW / 2;
+      const tailLeft = Math.max(18, Math.min(bubbleW - 18, onScreenX - clampedLeft));
+      const anchorYPx = (station.anchorY / 100) * viewportH;
+      const clampedTop = Math.max(6, anchorYPx - bubbleH - 8);
+
+      bubble.style.transform = `translate3d(calc(-50% + ${offsetFromCenter.toFixed(1)}px), ${clampedTop.toFixed(1)}px, 0)`;
+      tail.style.left = `${tailLeft.toFixed(1)}px`;
+    };
+
+    const setActiveStation = (
+      id: StationId,
+      opts: { advanceQuote?: boolean; animateBubble?: boolean; animatePan?: boolean } = {},
+    ) => {
+      const station = stationMap.get(id);
+      if (!station) return;
+
+      const prevId = activeId;
+      activeId = id;
+      root.dataset.activeStation = id;
+      bubble.dataset.station = id;
+
+      bubble.classList.remove(
+        "office-theme-duy",
+        "office-theme-claude",
+        "office-theme-codex",
+        "office-theme-antigravity",
+        "office-theme-opencode",
+      );
+      bubble.classList.add(`office-theme-${id}`);
+
+      let idx = quoteCursor.get(id) ?? 0;
+      if (opts.advanceQuote) {
+        idx = (idx + 1) % station.quotes.length;
+        quoteCursor.set(id, idx);
+      }
+
+      tagEl.textContent = station.tag;
+      textEl.textContent = station.quotes[idx] ?? station.quotes[0] ?? "";
+
+      const syncPressed = (btn: HTMLButtonElement, btnId: string | undefined) => {
+        btn.setAttribute("aria-pressed", String(btnId === id));
+      };
+      hotspots.forEach((b) => syncPressed(b, b.dataset.officeStation));
+      pills.forEach((b) => syncPressed(b, b.dataset.officePill));
+
+      if (opts.animateBubble && !reduceMotion && (prevId !== id || opts.advanceQuote)) {
+        bubble.classList.remove("is-popping");
+        void bubble.offsetWidth;
+        bubble.classList.add("is-popping");
+      }
+
+      updateCameraAndBubble(opts.animatePan ?? true);
+    };
+
+    const stepCycle = () => {
+      const idx = cycle.indexOf(activeId);
+      const nextId = cycle[(idx + 1) % cycle.length] ?? "duy";
+      setActiveStation(nextId, { advanceQuote: true, animateBubble: true, animatePan: true });
+    };
+
+    const scheduleAuto = (delayMs = 5400) => {
+      clearTimeout(autoTimer);
+      autoTimer = window.setTimeout(() => {
+        if (!root.isConnected) return;
+        if (!document.hidden && !hovered && !focusedInside) {
+          stepCycle();
+        }
+        scheduleAuto(5400);
+      }, delayMs);
+    };
+
+    const onStationSelect = (id: StationId) => {
+      activateLiveSprites();
+      const isSame = id === activeId;
+      setActiveStation(id, { advanceQuote: isSame, animateBubble: true, animatePan: true });
+      scheduleAuto(7400);
+    };
+
+    const onStationHover = (id: StationId) => {
+      if (!canHover) return;
+      activateLiveSprites();
+      clearTimeout(resumeTimer);
+      hovered = true;
+      clearTimeout(autoTimer);
+      if (id !== activeId) {
+        setActiveStation(id, { advanceQuote: false, animateBubble: true, animatePan: true });
+      }
+    };
+
+    const onStageLeave = () => {
+      if (!canHover) return;
+      hovered = false;
+      clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        if (!hovered && !focusedInside && root.isConnected) {
+          scheduleAuto(4200);
+        }
+      }, 450);
+    };
+
+    const onBubbleClick = () => {
+      activateLiveSprites();
+      stepCycle();
+      scheduleAuto(7400);
+    };
+
+    const onBubbleEnter = () => {
+      if (!canHover) return;
+      activateLiveSprites();
+      clearTimeout(resumeTimer);
+      hovered = true;
+      clearTimeout(autoTimer);
+    };
+
+    const onFocusIn = () => {
+      focusedInside = true;
+      clearTimeout(autoTimer);
+    };
+
+    const onFocusOut = (e: FocusEvent) => {
+      if (!root.contains(e.relatedTarget as Node | null)) {
+        focusedInside = false;
+        scheduleAuto(5000);
+      }
+    };
+
+    const cleanups: Array<() => void> = [];
+    const bind = <K extends keyof HTMLElementEventMap>(
+      el: HTMLElement,
+      type: K,
+      fn: (ev: HTMLElementEventMap[K]) => void,
+    ) => {
+      el.addEventListener(type, fn as EventListener);
+      cleanups.push(() => el.removeEventListener(type, fn as EventListener));
+    };
+
+    hotspots.forEach((btn) => {
+      const id = btn.dataset.officeStation as StationId | undefined;
+      if (!id) return;
+      bind(btn, "click", () => onStationSelect(id));
+      bind(btn, "pointerenter", () => onStationHover(id));
+      bind(btn, "focus", () => {
+        if (id !== activeId) setActiveStation(id, { advanceQuote: false, animateBubble: false, animatePan: true });
+      });
+    });
+
+    pills.forEach((btn) => {
+      const id = btn.dataset.officePill as StationId | undefined;
+      if (!id) return;
+      bind(btn, "click", () => onStationSelect(id));
+    });
+
+    bind(bubble, "click", onBubbleClick);
+    bind(bubble, "pointerenter", onBubbleEnter);
+    bind(root, "pointerleave", onStageLeave);
+    bind(root, "focusin", onFocusIn);
+    bind(root, "focusout", onFocusOut);
+
+    // Watch html.dark theme toggles seamlessly in both poster and live modes
+    const mo = new MutationObserver(syncThemeImages);
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+    // Upgrade to animated 4-frame chibi sprites immediately on user interaction or cleanly once initial load settles
+    const onFirstUserActivity = () => activateLiveSprites();
+    if (!reduceMotion) {
+      const activityEvents = ["pointerdown", "pointermove", "keydown", "scroll", "touchstart"] as const;
+      activityEvents.forEach((ev) => {
+        window.addEventListener(ev, onFirstUserActivity, { passive: true, once: true });
+        cleanups.push(() => window.removeEventListener(ev, onFirstUserActivity));
+      });
+      liveTimer = window.setTimeout(activateLiveSprites, 3200);
+    }
+
+    const ro =
+      "ResizeObserver" in window
+        ? new ResizeObserver(() => {
+            if (activeId !== "duy") updateCameraAndBubble(false);
+          })
+        : undefined;
+    ro?.observe(viewport);
+
+    scheduleAuto(5400);
+
+    officeCleanup = () => {
+      clearTimeout(autoTimer);
+      clearTimeout(resumeTimer);
+      clearTimeout(liveTimer);
+      ro?.disconnect();
+      mo.disconnect();
+      cleanups.forEach((fn) => fn());
+    };
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    if (typeof requestIdleCallback === "function") requestIdleCallback(initHeroOffice);
+    else requestAnimationFrame(initHeroOffice);
+  });
+</script>

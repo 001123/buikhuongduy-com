@@ -32,6 +32,10 @@ interface Props {
   dates?: PageDates;
   /** Listing page number; pages after the first get it in the document title and description. */
   page?: number;
+  /** Use a wider container for multi-column listing pages. */
+  wide?: boolean;
+  /** Omit the bottom border under the page header (e.g. when a tab bar sits directly below it). */
+  hideHeaderBorder?: boolean;
 }
 
 const lang = getLang(Astro.currentLocale);
@@ -52,6 +56,8 @@ const {
   itemList,
   dates,
   page = 1,
+  wide = false,
+  hideHeaderBorder = false,
 } = Astro.props;
 
 const pageLabel = page > 1 ? `${t("blog.page")} ${page}` : "";
@@ -86,7 +92,7 @@ const kicker = t(`section.${section}Kicker`);
   <article
     class:list={[
       "mx-auto px-5 pt-10 pb-16 sm:px-8 sm:pt-14 sm:pb-24",
-      article ? "max-w-[46rem]" : "max-w-[52rem]",
+      article ? "max-w-[46rem]" : wide ? "max-w-5xl" : "max-w-[52rem]",
     ]}
     transition:name={`content-${section}`}
     transition:animate={contentAnim}
@@ -105,7 +111,12 @@ const kicker = t(`section.${section}Kicker`);
       )
     }
 
-    <header class="mb-10 flex flex-col items-start gap-3 border-b border-border pb-7">
+    <header
+      class:list={[
+        "flex flex-col items-start gap-2.5",
+        hideHeaderBorder ? "mb-6" : "mb-10 gap-3 border-b border-border pb-7",
+      ]}
+    >
       {!article && <p class="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-accent">{kicker}</p>}
       <h1
         class:list={[

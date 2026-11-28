@@ -12,13 +12,13 @@ const t = useTranslations(lang);
 const langs = Object.keys(languages) as Lang[];
 ---
 
-<nav aria-label={t("lang.switch")} class:list={["inline-flex items-center gap-1 font-mono text-xs uppercase tracking-wider", className]}>
+<nav aria-label={t("lang.switch")} class:list={["inline-flex items-center gap-0.5 font-mono text-xs uppercase tracking-wider", className]}>
   {
     langs.map((l, i) => (
       <>
         {i > 0 && <span aria-hidden="true" class="text-border-strong select-none">/</span>}
         {l === lang ? (
-          <span aria-current="true" title={languages[l]} class="px-1 py-0.5 font-medium text-fg">
+          <span aria-current="true" title={languages[l]} class="px-1.5 py-1 font-medium leading-none text-fg">
             {l}
           </span>
         ) : (
@@ -27,7 +27,7 @@ const langs = Object.keys(languages) as Lang[];
             hreflang={l}
             lang={l}
             title={languages[l]}
-            class="rounded px-1 py-0.5 text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            class="rounded px-1.5 py-1 leading-none text-fg-muted transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             {l}
           </a>

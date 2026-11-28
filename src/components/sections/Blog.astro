@@ -27,6 +27,8 @@ const pageLabel = `${t("blog.page")} ${page}`;
   title={t("blog.title")}
   lead={t("blog.lead")}
   page={page}
+  wide
+  hideHeaderBorder={all.length > 0}
   alternates={page > 1 ? alternates : undefined}
   translations={page > 1 ? translations : undefined}
   breadcrumbs={page > 1 ? [{ name: t("nav.blog"), path: base }, { name: pageLabel, path: pagePath(base, page) }] : undefined}
@@ -38,7 +40,7 @@ const pageLabel = `${t("blog.page")} ${page}`;
     ) : (
       <>
         <CategoryNav />
-        <PostList posts={posts} />
+        <PostList posts={posts} featured={page === 1} />
         <Pagination base={base} current={page} total={total} />
       </>
     )

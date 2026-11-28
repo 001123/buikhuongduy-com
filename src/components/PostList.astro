@@ -9,87 +9,252 @@ interface Props {
   class?: string;
   /** Heading level for post titles; use h3 when the list sits under a section h2. */
   headingLevel?: "h2" | "h3";
-  /** Compact row layout for the home page. */
+  /** Compact editorial layout for the home page (1 featured card + clean hairline list). */
   compact?: boolean;
-  /** Show 01, 02… numbering. */
-  numbered?: boolean;
+  /** Highlight the first post as a full-width featured card above the 2-column grid. */
+  featured?: boolean;
 }
 
-const { posts, class: className, headingLevel = "h2", compact = false, numbered = false } = Astro.props;
+const { posts, class: className, headingLevel = "h2", compact = false, featured = false } = Astro.props;
 const Heading = headingLevel;
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
+const [featuredPost, ...restPosts] = posts;
 ---
 
-<ul class:list={["not-prose divide-y divide-border", className]}>
-  {
-    posts.map((post, i) => {
-      const minutes = readingTimeMinutes(post.body);
-      const readingLabel = t("blog.readingTime").replace("{n}", String(minutes));
-      const categoryName = post.data.category ? categories[post.data.category][lang].name : undefined;
-      const num = String(i + 1).padStart(2, "0");
+{
+  compact && featuredPost ? (
+    <div class:list={["not-prose flex flex-col", className]}>
+      {(() => {
+        const minutes = readingTimeMinutes(featuredPost.body);
+        const readingLabel = t("blog.readingTime").replace("{n}", String(minutes));
+        const categoryName = featuredPost.data.category ? categories[featuredPost.data.category][lang].name : undefined;
+        const tags = featuredPost.data.tags.slice(0, 3);
 
-      return compact ? (
-        <li data-reveal={numbered ? "pending" : undefined}>
+        return (
           <a
-            href={postUrl(post)}
-            class="group flex items-baseline gap-4 rounded-lg px-2 py-4 transition-colors hover:bg-surface sm:gap-6 sm:px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            href={postUrl(featuredPost)}
+            data-reveal="pending"
+            class="group flex flex-col rounded-2xl border border-border bg-surface/75 p-5 transition-colors duration-200 hover:border-border-strong hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:p-6"
           >
-            {numbered && (
-              <span aria-hidden="true" class="shrink-0 font-mono text-xs font-medium text-accent tabular-nums">
-                {num}
-              </span>
-            )}
-            <div class="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-              <div class="min-w-0 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none">
-                <Heading class="text-base font-medium leading-snug tracking-[-0.01em] text-fg transition-colors group-hover:text-accent sm:text-[1.0625rem]">
-                  {post.data.title}
-                </Heading>
-                <p class="mt-1 line-clamp-1 text-sm text-fg-muted">{post.data.description}</p>
-              </div>
-              <div class="flex shrink-0 items-center gap-2 font-mono text-xs tabular-nums text-fg-muted">
-                {categoryName && <span class="text-accent">{categoryName}</span>}
-                {categoryName && <span aria-hidden="true" class="text-border-strong">·</span>}
-                <time datetime={post.data.pubDate.toISOString()}>{formatShortDate(post.data.pubDate, lang)}</time>
-                <span aria-hidden="true" class="hidden text-accent transition-transform group-hover:translate-x-0.5 sm:inline">→</span>
-              </div>
-            </div>
-          </a>
-        </li>
-      ) : (
-        <li class="py-6 first:pt-0">
-          <a
-            href={postUrl(post)}
-            class="group block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-          >
-            <div class="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs tabular-nums text-fg-muted">
-              <time datetime={post.data.pubDate.toISOString()}>{formatShortDate(post.data.pubDate, lang)}</time>
-              <span aria-hidden="true" class="text-border-strong">·</span>
-              <span>{readingLabel}</span>
-              {categoryName && (
-                <>
-                  <span aria-hidden="true" class="text-border-strong">·</span>
-                  <span class="font-medium text-accent">{categoryName}</span>
-                </>
-              )}
-              {post.data.draft && (
-                <>
-                  <span aria-hidden="true" class="text-border-strong">·</span>
-                  <span class="rounded border border-accent/40 px-1.5 py-0.5 text-[0.6875rem] text-accent">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-1.5 font-mono text-[0.6875rem]">
+                <span class="inline-flex items-center gap-1.5 rounded-md border border-border-strong bg-surface-elevated px-2 py-0.5 font-medium text-fg">
+                  <span aria-hidden="true" class="size-1.5 rounded-full bg-accent-vivid"></span>
+                  <span>{t("blog.featured")}</span>
+                </span>
+                {categoryName && (
+                  <span class="rounded-md border border-accent/25 bg-accent-soft/75 px-2 py-0.5 font-medium text-accent">
+                    {categoryName}
+                  </span>
+                )}
+                {featuredPost.data.draft && (
+                  <span class="rounded-md border border-accent/40 px-1.5 py-0.5 font-medium text-accent">
                     {t("blog.draft")}
                   </span>
-                </>
-              )}
+                )}
+              </div>
+
+              <div class="flex items-center gap-2 font-mono text-[0.6875rem] tabular-nums text-fg-muted">
+                <time datetime={featuredPost.data.pubDate.toISOString()}>
+                  {formatShortDate(featuredPost.data.pubDate, lang)}
+                </time>
+                <span aria-hidden="true" class="text-border-strong">·</span>
+                <span>{readingLabel}</span>
+                <span
+                  aria-hidden="true"
+                  class="text-fg-muted transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent"
+                >
+                  ↗
+                </span>
+              </div>
             </div>
-            <Heading class="mt-1.5 text-xl font-semibold leading-snug tracking-[-0.02em] text-fg transition-colors group-hover:text-accent">
-              {post.data.title}
+
+            <Heading class="mt-3 text-lg font-semibold leading-snug tracking-[-0.02em] text-fg transition-colors group-hover:text-accent sm:text-xl">
+              {featuredPost.data.title}
             </Heading>
+
             <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-pretty text-fg-secondary">
-              {post.data.description}
+              {featuredPost.data.description}
             </p>
+
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-3 pt-1">
+              <div class="flex flex-wrap gap-1.5">
+                {tags.map((tag) => (
+                  <span class="rounded-md border border-border bg-surface-elevated px-2 py-0.5 font-mono text-[0.6875rem] text-fg-muted">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+
+              <span class="inline-flex items-center gap-1 font-mono text-xs font-medium text-fg-muted transition-colors group-hover:text-accent">
+                <span>{t("blog.readMore")}</span>
+                <span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+              </span>
+            </div>
           </a>
-        </li>
+        );
+      })()}
+
+      {restPosts.length > 0 && (
+        <ul class="mt-3 divide-y divide-border border-y border-border">
+          {restPosts.map((post) => {
+            const minutes = readingTimeMinutes(post.body);
+            const readingLabel = t("blog.readingTime").replace("{n}", String(minutes));
+            const categoryName = post.data.category ? categories[post.data.category][lang].name : undefined;
+
+            return (
+              <li data-reveal="pending">
+                <a
+                  href={postUrl(post)}
+                  class="group -mx-2.5 flex flex-col gap-1.5 rounded-xl px-2.5 py-4 transition-colors duration-150 hover:bg-surface/65 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
+                >
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                      {categoryName && (
+                        <span class="font-mono text-[0.6875rem] font-medium text-accent">
+                          {categoryName}
+                        </span>
+                      )}
+                      {post.data.draft && (
+                        <span class="rounded border border-accent/40 px-1.5 py-px font-mono text-[0.625rem] font-medium text-accent">
+                          {t("blog.draft")}
+                        </span>
+                      )}
+                    </div>
+
+                    <Heading class="mt-0.5 text-[0.9375rem] font-semibold leading-snug tracking-[-0.015em] text-fg transition-colors group-hover:text-accent sm:text-base">
+                      {post.data.title}
+                    </Heading>
+
+                    <p class="mt-1 line-clamp-1 text-sm text-fg-muted">
+                      {post.data.description}
+                    </p>
+                  </div>
+
+                  <div class="flex shrink-0 items-center gap-2 font-mono text-[0.6875rem] tabular-nums text-fg-muted">
+                    <time datetime={post.data.pubDate.toISOString()}>{formatShortDate(post.data.pubDate, lang)}</time>
+                    <span aria-hidden="true" class="text-border-strong">·</span>
+                    <span>{readingLabel}</span>
+                    <span
+                      aria-hidden="true"
+                      class="hidden text-fg-muted transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent sm:inline"
+                    >
+                      ↗
+                    </span>
+                  </div>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  ) : (
+    <ul class:list={["not-prose grid gap-4 md:grid-cols-2", className]}>
+      {
+        posts.map((post, index) => {
+          const isFeatured = featured && index === 0;
+          const minutes = readingTimeMinutes(post.body);
+          const readingLabel = t("blog.readingTime").replace("{n}", String(minutes));
+          const categoryName = post.data.category ? categories[post.data.category][lang].name : undefined;
+          const tags = post.data.tags.slice(0, 3);
+
+          return (
+            <li class:list={[isFeatured && "md:col-span-2"]}>
+              <a
+                href={postUrl(post)}
+                class:list={[
+                  "spotlight-card group flex h-full flex-col rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                  isFeatured ? "spotlight-card-featured p-6 sm:p-7" : "p-5 sm:p-6",
+                ]}
+              >
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex flex-wrap items-center gap-2 font-mono text-[0.6875rem]">
+                    {isFeatured && (
+                      <span class="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-0.5 font-medium text-accent">
+                        <span aria-hidden="true" class="size-1.5 rounded-full bg-accent-vivid"></span>
+                        <span>{t("blog.featured")}</span>
+                      </span>
+                    )}
+                    {categoryName && (
+                      <span class="font-medium text-accent">
+                        {categoryName}
+                      </span>
+                    )}
+                    {post.data.draft && (
+                      <span class="rounded border border-accent/40 px-1.5 py-px font-medium text-accent">
+                        {t("blog.draft")}
+                      </span>
+                    )}
+                  </div>
+
+                  <div class="flex items-center gap-2 font-mono text-[0.6875rem] tabular-nums text-fg-muted">
+                    <time datetime={post.data.pubDate.toISOString()}>{formatShortDate(post.data.pubDate, lang)}</time>
+                    <span aria-hidden="true" class="text-border-strong">·</span>
+                    <span>{readingLabel}</span>
+                    <span
+                      aria-hidden="true"
+                      class="text-fg-muted/70 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent"
+                    >
+                      ↗
+                    </span>
+                  </div>
+                </div>
+
+                <Heading
+                  class:list={[
+                    "font-semibold leading-snug text-fg transition-colors group-hover:text-accent",
+                    isFeatured
+                      ? "mt-3.5 text-xl tracking-[-0.025em] sm:text-2xl"
+                      : "mt-2.5 text-[1.0625rem] tracking-[-0.02em] sm:text-lg",
+                  ]}
+                >
+                  {post.data.title}
+                </Heading>
+
+                <p
+                  class:list={[
+                    "mt-2 line-clamp-2 leading-relaxed text-pretty text-fg-secondary",
+                    isFeatured ? "max-w-3xl text-sm sm:text-[0.9375rem]" : "text-sm",
+                  ]}
+                >
+                  {post.data.description}
+                </p>
+
+                {tags.length > 0 && (
+                  <div class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 font-mono text-[0.6875rem] text-fg-muted/80">
+                    {tags.map((tag) => (
+                      <span>#{tag}</span>
+                    ))}
+                  </div>
+                )}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  )
+}
+
+<script>
+  function initPostSpotlight() {
+    if (!window.matchMedia("(hover: hover)").matches) return;
+    document.querySelectorAll<HTMLElement>(".spotlight-card").forEach((card) => {
+      if (card.dataset.spotBound) return;
+      card.dataset.spotBound = "1";
+      card.addEventListener(
+        "pointermove",
+        (e) => {
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty("--mx", `${e.clientX - rect.left}px`);
+          card.style.setProperty("--my", `${e.clientY - rect.top}px`);
+        },
+        { passive: true },
       );
-    })
+    });
   }
-</ul>
+
+  document.addEventListener("astro:page-load", initPostSpotlight);
+</script>
