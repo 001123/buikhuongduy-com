@@ -253,7 +253,7 @@ const labels = {
       <!-- Selected Role Detail Stage (Clean elevated right pane) -->
       <div class="min-w-0 bg-surface-elevated">
         {items.map((job, idx) => (
-          <article
+          <div
             role="tabpanel"
             id={`exp-panel-${job.id}`}
             aria-labelledby={`exp-tab-${job.id}`}
@@ -370,7 +370,7 @@ const labels = {
                 </span>
               ))}
             </div>
-          </article>
+          </div>
         ))}
       </div>
     </div>

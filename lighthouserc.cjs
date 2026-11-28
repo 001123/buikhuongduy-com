@@ -25,6 +25,7 @@ module.exports = {
         'categories:accessibility': ['error', { minScore: 1 }],
         'categories:best-practices': ['error', { minScore: 1 }],
         'categories:seo': ['error', { minScore: 1 }],
+        'categories:agentic-browsing': ['error', { minScore: 1 }],
       },
     },
     upload: {
