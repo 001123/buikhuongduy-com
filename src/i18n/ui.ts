@@ -126,6 +126,7 @@ export const ui = {
     "blog.categories": "Chủ đề",
     "blog.allTopics": "Tất cả",
     "blog.related": "Bài cùng chủ đề",
+    "blog.toc": "Mục lục",
     "blog.author.label": "Tác giả",
     "blog.author.bio": "Lead/Senior Frontend Engineer và Full-Stack Developer (AI-Native) với hơn 9 năm làm React, Next.js, Node.js, TypeScript, DevOps và Kubernetes. Blog này ghi lại những gì mình thử, đo và rút ra từ công việc thực tế.",
     "blog.author.more": "Về mình →",
@@ -183,7 +184,7 @@ export const ui = {
     "seo.search": "Tìm kiếm bài viết trên blog của Bùi Khương Duy về frontend, AI agents, hiệu năng web và DevOps.",
 
     "contact.title": "Liên Hệ",
-    "contact.lead": "Duy đang sẵn sàng cho công việc mới, đặc biệt là vai trò Lead/Senior Frontend Engineer hoặc Full-Stack Developer theo hướng AI\u2060-\u2060native. Nếu đội của bạn đang tìm người, hãy kết nối với Duy nhé!",
+    "contact.lead": "Liên hệ Bùi Khương Duy, sẵn sàng cho vai trò Lead/Senior Frontend Engineer hoặc Full-Stack Developer theo hướng AI\u2060-\u2060native.",
     "contact.email": "Email",
     "contact.copyEmail": "Sao chép",
     "contact.emailCopied": "Đã chép",
@@ -317,6 +318,7 @@ export const ui = {
     "blog.categories": "Topics",
     "blog.allTopics": "All",
     "blog.related": "More on this topic",
+    "blog.toc": "On this page",
     "blog.author.label": "Written by",
     "blog.author.bio": "Lead/Senior Frontend Engineer and Full-Stack Developer (AI-Native) with 9+ years in React, Next.js, Node.js, TypeScript, DevOps and Kubernetes. This blog records what I try, measure and learn from real-world work.",
     "blog.author.more": "About me →",
@@ -374,7 +376,7 @@ export const ui = {
     "seo.search": "Search Bui Khuong Duy's blog on front-end engineering, AI agents, web performance and DevOps.",
 
     "contact.title": "Contact",
-    "contact.lead": "I'm open to new roles, especially Lead/Senior Frontend Engineer or Full-Stack Developer positions with an AI\u2060-\u2060native focus. If your team is hiring, let's connect!",
+    "contact.lead": "Contact Bui Khuong Duy, open to Lead/Senior Frontend Engineer and Full-Stack Developer roles with an AI\u2060-\u2060native focus.",
     "contact.email": "Email",
     "contact.copyEmail": "Copy",
     "contact.emailCopied": "Copied",

@@ -497,24 +497,6 @@ const kdAgents = [
   function initMotionCraft() {
     clearInterval(homeTimer);
 
-    const canHover = window.matchMedia("(hover: hover)").matches;
-
-    if (canHover) {
-      document.querySelectorAll<HTMLElement>(".spotlight-card").forEach((card) => {
-        if (card.dataset.spotBound) return;
-        card.dataset.spotBound = "1";
-        card.addEventListener(
-          "pointermove",
-          (e) => {
-            const rect = card.getBoundingClientRect();
-            card.style.setProperty("--mx", `${e.clientX - rect.left}px`);
-            card.style.setProperty("--my", `${e.clientY - rect.top}px`);
-          },
-          { passive: true },
-        );
-      });
-    }
-
     const kdDemo = document.querySelector<HTMLElement>("[data-kd-demo]");
     if (kdDemo && !kdDemo.dataset.bound) {
       kdDemo.dataset.bound = "1";

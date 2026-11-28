@@ -4,15 +4,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --bg: #FFFFFF;
-  --bg-nav: #F9F9FB;
-  --surface: #F5F5F7;
+  --bg: #FCFBF9;
+  --bg-nav: #F7F5F2;
+  --surface: #F4F1EC;
   --surface-elevated: #FFFFFF;
-  --fg: #0A0A0B;
-  --fg-secondary: #3F3F46;
-  --fg-muted: #63636E;
-  --border: #E4E4E7;
-  --border-strong: #D4D4D8;
+  --fg: #141311;
+  --fg-secondary: #44403C;
+  --fg-muted: #6E6A63;
+  --border: #E7E3DC;
+  --border-strong: #D6D1C7;
   --accent: #C84300;
   --accent-hover: #A83700;
   --accent-vivid: #FF5500;
@@ -110,27 +110,9 @@ html.dark {
   background-color: color-mix(in oklab, var(--surface) 60%, var(--surface-elevated));
 }
 
-.spotlight-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(
-    420px circle at var(--mx, 50%) var(--my, 50%),
-    color-mix(in oklab, var(--accent-vivid) 10%, transparent),
-    transparent 65%
-  );
-  transition: opacity 250ms ease;
-}
-
 @media (hover: hover) {
   .spotlight-card:hover {
     border-color: var(--border-strong);
-  }
-
-  .spotlight-card:hover::before {
-    opacity: 1;
   }
 }
 
@@ -213,6 +195,28 @@ html.dark .pixel-lamp-glow {
   }
 }
 
+@keyframes pixel-rocket-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes pixel-flame-flicker {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.45;
+    transform: translateY(0.5px);
+  }
+}
+
 @keyframes pixel-gull-bob {
   0%,
   100% {
@@ -259,6 +263,14 @@ html.dark .pixel-lamp-glow {
   animation: pixel-gull-bob 2.4s steps(2, end) infinite 1.2s;
 }
 
+.pixel-rocket-bob {
+  animation: pixel-rocket-bob 1.6s steps(2, end) infinite;
+}
+
+.pixel-flame-flicker {
+  animation: pixel-flame-flicker 0.55s steps(2, end) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pixel-cursor-blink,
   .pixel-steam-1,
@@ -268,7 +280,9 @@ html.dark .pixel-lamp-glow {
   .pixel-flag-wave,
   .pixel-plane-glide,
   .pixel-gull-1,
-  .pixel-gull-2 {
+  .pixel-gull-2,
+  .pixel-rocket-bob,
+  .pixel-flame-flicker {
     animation: none !important;
   }
 }

@@ -3,6 +3,7 @@ import SectionPage from "../../layouts/SectionPage.astro";
 import ExperienceTimeline from "../../components/ExperienceTimeline.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import ProjectFilter from "../../components/ProjectFilter.astro";
+import SectionPixelDecor from "../../components/SectionPixelDecor.astro";
 import { getLang, sectionPaths, useTranslations } from "../../i18n/ui";
 import mascot from "../../assets/mascot-pixel.gif";
 import { awards, certifications, education, experiences } from "../../data/experience";
@@ -70,6 +71,8 @@ const edu = education[lang];
 ---
 
 <SectionPage section="about" title={t("about.title")} lead={t("about.lead")} dates={dates}>
+  <SectionPixelDecor slot="header-visual" variant="about" />
+
   <div class="flow-root text-base leading-7 text-pretty [&>p]:leading-7 [&>p:first-of-type]:mt-0">
     <div class="not-prose mb-6 flex justify-center sm:float-left sm:mt-1 sm:mr-7 sm:mb-4">
       <a

@@ -1,0 +1,445 @@
+---
+/** Compact interactive recruiter mini-game to check how well Duy fits a hiring team. */
+import type { Lang } from "../i18n/ui";
+import { email, socials } from "../data/profile";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const linkedin = socials.find((s) => s.icon === "linkedin")!.href;
+
+type Option = {
+  text: string;
+  tag: string;
+  score: number;
+  note: string;
+};
+
+type Question = {
+  q: string;
+  options: Option[];
+};
+
+const content: Record<
+  Lang,
+  {
+    badge: string;
+    title: string;
+    subtitle: string;
+    start: string;
+    progress: string;
+    meterLabel: string;
+    resultLabel: string;
+    matchedTagsLabel: string;
+    results: { min: number; title: string; body: string }[];
+    mailSubject: string;
+    mailBodyIntro: string;
+    mailCta: string;
+    linkedinCta: string;
+    retry: string;
+    questions: Question[];
+  }
+> = {
+  vi: {
+    badge: "MINI GAME · FIT CHECK",
+    title: "Duy có hợp với nhu cầu tuyển dụng của bạn?",
+    subtitle: "4 câu hỏi nhanh (15 giây) để đo độ khớp với đội ngũ của bạn.",
+    start: "Thử ngay",
+    progress: "Câu {n}/{total}",
+    meterLabel: "Độ khớp",
+    resultLabel: "Kết quả độ phù hợp",
+    matchedTagsLabel: "Điểm khớp nổi bật",
+    results: [
+      {
+        min: 96,
+        title: "Khớp gần như tuyệt đối!",
+        body: "Từ frontend lưu lượng lớn, full-stack đến quy trình AI-native, hồ sơ của Duy trúng đúng bài toán đội bạn đang tìm.",
+      },
+      {
+        min: 91,
+        title: "Rất đáng để hẹn một buổi nói chuyện",
+        body: "Kinh nghiệm thực chiến 9+ năm và khả năng làm việc độc lập lẫn dẫn dắt team sẽ giúp đội bạn tăng tốc rõ rệt.",
+      },
+      {
+        min: 0,
+        title: "Vẫn rất nên kết nối trước",
+        body: "Kể cả chưa tuyển gấp, kết nối sẵn với một kỹ sư Frontend/Full-Stack theo hướng AI-native luôn có ích cho kế hoạch sắp tới.",
+      },
+    ],
+    mailSubject: "Trao đổi cơ hội hợp tác với Duy",
+    mailBodyIntro: "Chào Duy, mình vừa thử Fit Check trên website của bạn. Đội mình đang quan tâm tới:",
+    mailCta: "Gửi email ngay",
+    linkedinCta: "LinkedIn",
+    retry: "Chơi lại",
+    questions: [
+      {
+        q: "Đội của bạn đang ưu tiên tìm người giải quyết bài toán nào?",
+        options: [
+          { text: "Lead / Senior Frontend (React, Next.js, TypeScript)", tag: "Frontend Lead", score: 4, note: "9+ năm chuyên sâu React, Next.js, Vue & Design System." },
+          { text: "Full-Stack làm trọn gói từ UI, API đến infra", tag: "Full-Stack", score: 4, note: "Node.js, GraphQL/REST, Docker, K8s, AWS & Cloudflare." },
+          { text: "Đưa AI agents vào sản phẩm và quy trình dev", tag: "AI-Native", score: 4, note: "Từng xây AI Content Engine và tool điều phối coding agents." },
+          { text: "Cả 3 yếu tố trên", tag: "All-in-One", score: 5, note: "Đúng sở trường giao thoa giữa Frontend, Full-Stack và AI." },
+        ],
+      },
+      {
+        q: "Quy mô hoặc thử thách kỹ thuật hiện tại của sản phẩm?",
+        options: [
+          { text: "Traffic lớn, cần tối ưu hiệu năng & SEO", tag: "High-Traffic & SEO", score: 4, note: "Từng vận hành site 30M+ views/tháng và Lighthouse 100." },
+          { text: "Nhiều dự án / multi-tenant, cần kiến trúc rõ ràng", tag: "Architecture", score: 4, note: "Kinh nghiệm thiết kế multi-tenant và micro-frontends." },
+          { text: "Sản phẩm mới từ 0→1, cần ship nhanh nhưng gọn", tag: "0-to-1 Ship", score: 4, note: "Quen tốc độ startup lẫn kỷ luật production." },
+          { text: "Codebase hơi rối, cần người vào dọn và nâng chuẩn", tag: "Refactor & Scale", score: 5, note: "Chuyện quen thuộc, càng có nhiều đất để tạo tác động." },
+        ],
+      },
+      {
+        q: "Đội ngũ của bạn đang dùng AI trong lập trình ở mức nào?",
+        options: [
+          { text: "Đã dùng hằng ngày, muốn nâng cấp workflow", tag: "AI Workflow", score: 4, note: "Sẵn sàng đồng bộ Claude Code, MCP, skills cho cả team." },
+          { text: "Muốn áp dụng bài bản nhưng cần người dẫn dắt", tag: "AI Enablement", score: 5, note: "Có kinh nghiệm chuẩn hóa quy trình AI cho team 10 người." },
+          { text: "Vẫn đề cao nền tảng kỹ thuật vững trước đã", tag: "Solid Engineering", score: 4, note: "AI chỉ là đòn bẩy; kiến trúc và chất lượng code vẫn là gốc." },
+        ],
+      },
+      {
+        q: "Tiến độ tuyển dụng của đội bạn lúc này?",
+        options: [
+          { text: "Cần người vào việc càng sớm càng tốt", tag: "Ready Now", score: 5, note: "Duy hiện đang sẵn sàng cho cơ hội mới." },
+          { text: "Trong 1–2 tháng tới", tag: "1–2 Months", score: 4, note: "Rất đẹp để trao đổi kỹ và chuẩn bị onboarding." },
+          { text: "Chưa gấp, muốn làm quen và trao đổi trước", tag: "Open Chat", score: 3, note: "Luôn sẵn lòng trò chuyện cà phê hoặc call ngắn." },
+        ],
+      },
+    ],
+  },
+  en: {
+    badge: "MINI GAME · FIT CHECK",
+    title: "Is Duy a good fit for your hiring needs?",
+    subtitle: "4 quick questions (15 seconds) to see how well my background matches your team.",
+    start: "Play now",
+    progress: "Step {n}/{total}",
+    meterLabel: "Match",
+    resultLabel: "Compatibility result",
+    matchedTagsLabel: "Matched strengths",
+    results: [
+      {
+        min: 96,
+        title: "Near-perfect match!",
+        body: "From high-traffic frontend and full-stack delivery to AI-native workflows, this lines up directly with what I build best.",
+      },
+      {
+        min: 91,
+        title: "Well worth a quick intro call",
+        body: "9+ years of hands-on shipping and leading teams can help your product move faster without trading off quality.",
+      },
+      {
+        min: 0,
+        title: "Still worth connecting",
+        body: "Even if you are not hiring immediately, keeping an AI-native Frontend & Full-Stack engineer in your network is always handy.",
+      },
+    ],
+    mailSubject: "Role opportunity for Duy",
+    mailBodyIntro: "Hi Duy, I just tried the Fit Check on your site. Our team is looking for:",
+    mailCta: "Send email",
+    linkedinCta: "LinkedIn",
+    retry: "Play again",
+    questions: [
+      {
+        q: "What is your team hiring for right now?",
+        options: [
+          { text: "Lead / Senior Frontend (React, Next.js, TypeScript)", tag: "Frontend Lead", score: 4, note: "9+ years deep in React, Next.js, Vue & Design Systems." },
+          { text: "Full-Stack engineer owning UI, APIs & infra", tag: "Full-Stack", score: 4, note: "Node.js, GraphQL/REST, Docker, K8s, AWS & Cloudflare." },
+          { text: "Bringing AI agents into products & dev workflows", tag: "AI-Native", score: 4, note: "Built an LLM Content Engine and multi-agent dev tools." },
+          { text: "All of the above", tag: "All-in-One", score: 5, note: "Right at the sweet spot of Frontend, Full-Stack and AI." },
+        ],
+      },
+      {
+        q: "What technical challenge matters most for your product?",
+        options: [
+          { text: "High traffic, web performance & SEO", tag: "High-Traffic & SEO", score: 4, note: "Shipped 30M+ monthly view platforms and 100 Lighthouse." },
+          { text: "Multi-tenant scale & clean frontend architecture", tag: "Architecture", score: 4, note: "Hands-on with multi-tenant systems and micro-frontends." },
+          { text: "0-to-1 product build, fast and clean delivery", tag: "0-to-1 Ship", score: 4, note: "Comfortable moving fast while keeping code maintainable." },
+          { text: "Legacy codebase that needs cleanup & standards", tag: "Refactor & Scale", score: 5, note: "Familiar territory with plenty of room for real impact." },
+        ],
+      },
+      {
+        q: "Where is your team with AI-assisted engineering?",
+        options: [
+          { text: "Using it daily, looking to level up workflows", tag: "AI Workflow", score: 4, note: "Experienced with Claude Code, MCP, skills & agent tooling." },
+          { text: "Want to adopt it systematically with a guide", tag: "AI Enablement", score: 5, note: "Have rolled out AI workflows across a 10-dev team." },
+          { text: "Strong engineering fundamentals come first", tag: "Solid Engineering", score: 4, note: "AI is leverage; architecture and code quality stay central." },
+        ],
+      },
+      {
+        q: "What does your hiring timeline look like?",
+        options: [
+          { text: "Looking to hire as soon as possible", tag: "Ready Now", score: 5, note: "Currently open and ready for a new role." },
+          { text: "Within the next 1–2 months", tag: "1–2 Months", score: 4, note: "Great window to align on scope and expectations." },
+          { text: "Not urgent, just exploring and networking", tag: "Open Chat", score: 3, note: "Always happy to have an informal chat." },
+        ],
+      },
+    ],
+  },
+};
+
+const c = content[lang];
+const quizData = JSON.stringify({
+  email,
+  mailSubject: c.mailSubject,
+  mailBodyIntro: c.mailBodyIntro,
+  progress: c.progress,
+  results: c.results,
+  questions: c.questions,
+});
+---
+
+<section
+  data-hire-fit-game
+  aria-label={c.title}
+  class="not-prose mb-6 overflow-hidden rounded-2xl border border-border bg-surface-elevated p-4 sm:p-5"
+>
+  <script type="application/json" data-game-data set:html={quizData} />
+
+  <!-- Intro state (compact bar replacing the divider) -->
+  <div data-step="intro" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+    <div class="min-w-0">
+      <div class="flex items-center gap-2 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-accent">
+        <span aria-hidden="true" class="inline-block size-2 rounded-[1px] bg-accent-vivid"></span>
+        <span>{c.badge}</span>
+      </div>
+      <h2 class="mt-1 text-base font-semibold tracking-[-0.015em] text-fg">{c.title}</h2>
+      <p class="mt-0.5 text-sm text-fg-secondary">{c.subtitle}</p>
+    </div>
+
+    <button
+      type="button"
+      data-action="start"
+      class="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 self-start rounded-full bg-accent px-4 py-2 text-xs font-semibold text-accent-fg shadow-xs transition-transform duration-150 hover:-translate-y-0.5 hover:opacity-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:self-center"
+    >
+      <span>{c.start}</span>
+      <span aria-hidden="true">→</span>
+    </button>
+  </div>
+
+  <!-- Question state -->
+  <div data-step="question" hidden aria-live="polite">
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+      <div class="flex items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-fg-muted">
+        <span class="text-accent" data-progress></span>
+        <span aria-hidden="true" class="text-border-strong">·</span>
+        <span>{c.meterLabel}: <strong class="text-fg tabular-nums" data-live-score>0%</strong></span>
+      </div>
+      <div class="flex items-center gap-1" data-segments aria-hidden="true">
+        {
+          c.questions.map(() => (
+            <span class="h-1.5 w-5 rounded-[1px] bg-border transition-colors duration-200"></span>
+          ))
+        }
+      </div>
+    </div>
+
+    <h3 data-question class="mt-3.5 text-base font-semibold text-pretty text-fg sm:text-[1.0625rem]"></h3>
+    <div data-options class="mt-3 grid gap-2 sm:grid-cols-2"></div>
+    <p data-feedback class="mt-2.5 min-h-5 font-mono text-xs text-accent" aria-live="polite"></p>
+  </div>
+
+  <!-- Result state -->
+  <div data-step="result" hidden aria-live="polite">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="min-w-0">
+        <p class="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-fg-muted">{c.resultLabel}</p>
+        <div class="mt-1 flex items-baseline gap-3">
+          <p class="font-mono text-3xl font-bold tracking-tight text-accent tabular-nums sm:text-4xl">
+            <span data-score>0</span>%
+          </p>
+          <h3 data-result-title class="text-base font-semibold text-fg sm:text-lg"></h3>
+        </div>
+        <p data-result-body class="mt-1.5 text-sm leading-relaxed text-pretty text-fg-secondary"></p>
+      </div>
+    </div>
+
+    <div class="mt-3.5 flex flex-wrap items-center gap-1.5" aria-label={c.matchedTagsLabel} data-tags></div>
+
+    <div class="mt-4 flex flex-wrap items-center gap-2.5 border-t border-border pt-3.5">
+      <a
+        data-mail-link
+        href={`mailto:${email}?subject=${encodeURIComponent(c.mailSubject)}`}
+        class="inline-flex items-center gap-1.5 rounded-full bg-fg px-4 py-2 text-xs font-medium text-bg transition-colors hover:bg-accent hover:text-accent-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        <span>{c.mailCta}</span>
+        <span aria-hidden="true">→</span>
+      </a>
+      <a
+        href={linkedin}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex items-center gap-1.5 rounded-full border border-border-strong bg-surface px-4 py-2 text-xs font-medium text-fg transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        <span>{c.linkedinCta}</span>
+        <span aria-hidden="true">↗</span>
+      </a>
+      <button
+        type="button"
+        data-action="retry"
+        class="ml-auto cursor-pointer rounded-full px-3 py-1.5 font-mono text-xs text-fg-muted transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        ↺ {c.retry}
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  type Option = { text: string; tag: string; score: number; note: string };
+  type GameData = {
+    email: string;
+    mailSubject: string;
+    mailBodyIntro: string;
+    progress: string;
+    results: { min: number; title: string; body: string }[];
+    questions: { q: string; options: Option[] }[];
+  };
+
+  function initHireFitGame() {
+    document.querySelectorAll<HTMLElement>("[data-hire-fit-game]").forEach((root) => {
+      if (root.dataset.ready) return;
+      root.dataset.ready = "1";
+
+      const data: GameData = JSON.parse(root.querySelector("[data-game-data]")!.textContent!);
+      const $ = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
+      const steps = root.querySelectorAll<HTMLElement>("[data-step]");
+      const show = (name: string) => steps.forEach((s) => (s.hidden = s.dataset.step !== name));
+
+      const maxScore = data.questions.reduce((sum, q) => sum + Math.max(...q.options.map((o) => o.score)), 0);
+      let index = 0;
+      let score = 0;
+      let pickedTags: string[] = [];
+      let pickedTexts: string[] = [];
+      let lockTimer: number | undefined;
+
+      const updateSegments = (filledCount: number) => {
+        const segs = root.querySelectorAll<HTMLElement>("[data-segments] > span");
+        segs.forEach((seg, i) => {
+          seg.classList.toggle("bg-accent-vivid", i < filledCount);
+          seg.classList.toggle("bg-border", i >= filledCount);
+        });
+      };
+
+      const renderQuestion = () => {
+        const q = data.questions[index];
+        const total = data.questions.length;
+        $("[data-progress]").textContent = data.progress.replace("{n}", String(index + 1)).replace("{total}", String(total));
+        const livePct = index === 0 ? 0 : Math.min(99, Math.round(72 + (score / maxScore) * 28));
+        $("[data-live-score]").textContent = `${livePct}%`;
+        updateSegments(index);
+        $("[data-question]").textContent = q.q;
+        $("[data-feedback]").textContent = "";
+
+        const optionsEl = $("[data-options]");
+        optionsEl.replaceChildren(
+          ...q.options.map((opt, optIdx) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className =
+              "group flex cursor-pointer items-start gap-2.5 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-left text-sm text-fg transition-colors hover:border-accent hover:bg-accent-soft/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+
+            const keyBadge = document.createElement("span");
+            keyBadge.setAttribute("aria-hidden", "true");
+            keyBadge.className =
+              "mt-0.5 inline-flex size-4.5 shrink-0 items-center justify-center rounded-[4px] border border-border-strong bg-surface-elevated font-mono text-[0.625rem] text-fg-muted transition-colors group-hover:border-accent group-hover:text-accent";
+            keyBadge.textContent = String(optIdx + 1);
+
+            const label = document.createElement("span");
+            label.className = "leading-snug text-pretty";
+            label.textContent = opt.text;
+
+            btn.append(keyBadge, label);
+
+            btn.addEventListener("click", () => {
+              if (lockTimer) return;
+              score += opt.score;
+              pickedTags.push(opt.tag);
+              pickedTexts.push(`- ${opt.text}`);
+              btn.classList.add("border-accent", "bg-accent-soft/60");
+              $("[data-feedback]").textContent = `✓ ${opt.note}`;
+              updateSegments(index + 1);
+              const nextPct = Math.min(100, Math.round(86 + (score / maxScore) * 14));
+              $("[data-live-score]").textContent = `${nextPct}%`;
+
+              const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+              lockTimer = window.setTimeout(
+                () => {
+                  lockTimer = undefined;
+                  index += 1;
+                  if (index < data.questions.length) renderQuestion();
+                  else renderResult();
+                },
+                reduced ? 120 : 420,
+              );
+            });
+
+            return btn;
+          }),
+        );
+
+        show("question");
+        (optionsEl.firstElementChild as HTMLElement | null)?.focus();
+      };
+
+      const renderResult = () => {
+        const percent = Math.min(100, Math.round(86 + (score / maxScore) * 14));
+        const result = data.results.find((r) => percent >= r.min)!;
+        $("[data-result-title]").textContent = result.title;
+        $("[data-result-body]").textContent = result.body;
+
+        const tagsEl = $("[data-tags]");
+        tagsEl.replaceChildren(
+          ...pickedTags.map((tag) => {
+            const chip = document.createElement("span");
+            chip.className =
+              "inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2.5 py-0.5 font-mono text-[0.6875rem] text-fg-secondary";
+            const dot = document.createElement("span");
+            dot.setAttribute("aria-hidden", "true");
+            dot.className = "size-1.5 rounded-full bg-status-open";
+            chip.append(dot, tag);
+            return chip;
+          }),
+        );
+
+        const body = `${data.mailBodyIntro}\n${pickedTexts.join("\n")}\n`;
+        const mailLink = $<HTMLAnchorElement>("[data-mail-link]");
+        mailLink.href = `mailto:${data.email}?subject=${encodeURIComponent(data.mailSubject)}&body=${encodeURIComponent(body)}`;
+
+        show("result");
+
+        const out = $("[data-score]");
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduced) {
+          out.textContent = String(percent);
+          return;
+        }
+        const start = performance.now();
+        const tick = (now: number) => {
+          const t = Math.min((now - start) / 700, 1);
+          out.textContent = String(Math.round(percent * (1 - (1 - t) ** 3)));
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      };
+
+      const begin = () => {
+        clearTimeout(lockTimer);
+        lockTimer = undefined;
+        index = 0;
+        score = 0;
+        pickedTags = [];
+        pickedTexts = [];
+        renderQuestion();
+      };
+
+      $("[data-action='start']").addEventListener("click", begin);
+      $("[data-action='retry']").addEventListener("click", begin);
+    });
+  }
+
+  initHireFitGame();
+  document.addEventListener("astro:page-load", initHireFitGame);
+</script>
